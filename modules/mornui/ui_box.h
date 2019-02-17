@@ -1,19 +1,20 @@
 
-#ifndef BOX_H
-#define BOX_H
+#ifndef UI_BOX_H
+#define UI_BOX_H
 #include "modules/pugixml/pugixml_exporter.h"
 #include "scene/gui/control.h"
 
-class Box : public Control {
+class UI_Box : public Control {
 
-	GDCLASS(Box, Control);
+	GDCLASS(UI_Box, Control);
 	OBJ_CATEGORY("GUI Nodes");
 public:
-	Box();
-	~Box();
+	UI_Box();
+	~UI_Box();
 	void Xml(const Variant& self, const String &v);
 	void SetXml(Ref<XMLNode> node, ScriptInstance* self);
 	virtual void InitAttribute(Ref<XMLNode> node,ScriptInstance* self);
+	void MouseEnabled(bool v);
 	void InitChilds(Ref<XMLNode> node,ScriptInstance* self);
 protected:
 	static void _bind_methods();

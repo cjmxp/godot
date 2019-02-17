@@ -1,12 +1,14 @@
-#include "box.h"
-#include "clip.h"
+#include "ui_box.h"
+#include "ui_clip.h"
+#include "ui_button.h"
 
-Box::Box() {
+UI_Box::UI_Box() {
+	set_mouse_filter(Control::MOUSE_FILTER_PASS);
 }
-Box::~Box() {
+UI_Box::~UI_Box() {
 }
 
-void Box::Xml(const Variant& self, const String &v) {
+void UI_Box::Xml(const Variant& self, const String &v) {
 	if(dom==nullptr){
 		dom.instance();
 	}
@@ -20,12 +22,12 @@ void Box::Xml(const Variant& self, const String &v) {
 		}
 	}
 }
-void Box::SetXml(Ref<XMLNode> node,ScriptInstance* self) {
+void UI_Box::SetXml(Ref<XMLNode> node,ScriptInstance* self) {
 	InitAttribute(node, self);
 	InitChilds(node, self);
 }
 
-void Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
+void UI_Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	Vector<Variant> array = node->get_attributes();
 	for(unsigned i = 0;i<array.size();i++){
 		Ref<XMLAttribute> attribute = array[i];
@@ -79,30 +81,45 @@ void Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 			}
 		}
 		else if (tag == "mouseenabled") {
-			set_mouse_filter(MouseFilter::MOUSE_FILTER_STOP);
-		}
-		else if (tag == "mousechildren") {
-			set_mouse_filter(MouseFilter::MOUSE_FILTER_PASS);
+			if (attribute->value() == "true") {
+				MouseEnabled(true);
+			}
+			else {
+				MouseEnabled(false);
+			}
 		}
 	}
-	
 }
 
-void Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
+void UI_Box::MouseEnabled(bool v) {
+	/*if (v) {
+		set_mouse_filter(Control::MOUSE_FILTER_STOP);
+	}
+	else {
+		set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
+	}*/
+}
+
+void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 	Vector<Variant> array = node->get_children();
 	for (unsigned i = 0; i < array.size(); i++) {
 		Ref<XMLNode> child = array[i];
 		String tag = child->name().to_lower();
 		if (tag == "clip") {
-			Clip* element = memnew(Clip);
+			UI_Clip* element = memnew(UI_Clip);
+			element->SetXml(child, self);
+			add_child(element);
+		}
+		else if (tag  == "button") {
+			UI_Button* element = memnew(UI_Button);
 			element->SetXml(child, self);
 			add_child(element);
 		}
 	}
 }
 
-void Box::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("Xml"), &Box::Xml);
+void UI_Box::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("Xml"), &UI_Box::Xml);
 }
 
 
