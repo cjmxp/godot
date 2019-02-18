@@ -43,31 +43,45 @@ void UI_Button::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	}*/
 }
 void UI_Button::_gui_input(Ref<InputEvent> p_event) {
-
-	/*if (status.disabled) // no interaction with disabled button
-		return;*/
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
-		printf("%d \n", b->is_pressed());
-	}
-	Ref<InputEventMouseMotion> mm = p_event;
-
-	if (mm.is_valid()) {
-		
+		if (b->is_pressed()) {
+			if (clipY_ > 1) {
+				index_ = 2;
+			}
+		}
+		else {
+			index_ = 1;
+		}
+		update();
 	}
 }
 void UI_Button::_notification(int p_what) {
 	if (p_what == NOTIFICATION_MOUSE_ENTER) {
-		printf("%s \n", "hovering = true");
-		//status.hovering = true;
-		//update();
+		if (clipY_ > 1) {
+			index_ = 1;
+		}
+		update();
 	}
 	else if (p_what == NOTIFICATION_MOUSE_EXIT) {
-		//status.hovering = false;
-		printf("%s \n", "hovering = false");
-		//update();
+		if (clipY_ > 1) {
+			index_ = 0;
+		}
+		update();
 	}
-	/*Clip::_notification(p_what);
+	UI_Clip::_notification(p_what);
+	if (p_what == NOTIFICATION_DRAW) {
+
+		RID ci = get_canvas_item();
+		Size2 size = get_size();
+		Color color;
+		Ref<Font> font = get_font("font");
+		int text_clip = size.width;
+		Point2 text_ofs = (size - font->get_string_size(xl_text)) / 2.0;
+		text_ofs.y += font->get_ascent();
+		font->draw(ci, text_ofs.floor(), xl_text, color, text_clip);
+	}
+	/*
 	if (p_what == NOTIFICATION_DRAW) {
 
 		RID ci = get_canvas_item();
