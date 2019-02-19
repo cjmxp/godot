@@ -33,6 +33,7 @@ protected:
 		AXIS_STRETCH_MODE_TILE_FIT,
 	};
 	void _notification(int p_what);
+	
 	String skin_;
 	String grid_;
 	Ref<Texture> texture_;
@@ -45,6 +46,7 @@ protected:
 	uint32_t ctimer_{0};
 	AxisStretchMode axis_h_{ AXIS_STRETCH_MODE_STRETCH };
 	AxisStretchMode axis_v_{ AXIS_STRETCH_MODE_STRETCH };
+	bool clip_draw_{ true };
 	//static void _bind_methods();
 };
 #endif

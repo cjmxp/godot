@@ -1,14 +1,14 @@
-#include "ui_button.h"
+#include "ui_label.h"
 #include "core/os/os.h"
 
-UI_Button::UI_Button() {
+UI_Label::UI_Label() {
 	set_focus_mode(FOCUS_ALL);
 }
-UI_Button::~UI_Button() {
+UI_Label::~UI_Label() {
 }
 
 
-void UI_Button::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
+void UI_Label::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	UI_Clip::InitAttribute(node, self);
 	/*Vector<Variant> array = node->get_attributes();
 	for(unsigned i = 0;i<array.size();i++){
@@ -42,7 +42,7 @@ void UI_Button::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		}
 	}*/
 }
-void UI_Button::_gui_input(Ref<InputEvent> p_event) {
+void UI_Label::_gui_input(Ref<InputEvent> p_event) {
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed()) {
@@ -56,8 +56,8 @@ void UI_Button::_gui_input(Ref<InputEvent> p_event) {
 		update();
 	}
 }
-void UI_Button::_notification(int p_what) {
-	if (!button_draw_)return;
+void UI_Label::_notification(int p_what) {
+	if (!label_draw_)return;
 	if (p_what == NOTIFICATION_MOUSE_ENTER) {
 		if (clipY_ > 1) {
 			index_ = 1;
@@ -83,7 +83,7 @@ void UI_Button::_notification(int p_what) {
 	}
 }
 
-void UI_Button::_bind_methods() {
+void UI_Label::_bind_methods() {
 }
 
 

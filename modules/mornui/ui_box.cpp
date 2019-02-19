@@ -1,9 +1,11 @@
 #include "ui_box.h"
 #include "ui_clip.h"
 #include "ui_button.h"
-
+#include "ui_checkbox.h"
 UI_Box::UI_Box() {
-	set_mouse_filter(Control::MOUSE_FILTER_PASS);
+
+	set_mouse_filter(Control::MOUSE_FILTER_STOP);
+
 }
 UI_Box::~UI_Box() {
 }
@@ -90,7 +92,8 @@ void UI_Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		}
 	}
 }
-
+void UI_Box::_gui_input(Ref<InputEvent> p_event) {
+}
 void UI_Box::MouseEnabled(bool v) {
 	/*if (v) {
 		set_mouse_filter(Control::MOUSE_FILTER_STOP);
@@ -105,7 +108,12 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 	for (unsigned i = 0; i < array.size(); i++) {
 		Ref<XMLNode> child = array[i];
 		String tag = child->name().to_lower();
-		if (tag == "clip") {
+		if (tag == "box") {
+			UI_Box* element = memnew(UI_Box);
+			element->SetXml(child, self);
+			add_child(element);
+		}
+		else if (tag == "clip") {
 			UI_Clip* element = memnew(UI_Clip);
 			element->SetXml(child, self);
 			add_child(element);
@@ -115,11 +123,18 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 			element->SetXml(child, self);
 			add_child(element);
 		}
+		else if (tag == "checkbox") {
+			UI_CheckBox* element = memnew(UI_CheckBox);
+			element->SetXml(child, self);
+			add_child(element);
+		}
+		
 	}
 }
 
 void UI_Box::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("Xml"), &UI_Box::Xml);
+	ClassDB::bind_method(D_METHOD("_gui_input"), &UI_Box::_gui_input);
 }
 
 

@@ -18,6 +18,7 @@ public:
 	void InitChilds(Ref<XMLNode> node,ScriptInstance* self);
 protected:
 	static void _bind_methods();
+	virtual void _gui_input(Ref<InputEvent> p_event);
 	Ref<XMLDocument> dom;
 };
 #endif

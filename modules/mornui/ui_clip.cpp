@@ -6,7 +6,7 @@ UI_Clip::UI_Clip() {
 	margin_[1] = 0;
 	margin_[2] = 0;
 	margin_[3] = 0;
-	set_mouse_filter(Control::MOUSE_FILTER_STOP);
+	set_clip_contents(true);
 }
 UI_Clip::~UI_Clip() {
 }
@@ -108,6 +108,7 @@ void UI_Clip::SetAutoPlay(bool v) {
 }
 
 void UI_Clip::_notification(int p_what) {
+	if (!clip_draw_)return;
 	if (p_what == NOTIFICATION_PROCESS && autoplay_ && interval_>0) {
 		uint32_t v = OS::get_singleton()->get_ticks_msec();
 		if (ctimer_ == 0) {

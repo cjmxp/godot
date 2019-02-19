@@ -1,25 +1,22 @@
 
-#ifndef UI_BUTTON_H
-#define UI_BUTTON_H
+#ifndef UI_CHECKBOX_H
+#define UI_CHECKBOX_H
 #include "modules/pugixml/pugixml_exporter.h"
-#include "ui_clip.h"
+#include "ui_button.h"
 
-class UI_Button : public UI_Clip {
+class UI_CheckBox  : public UI_Button {
 
-	GDCLASS(UI_Button, UI_Clip);
+	GDCLASS(UI_CheckBox, UI_Button);
 	OBJ_CATEGORY("GUI Nodes");
 public:
-	UI_Button();
-	~UI_Button();
+	UI_CheckBox();
+	~UI_CheckBox();
 	void InitAttribute(Ref<XMLNode> node,ScriptInstance* self) override;
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
 	//virtual void _unhandled_input(Ref<InputEvent> p_event);
-	//static void _bind_methods();
-	String xl_text{"button"};
-	bool button_draw_{ true };
-	bool select_{ false };
+	bool checkbox_draw_{ true };
 };
 #endif
