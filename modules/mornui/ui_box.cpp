@@ -2,6 +2,7 @@
 #include "ui_clip.h"
 #include "ui_button.h"
 #include "ui_checkbox.h"
+#include "ui_label.h"
 UI_Box::UI_Box() {
 
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
@@ -125,6 +126,11 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 		}
 		else if (tag == "checkbox") {
 			UI_CheckBox* element = memnew(UI_CheckBox);
+			element->SetXml(child, self);
+			add_child(element);
+		}
+		else if (tag == "label") {
+			UI_Label* element = memnew(UI_Label);
 			element->SetXml(child, self);
 			add_child(element);
 		}
