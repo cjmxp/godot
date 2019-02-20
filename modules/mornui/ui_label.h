@@ -11,6 +11,7 @@ class UI_Label : public UI_Clip {
 public:
 	UI_Label();
 	~UI_Label();
+	virtual Size2 get_minimum_size() const;
 	void InitAttribute(Ref<XMLNode> node,ScriptInstance* self) override;
 protected:
 	static void _bind_methods();
@@ -19,7 +20,7 @@ protected:
 	//virtual void _unhandled_input(Ref<InputEvent> p_event);
 	//static void _bind_methods();
 	bool label_draw_{ true };
-	String xl_text{"buttonasdfasdfasdfasdfdasdsafasfasdsdafsdsd"};
+	String xl_text{"abcd"};
 private:
 	enum Align {
 		ALIGN_LEFT,

@@ -77,9 +77,18 @@ void UI_Button::_notification(int p_what) {
 		Color color;
 		Ref<Font> font = get_font("font");
 		int text_clip = size.width;
-		Point2 text_ofs = (size - font->get_string_size(xl_text)) / 2.0;
-		text_ofs.y += font->get_ascent();
-		font->draw(ci, text_ofs.floor(), xl_text, color, text_clip);
+
+		Vector<String> list =  xl_text.split("\n");
+		real_t h = font->get_ascent()*list.size();
+		real_t of = (size.height - h)*0.5;
+
+		for (unsigned i = 0; i < list.size(); i++) {
+			Point2 text_ofs = (size - font->get_string_size(list[i]));
+			text_ofs.x *= 0.5;
+			text_ofs.y = font->get_ascent() + of;
+			of += font->get_ascent()+1;
+			font->draw(ci, text_ofs.floor(), list[i], color, text_clip);
+		}
 	}
 }
 

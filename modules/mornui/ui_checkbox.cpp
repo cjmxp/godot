@@ -54,6 +54,7 @@ void UI_CheckBox::_gui_input(Ref<InputEvent> p_event) {
 		update();
 	}
 }
+
 void UI_CheckBox::_notification(int p_what) {
 	if (!checkbox_draw_)return;
 	if (p_what == NOTIFICATION_MOUSE_ENTER && index_ != 2) {
@@ -81,7 +82,7 @@ void UI_CheckBox::_notification(int p_what) {
 			int y = index_ / clipX_;
 			int x = index_ % clipX_;
 
-			Rect2 rect = Rect2(Point2(0, (size.height-h)/2), Point2(w,h));
+			Rect2 rect = Rect2(Point2(0, (size.height-w)), Point2(w,h));
 			Rect2 src_rect;
 			texture_->get_rect_region(rect, src_rect, rect, src_rect);
 			if (index_ < 0) {
@@ -101,18 +102,27 @@ void UI_CheckBox::_notification(int p_what) {
 
 			texture_->draw_rect_region(ci, rect, src_rect);
 		}
-			
 
 		Color color;
 		Ref<Font> font = get_font("font");
-		int text_clip = size.width;
-		Point2 text_ofs = (size - font->get_string_size(xl_text)) / 2.0;
-		text_ofs.x += (w+2);
-		text_ofs.y += font->get_ascent();
+		
+		Point2 text_ofs = font->get_string_size(xl_text);
+		int text_clip = text_ofs.width;
+		text_ofs.x = (w+2);
+		text_ofs.y = size.height-text_ofs.height + font->get_ascent();
 		font->draw(ci, text_ofs.floor(), xl_text, color, text_clip);
+		minsize_.width = text_ofs.x + text_clip;
+		minsize_.height = text_ofs.height>h? text_ofs.height:h;
+		if(minsize_.width>size.width || minsize_.height>size.height)minimum_size_changed();
+		
 	}
 }
 
+Size2 UI_CheckBox::get_minimum_size() const {
+	
+		return minsize_;
+
+}
 void UI_CheckBox::_bind_methods() {
 }
 

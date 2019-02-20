@@ -42,6 +42,23 @@ void UI_Label::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		}
 	}*/
 }
+
+Size2 UI_Label::get_minimum_size() const {
+
+	// don't want to mutable everything
+	if (word_cache_dirty)
+		const_cast<UI_Label*>(this)->regenerate_word_cache();
+
+	if (autowrap)
+		return Size2(1, clip ? 1 : minsize.height);
+	else {
+		Size2 ms = minsize;
+		if (clip)
+			ms.width = 1;
+		return ms;
+	}
+}
+
 void UI_Label::_gui_input(Ref<InputEvent> p_event) {
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
