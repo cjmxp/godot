@@ -3,6 +3,7 @@
 
 UI_Button::UI_Button() {
 	set_focus_mode(FOCUS_ALL);
+	set_mouse_filter(Control::MOUSE_FILTER_STOP);
 }
 UI_Button::~UI_Button() {
 }

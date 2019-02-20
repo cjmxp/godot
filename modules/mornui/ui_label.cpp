@@ -2,7 +2,7 @@
 #include "core/os/os.h"
 
 UI_Label::UI_Label() {
-	set_focus_mode(FOCUS_ALL);
+
 }
 UI_Label::~UI_Label() {
 }

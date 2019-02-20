@@ -7,6 +7,7 @@ UI_Clip::UI_Clip() {
 	margin_[2] = 0;
 	margin_[3] = 0;
 	set_clip_contents(true);
+	set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
 }
 UI_Clip::~UI_Clip() {
 }
