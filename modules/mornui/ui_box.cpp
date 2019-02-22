@@ -3,6 +3,7 @@
 #include "ui_button.h"
 #include "ui_checkbox.h"
 #include "ui_label.h"
+#include "ui_textinput.h"
 UI_Box::UI_Box() {
 
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
@@ -134,7 +135,11 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 			element->SetXml(child, self);
 			add_child(element);
 		}
-		
+		else if (tag == "textinput") {
+			UI_TextInput* element = memnew(UI_TextInput);
+			element->SetXml(child, self);
+			add_child(element);
+		}
 	}
 }
 

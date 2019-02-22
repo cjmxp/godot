@@ -6,6 +6,10 @@
 UI_TextInput::UI_TextInput() {
 	set_focus_mode(FOCUS_ALL);
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
+	set_default_cursor_shape(CURSOR_IBEAM);
+	undo_stack_pos = NULL;
+	_create_undo_state();
+	cursor_set_blink_enabled(true);
 }
 UI_TextInput::~UI_TextInput() {
 }
@@ -45,6 +49,12 @@ void UI_TextInput::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		}
 	}*/
 }
+
+static bool _is_text_char(CharType c) {
+
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
+}
+
 void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid() && b->get_button_index() == BUTTON_LEFT) {
@@ -216,12 +226,298 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 				return;
 			}
 		}
+		_reset_caret_blink_timer();
+		if (!k->get_metakey()) {
 
+			bool handled = true;
+			switch (code) {
+
+			case KEY_KP_ENTER:
+			case KEY_ENTER: {
+
+				//emit_signal("text_entered", text);
+				if (OS::get_singleton()->has_virtual_keyboard())
+					OS::get_singleton()->hide_virtual_keyboard();
+
+				return;
+			} break;
+
+			case KEY_BACKSPACE: {
+
+				if (!editable)
+					break;
+
+				if (selection.enabled) {
+					selection_delete();
+					break;
+				}
+
+#ifdef APPLE_STYLE_KEYS
+				if (k->get_alt()) {
+#else
+				if (k->get_alt()) {
+					handled = false;
+					break;
+				}
+				else if (k->get_command()) {
+#endif
+					int cc = cursor_pos;
+					bool prev_char = false;
+
+					while (cc > 0) {
+						bool ischar = _is_text_char(text[cc - 1]);
+
+						if (prev_char && !ischar)
+							break;
+
+						prev_char = ischar;
+						cc--;
+					}
+
+					delete_text(cc, cursor_pos);
+
+					set_cursor_position(cc);
+
+				}
+				else {
+					delete_char();
+				}
+
+				} break;
+			case KEY_KP_4: {
+				if (k->get_unicode() != 0) {
+					handled = false;
+					break;
+				}
+				// numlock disabled. fallthrough to key_left
+			}
+			case KEY_LEFT: {
+
+#ifndef APPLE_STYLE_KEYS
+				if (!k->get_alt())
+#endif
+					shift_selection_check_pre(k->get_shift());
+
+#ifdef APPLE_STYLE_KEYS
+				if (k->get_command()) {
+					set_cursor_position(0);
+				}
+				else if (k->get_alt()) {
+
+#else
+				if (k->get_alt()) {
+					handled = false;
+					break;
+				}
+				else if (k->get_command()) {
+#endif
+					bool prev_char = false;
+					int cc = cursor_pos;
+
+					while (cc > 0) {
+						bool ischar = _is_text_char(text[cc - 1]);
+
+						if (prev_char && !ischar)
+							break;
+
+						prev_char = ischar;
+						cc--;
+					}
+
+					set_cursor_position(cc);
+
+				}
+				else {
+					set_cursor_position(get_cursor_position() - 1);
+				}
+
+				shift_selection_check_post(k->get_shift());
+
+				} break;
+			case KEY_KP_6: {
+				if (k->get_unicode() != 0) {
+					handled = false;
+					break;
+				}
+				// numlock disabled. fallthrough to key_right
+			}
+			case KEY_RIGHT: {
+
+				shift_selection_check_pre(k->get_shift());
+
+#ifdef APPLE_STYLE_KEYS
+				if (k->get_command()) {
+					set_cursor_position(text.length());
+				}
+				else if (k->get_alt()) {
+#else
+				if (k->get_alt()) {
+					handled = false;
+					break;
+				}
+				else if (k->get_command()) {
+#endif
+					bool prev_char = false;
+					int cc = cursor_pos;
+
+					while (cc < text.length()) {
+						bool ischar = _is_text_char(text[cc]);
+
+						if (prev_char && !ischar)
+							break;
+
+						prev_char = ischar;
+						cc++;
+					}
+
+					set_cursor_position(cc);
+
+				}
+				else {
+					set_cursor_position(get_cursor_position() + 1);
+				}
+
+				shift_selection_check_post(k->get_shift());
+
+				} break;
+			case KEY_UP: {
+
+				shift_selection_check_pre(k->get_shift());
+				if (get_cursor_position() == 0) handled = false;
+				set_cursor_position(0);
+				shift_selection_check_post(k->get_shift());
+			} break;
+			case KEY_DOWN: {
+
+				shift_selection_check_pre(k->get_shift());
+				if (get_cursor_position() == text.length()) handled = false;
+				set_cursor_position(text.length());
+				shift_selection_check_post(k->get_shift());
+			} break;
+			case KEY_DELETE: {
+
+				if (!editable)
+					break;
+
+				if (k->get_shift() && !k->get_command() && !k->get_alt()) {
+					cut_text();
+					break;
+				}
+
+				if (selection.enabled) {
+					selection_delete();
+					break;
+				}
+
+				int text_len = text.length();
+
+				if (cursor_pos == text_len)
+					break; // nothing to do
+
+#ifdef APPLE_STYLE_KEYS
+				if (k->get_alt()) {
+#else
+				if (k->get_alt()) {
+					handled = false;
+					break;
+				}
+				else if (k->get_command()) {
+#endif
+					int cc = cursor_pos;
+
+					bool prev_char = false;
+
+					while (cc < text.length()) {
+
+						bool ischar = _is_text_char(text[cc]);
+
+						if (prev_char && !ischar)
+							break;
+						prev_char = ischar;
+						cc++;
+					}
+
+					delete_text(cursor_pos, cc);
+
+				}
+				else {
+					set_cursor_position(cursor_pos + 1);
+					delete_char();
+				}
+
+				} break;
+			case KEY_KP_7: {
+				if (k->get_unicode() != 0) {
+					handled = false;
+					break;
+				}
+				// numlock disabled. fallthrough to key_home
+			}
+			case KEY_HOME: {
+
+				shift_selection_check_pre(k->get_shift());
+				set_cursor_position(0);
+				shift_selection_check_post(k->get_shift());
+			} break;
+			case KEY_KP_1: {
+				if (k->get_unicode() != 0) {
+					handled = false;
+					break;
+				}
+				// numlock disabled. fallthrough to key_end
+			}
+			case KEY_END: {
+
+				shift_selection_check_pre(k->get_shift());
+				set_cursor_position(text.length());
+				shift_selection_check_post(k->get_shift());
+			} break;
+
+			default: {
+
+				handled = false;
+			} break;
+			}
+
+			if (handled) {
+				accept_event();
+			}
+			else if (!k->get_alt() && !k->get_command()) {
+				if (k->get_unicode() >= 32 && k->get_scancode() != KEY_DELETE) {
+
+					if (editable) {
+						selection_delete();
+						CharType ucodestr[2] = { (CharType)k->get_unicode(), 0 };
+						append_at_cursor(ucodestr);
+						_text_changed();
+						accept_event();
+					}
+
+				}
+				else {
+					return;
+				}
+			}
+
+			update();
+			}
+
+		return;
 	}
 }
 void UI_TextInput::_notification(int p_what) {
 	if (!textinput_draw_)return;
-	if (p_what == NOTIFICATION_MOUSE_ENTER) {
+	if (p_what == NOTIFICATION_PROCESS && caret_blink_enabled) {
+		uint32_t v = OS::get_singleton()->get_ticks_msec();
+		if (blink_ctimer_ == 0) {
+			blink_ctimer_ = v;
+		}
+		else if (v - blink_ctimer_ >= 600) {
+			blink_ctimer_ = v;
+			_toggle_draw_caret();
+		}
+	}
+	else if (p_what == NOTIFICATION_MOUSE_ENTER) {
 		if (clipY_ > 1) {
 			index_ = 1;
 		}
@@ -233,26 +529,234 @@ void UI_TextInput::_notification(int p_what) {
 		}
 		update();
 	}
-	if (p_what == NOTIFICATION_DRAW) {
+	switch (p_what) {
+	case NOTIFICATION_RESIZED: {
+
+		if (expand_to_text_length) {
+			window_pos = 0; //force scroll back since it's expanding to text length
+		}
+		set_cursor_position(get_cursor_position());
+
+	} break;
+	case MainLoop::NOTIFICATION_WM_FOCUS_IN: {
+		window_has_focus = true;
+		draw_caret = true;
+		update();
+	} break;
+	case MainLoop::NOTIFICATION_WM_FOCUS_OUT: {
+		window_has_focus = false;
+		draw_caret = false;
+		update();
+	} break;
+	case NOTIFICATION_DRAW: {
+		if (!has_focus()  || !window_has_focus) {
+			draw_caret = false;
+		}
+		int width, height;
+
+		Size2 size = get_size();
+		width = size.width;
+		height = size.height;
 
 		RID ci = get_canvas_item();
-		Size2 size = get_size();
-		Color color;
-		Ref<Font> font = get_font("font");
-		int text_clip = size.width;
 
-		Vector<String> list =  xl_text.split("\n");
-		real_t h = font->get_ascent()*list.size();
-		real_t of = (size.height - h)*0.5;
-
-		for (unsigned i = 0; i < list.size(); i++) {
-			Point2 text_ofs = (size - font->get_string_size(list[i]));
-			text_ofs.x *= 0.5;
-			text_ofs.y = font->get_ascent() + of;
-			of += font->get_ascent()+1;
-			font->draw(ci, text_ofs.floor(), list[i], color, text_clip);
+			
+		float disabled_alpha = 1.0; // used to set the disabled input text color
+		if (!is_editable()) {
+			disabled_alpha = .5;
+			draw_caret = false;
 		}
+
+		Ref<Font> font = get_font("font");
+
+		if (has_focus()) {
+			index_ = 3;
+		}
+
+		int x_ofs = 0;
+		bool using_placeholder = text.empty();
+		int cached_text_width = using_placeholder ? cached_placeholder_width : cached_width;
+		switch (align) {
+
+			case ALIGN_FILL:
+			case ALIGN_LEFT: {
+
+				x_ofs = 2;
+			} break;
+			case ALIGN_CENTER: {
+
+				if (window_pos != 0)
+					x_ofs = 2;
+				else
+					x_ofs = MAX(2, int(size.width - (cached_text_width)) / 2);
+			} break;
+			case ALIGN_RIGHT: {
+
+				x_ofs = MAX(2, int(size.width - 2 - (cached_text_width)));
+			} break;
+		}
+		int ofs_max = width - 2;
+		int char_ofs = window_pos;
+
+		int y_area = height;
+		int y_ofs = (y_area - font->get_height()) / 2;
+
+		int font_ascent = font->get_ascent();
+
+		Color selection_color = Color(0, 0.4, 0.8f);
+		Color font_color = Color(1, 0, 0);
+		Color font_color_selected = Color(1, 1, 1);
+		Color cursor_color = Color(0, 0, 0);
+
+		const String &t = using_placeholder ? placeholder : text;
+		// draw placeholder color
+		if (using_placeholder)
+			font_color.a *= placeholder_alpha;
+		font_color.a *= disabled_alpha;
+
+		int caret_height = font->get_height() > y_area ? y_area : font->get_height();
+		FontDrawer drawer(font, Color(1, 1, 1));
+		while (true) {
+			//end of string, break!
+			if (char_ofs >= t.length())
+				break;
+			if (char_ofs == cursor_pos) {
+				if (ime_text.length() > 0) {
+					int ofs = 0;
+					while (true) {
+						if (ofs >= ime_text.length())
+							break;
+
+						CharType cchar = (pass && !text.empty()) ? secret_character[0] : ime_text[ofs];
+						CharType next = (pass && !text.empty()) ? secret_character[0] : ime_text[ofs + 1];
+						int im_char_width = font->get_char_size(cchar, next).width;
+
+						if ((x_ofs + im_char_width) > ofs_max)
+							break;
+
+						bool selected = ofs >= ime_selection.x && ofs < ime_selection.x + ime_selection.y;
+						if (selected) {
+							VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs + caret_height), Size2(im_char_width, 3)), font_color);
+						}
+						else {
+							VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs + caret_height), Size2(im_char_width, 1)), font_color);
+						}
+
+						drawer.draw_char(ci, Point2(x_ofs, y_ofs + font_ascent), cchar, next, font_color);
+
+						x_ofs += im_char_width;
+						ofs++;
+					}
+				}
+			}
+
+			CharType cchar = (pass && !text.empty()) ? secret_character[0] : t[char_ofs];
+			CharType next = (pass && !text.empty()) ? secret_character[0] : t[char_ofs + 1];
+			int char_width = font->get_char_size(cchar, next).width;
+			// end of widget, break!
+			if ((x_ofs + char_width) > ofs_max)
+				break;
+
+			bool selected = selection.enabled && char_ofs >= selection.begin && char_ofs < selection.end;
+
+			if (selected)
+				VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs), Size2(char_width, caret_height)), selection_color);
+
+			int yofs = y_ofs + (caret_height - font->get_height()) / 2;
+			drawer.draw_char(ci, Point2(x_ofs, yofs + font_ascent), cchar, next, selected ? font_color_selected : font_color);
+
+			if (char_ofs == cursor_pos && draw_caret) {
+				if (ime_text.length() == 0) {
+
+					VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs), Size2(1, caret_height)), cursor_color);
+
+				}
+			}
+
+			x_ofs += char_width;
+			char_ofs++;
+		}
+
+		if (char_ofs == cursor_pos) {
+			if (ime_text.length() > 0) {
+				int ofs = 0;
+				while (true) {
+					if (ofs >= ime_text.length())
+						break;
+
+					CharType cchar = (pass && !text.empty()) ? secret_character[0] : ime_text[ofs];
+					CharType next = (pass && !text.empty()) ? secret_character[0] : ime_text[ofs + 1];
+					int im_char_width = font->get_char_size(cchar, next).width;
+
+					if ((x_ofs + im_char_width) > ofs_max)
+						break;
+
+					bool selected = ofs >= ime_selection.x && ofs < ime_selection.x + ime_selection.y;
+					if (selected) {
+						VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs + caret_height), Size2(im_char_width, 3)), font_color);
+					}
+					else {
+						VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs + caret_height), Size2(im_char_width, 1)), font_color);
+					}
+
+					drawer.draw_char(ci, Point2(x_ofs, y_ofs + font_ascent), cchar, next, font_color);
+
+					x_ofs += im_char_width;
+					ofs++;
+				}
+			}
+		}
+
+		if (char_ofs == cursor_pos && draw_caret) { //may be at the end
+			if (ime_text.length() == 0) {
+
+				VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs), Size2(1, caret_height)), cursor_color);
+
+			}
+		}
+
+		if (has_focus()) {
+
+			OS::get_singleton()->set_ime_active(true);
+			OS::get_singleton()->set_ime_position(get_global_position() + Point2(using_placeholder ? 0 : x_ofs, y_ofs + caret_height));
+		}
+
+	}break;
+	case NOTIFICATION_FOCUS_ENTER: {
+
+		if (!caret_blink_enabled) {
+			draw_caret = true;
+		}
+
+		OS::get_singleton()->set_ime_active(true);
+		Point2 cursor_pos = Point2(get_cursor_position(), 1) * get_minimum_size().height;
+		OS::get_singleton()->set_ime_position(get_global_position() + cursor_pos);
+
+		if (OS::get_singleton()->has_virtual_keyboard())
+			OS::get_singleton()->show_virtual_keyboard(text, get_global_rect());
+
+	} break;
+	case NOTIFICATION_FOCUS_EXIT: {
+
+		OS::get_singleton()->set_ime_position(Point2());
+		OS::get_singleton()->set_ime_active(false);
+		ime_text = "";
+		ime_selection = Point2();
+
+		if (OS::get_singleton()->has_virtual_keyboard())
+			OS::get_singleton()->hide_virtual_keyboard();
+
+	} break;
+	case MainLoop::NOTIFICATION_OS_IME_UPDATE: {
+
+		if (has_focus()) {
+			ime_text = OS::get_singleton()->get_ime_text();
+			ime_selection = OS::get_singleton()->get_ime_selection();
+			update();
+		}
+	} break;
 	}
+	
 }
 void UI_TextInput::selection_fill_at_cursor() {
 
@@ -266,6 +770,12 @@ void UI_TextInput::selection_fill_at_cursor() {
 	}
 
 	selection.enabled = (selection.begin != selection.end);
+}
+
+void UI_TextInput::shift_selection_check_post(bool p_shift) {
+
+	if (p_shift)
+		selection_fill_at_cursor();
 }
 
 void UI_TextInput::shift_selection_check_pre(bool p_shift) {
@@ -314,6 +824,21 @@ void UI_TextInput::select_all() {
 	update();
 }
 
+void UI_TextInput::delete_char() {
+
+	if ((text.length() <= 0) || (cursor_pos == 0)) return;
+
+	Ref<Font> font = get_font("font");
+	if (font != NULL) {
+		cached_width -= font->get_char_size(text[cursor_pos - 1]).width;
+	}
+
+	text.erase(cursor_pos - 1, 1);
+
+	set_cursor_position(get_cursor_position() - 1);
+
+	_text_changed();
+}
 
 void UI_TextInput::selection_delete() {
 
@@ -436,6 +961,37 @@ void UI_TextInput::clear() {
 	clear_internal();
 	_text_changed();
 }
+
+void UI_TextInput::_text_changed() {
+
+	if (expand_to_text_length)
+		minimum_size_changed();
+
+	_emit_text_change();
+	_clear_redo();
+}
+
+void UI_TextInput::_emit_text_change() {
+	//emit_signal("text_changed", text);
+	_change_notify("text");
+	text_changed_dirty = false;
+}
+
+void UI_TextInput::_clear_redo() {
+	_create_undo_state();
+	if (undo_stack_pos == NULL) {
+		return;
+	}
+
+	undo_stack_pos = undo_stack_pos->next();
+	while (undo_stack_pos) {
+		List<TextOperation>::Element *elem = undo_stack_pos;
+		undo_stack_pos = undo_stack_pos->next();
+		undo_stack.erase(elem);
+	}
+	_create_undo_state();
+}
+
 void UI_TextInput::clear_internal() {
 
 	_clear_undo_stack();
@@ -465,6 +1021,39 @@ void UI_TextInput::_reset_caret_blink_timer() {
 		draw_caret = true;
 		update();
 	}
+}
+
+void UI_TextInput::_toggle_draw_caret() {
+	draw_caret = !draw_caret;
+	if (is_visible_in_tree() && has_focus() && window_has_focus) {
+		update();
+	}
+}
+
+bool UI_TextInput::cursor_get_blink_enabled() const {
+	return caret_blink_enabled;
+}
+
+void UI_TextInput::cursor_set_blink_enabled(const bool p_enabled) {
+	caret_blink_enabled = p_enabled;
+	set_process(p_enabled);
+	draw_caret = true;
+}
+
+void UI_TextInput::set_editable(bool p_editable) {
+
+	editable = p_editable;
+	update();
+}
+
+bool UI_TextInput::is_editable() const {
+
+	return editable;
+}
+
+int UI_TextInput::get_cursor_position() const {
+
+	return cursor_pos;
 }
 
 void UI_TextInput::set_cursor_at_pixel_pos(int p_x) {
