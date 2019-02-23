@@ -724,6 +724,9 @@ uniform vec2 screen_pixel_size;
 #if defined(SCREEN_TEXTURE_USED)
 uniform highp sampler2D screen_texture; //texunit:-4
 #endif
+#if defined(DEPTH_TEXTURE_USED)
+uniform highp sampler2D depth_texture; //texunit:-4
+#endif
 
 #ifdef USE_REFLECTION_PROBE1
 
@@ -2056,7 +2059,6 @@ FRAGMENT_SHADER_CODE
 #else
 	gl_FragColor.rgb *= (1.0 - fog_interp.a);
 #endif // BASE_PASS
-
 
 #else //pixel based fog
 	float fog_amount = 0.0;
