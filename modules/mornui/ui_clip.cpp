@@ -6,7 +6,6 @@ UI_Clip::UI_Clip() {
 	margin_[1] = 0;
 	margin_[2] = 0;
 	margin_[3] = 0;
-	set_clip_contents(true);
 	set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
 }
 UI_Clip::~UI_Clip() {
@@ -56,11 +55,15 @@ void UI_Clip::SetSkin(const String& v) {
 		//t->set_region(Rect2(0,0,64,64));
 		texture_ = ResourceLoader::load(v);//t;
 		update();
-		minimum_size_changed();
-		emit_signal("texture_changed");
-		_change_notify("texture");
+		//emit_signal("texture_changed");
+		//_change_notify("texture");
 	}
 }
+
+Size2 UI_Clip::get_minimum_size() const {
+	return minsize_;
+}
+
 void UI_Clip::SetInterval(int v) {
 	if (interval_!=v && v>0) {
 		interval_ = v;
@@ -141,6 +144,11 @@ void UI_Clip::_notification(int p_what) {
 		int h = texture_->get_height() / clipY_;
 		int y = index_ / clipX_;
 		int x = index_ % clipX_;
+		if (rect.size.width<=0 && rect.size.height<=0 && (minsize_.width != w || minsize_.height != h)) {
+			minsize_.width = w;
+			minsize_.height = h;
+			minimum_size_changed();
+		}
 
 		src_rect.position.x += (x * w);
 		src_rect.position.y += (y * h);

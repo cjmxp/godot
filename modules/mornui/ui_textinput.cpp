@@ -10,6 +10,7 @@ UI_TextInput::UI_TextInput() {
 	undo_stack_pos = NULL;
 	_create_undo_state();
 	cursor_set_blink_enabled(true);
+	set_clip_contents(true);
 }
 UI_TextInput::~UI_TextInput() {
 }

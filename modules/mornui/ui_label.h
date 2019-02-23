@@ -11,7 +11,7 @@ class UI_Label : public UI_Clip {
 public:
 	UI_Label();
 	~UI_Label();
-	virtual Size2 get_minimum_size() const;
+	virtual Size2 get_minimum_size() const override;
 	void InitAttribute(Ref<XMLNode> node,ScriptInstance* self) override;
 protected:
 	static void _bind_methods();
@@ -34,7 +34,6 @@ private:
 	int line_count{ 0 };
 	bool uppercase{ false };
 	int total_char_cache{ 0 };
-	Size2 minsize;
 	int max_lines_visible{ -1 };
 	bool word_cache_dirty{ true };
 	int lines_skipped{ 0 };

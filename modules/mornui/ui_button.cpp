@@ -4,6 +4,7 @@
 UI_Button::UI_Button() {
 	set_focus_mode(FOCUS_ALL);
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
+	set_clip_contents(true);
 }
 UI_Button::~UI_Button() {
 }
@@ -71,7 +72,7 @@ void UI_Button::_notification(int p_what) {
 		}
 		update();
 	}
-	if (p_what == NOTIFICATION_DRAW) {
+	if (p_what == NOTIFICATION_DRAW && text_!="") {
 
 		RID ci = get_canvas_item();
 		Size2 size = get_size();
@@ -79,7 +80,7 @@ void UI_Button::_notification(int p_what) {
 		Ref<Font> font = get_font("font");
 		int text_clip = size.width;
 
-		Vector<String> list =  xl_text.split("\n");
+		Vector<String> list = text_.split("\n");
 		real_t h = font->get_ascent()*list.size();
 		real_t of = (size.height - h)*0.5;
 

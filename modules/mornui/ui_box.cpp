@@ -4,6 +4,8 @@
 #include "ui_checkbox.h"
 #include "ui_label.h"
 #include "ui_textinput.h"
+#include "ui_slider.h"
+
 UI_Box::UI_Box() {
 
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
@@ -137,6 +139,18 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 		}
 		else if (tag == "textinput") {
 			UI_TextInput* element = memnew(UI_TextInput);
+			element->SetXml(child, self);
+			add_child(element);
+		}
+		else if (tag == "hslider") {
+			UI_Slider* element = memnew(UI_Slider);
+			element->SetDirection("horizontal");
+			element->SetXml(child, self);
+			add_child(element);
+		}
+		else if (tag == "vslider") {
+			UI_Slider* element = memnew(UI_Slider);
+			element->SetDirection("vertical");
 			element->SetXml(child, self);
 			add_child(element);
 		}

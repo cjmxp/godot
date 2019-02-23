@@ -2,7 +2,7 @@
 #include "core/os/os.h"
 
 UI_Label::UI_Label() {
-
+	set_clip_contents(true);
 }
 UI_Label::~UI_Label() {
 }
@@ -50,9 +50,9 @@ Size2 UI_Label::get_minimum_size() const {
 		const_cast<UI_Label*>(this)->regenerate_word_cache();
 
 	if (autowrap)
-		return Size2(1, clip ? 1 : minsize.height);
+		return Size2(1, clip ? 1 : minsize_.height);
 	else {
-		Size2 ms = minsize;
+		Size2 ms = minsize_;
 		if (clip)
 			ms.width = 1;
 		return ms;
@@ -431,13 +431,13 @@ void UI_Label::regenerate_word_cache() {
 	}
 
 	if (!autowrap)
-		minsize.width = width;
+		minsize_.width = width;
 
 	if (max_lines_visible > 0 && line_count > max_lines_visible) {
-		minsize.height = (font->get_height() * max_lines_visible) + (line_spacing * (max_lines_visible - 1));
+		minsize_.height = (font->get_height() * max_lines_visible) + (line_spacing * (max_lines_visible - 1));
 	}
 	else {
-		minsize.height = (font->get_height() * line_count) + (line_spacing * (line_count - 1));
+		minsize_.height = (font->get_height() * line_count) + (line_spacing * (line_count - 1));
 	}
 
 	if (!autowrap || !clip) {

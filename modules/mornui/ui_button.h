@@ -18,7 +18,7 @@ protected:
 	void _gui_input(Ref<InputEvent> p_event) override;
 	//virtual void _unhandled_input(Ref<InputEvent> p_event);
 	//static void _bind_methods();
-	String xl_text{"a\nb\nc\nd"};
+	String text_{""};
 	bool button_draw_{ true };
 	bool select_{ false };
 };
