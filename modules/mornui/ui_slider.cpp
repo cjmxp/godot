@@ -7,6 +7,7 @@ UI_Slider::UI_Slider() {
 	set_clip_contents(false);
 	but = memnew(UI_Button);
 	but->set_mouse_filter(Control::MOUSE_FILTER_PASS);
+	but->set_name("ui_slider_item");
 	add_child(but);
 }
 UI_Slider::~UI_Slider() {
@@ -54,7 +55,15 @@ void UI_Slider::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		}
 	}*/
 }
+void UI_Slider::OnEvent(Ref<InputEvent> e) {
+	if (e->GetName() == "ui_slider_item")return;
+	UI_Box* p = Parent();
+	if (p)p->OnEvent(e);
+}
+
 void UI_Slider::_gui_input(Ref<InputEvent> p_event) {
+	p_event->SetName(get_name());
+	OnEvent(p_event);
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed()) {

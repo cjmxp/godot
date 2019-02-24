@@ -163,7 +163,7 @@ class InputEvent : public Resource {
 
 protected:
 	static void _bind_methods();
-
+	String data{""};
 public:
 	void set_device(int p_device);
 	int get_device() const;
@@ -172,7 +172,8 @@ public:
 	bool is_action_pressed(const StringName &p_action) const;
 	bool is_action_released(const StringName &p_action) const;
 	float get_action_strength(const StringName &p_action) const;
-
+	String GetName();
+	void SetName(const String& v);
 	// To be removed someday, since they do not make sense for all events
 	virtual bool is_pressed() const;
 	virtual bool is_echo() const;

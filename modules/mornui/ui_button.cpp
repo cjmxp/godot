@@ -45,6 +45,8 @@ void UI_Button::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	}*/
 }
 void UI_Button::_gui_input(Ref<InputEvent> p_event) {
+	p_event->SetName(get_name());
+	OnEvent(p_event);
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed() && index_ != 1) {
@@ -66,6 +68,7 @@ void UI_Button::_gui_input(Ref<InputEvent> p_event) {
 		
 	}
 }
+
 void UI_Button::_notification(int p_what) {
 	if (!button_draw_)return;
 	if (p_what == NOTIFICATION_MOUSE_ENTER && (!tab_mode_ || !selected_)) {

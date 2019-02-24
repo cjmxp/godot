@@ -17,6 +17,8 @@ public:
 	void MouseEnabled(bool v);
 	void InitChilds(Ref<XMLNode> node,ScriptInstance* self);
 	virtual Size2 get_minimum_size() const;
+	virtual void OnEvent(Ref<InputEvent> e);
+	UI_Box* Parent();
 protected:
 	static void _bind_methods();
 	virtual void _gui_input(Ref<InputEvent> p_event);

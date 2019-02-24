@@ -26,6 +26,7 @@ public:
 	void SetSelectedIndex(int v);
 	void SetDirection(String v);
 	void SetSpace(int v);
+	void OnEvent(Ref<InputEvent> e) override;
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);

@@ -9,7 +9,7 @@
 
 UI_Box::UI_Box() {
 
-	set_mouse_filter(Control::MOUSE_FILTER_STOP);
+	set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
 
 }
 UI_Box::~UI_Box() {
@@ -98,12 +98,22 @@ void UI_Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	}
 }
 void UI_Box::_gui_input(Ref<InputEvent> p_event) {
+	p_event->SetName(get_name());
+	OnEvent(p_event);
 }
 
 Size2 UI_Box::get_minimum_size() const {
 	return minsize_;
 }
 
+UI_Box* UI_Box::Parent() {
+	if (!get_parent())return nullptr;
+	return Object::cast_to<UI_Box>(get_parent());
+}
+void UI_Box::OnEvent(Ref<InputEvent> e) {
+	UI_Box* p = Parent();
+	if (p)p->OnEvent(e);
+}
 void UI_Box::MouseEnabled(bool v) {
 	/*if (v) {
 		set_mouse_filter(Control::MOUSE_FILTER_STOP);

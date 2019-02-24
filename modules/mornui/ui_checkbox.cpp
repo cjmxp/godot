@@ -44,6 +44,8 @@ void UI_CheckBox::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	}*/
 }
 void UI_CheckBox::_gui_input(Ref<InputEvent> p_event) {
+	p_event->SetName(get_name());
+	OnEvent(p_event);
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed()) {

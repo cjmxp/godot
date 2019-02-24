@@ -87,7 +87,12 @@ String InputEvent::as_text() const {
 
 	return String();
 }
-
+String InputEvent::GetName(){
+	return data;
+}
+void InputEvent::SetName(const String& v) {
+	data = v;
+}
 bool InputEvent::action_match(const Ref<InputEvent> &p_event, bool *p_pressed, float *p_strength, float p_deadzone) const {
 
 	return false;

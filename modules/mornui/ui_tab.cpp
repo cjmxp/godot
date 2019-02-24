@@ -99,6 +99,7 @@ void UI_Tab::_notification(int p_what) {
 		for (unsigned i = 0; i < list.size(); i++) {
 			if (get_child_count() <= i) {
 				button = memnew(UI_Button);
+				button->set_name("ui_table_item");
 				button->SetTabMode(true);
 				add_child(button);
 			}
@@ -164,8 +165,18 @@ void UI_Tab::SetSpace(int v) {
 
 }
 
+void UI_Tab::OnEvent(Ref<InputEvent> e) {
+	if (e->GetName() == "ui_table_item") {
+
+		return;
+	}
+	UI_Box* p = Parent();
+	if (p)p->OnEvent(e);
+}
+
 void UI_Tab::_gui_input(Ref<InputEvent> p_event) {
-	
+	p_event->SetName(get_name());
+	OnEvent(p_event);
 }
 
 

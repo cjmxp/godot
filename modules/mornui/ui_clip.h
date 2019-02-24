@@ -33,7 +33,7 @@ protected:
 		AXIS_STRETCH_MODE_TILE_FIT,
 	};
 	void _notification(int p_what);
-	
+	void _gui_input(Ref<InputEvent> p_event) override;
 	String skin_;
 	String grid_;
 	Ref<Texture> texture_;

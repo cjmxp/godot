@@ -107,7 +107,10 @@ void UI_Clip::SetAutoPlay(bool v) {
 		set_process(v);
 	}
 }
-
+void UI_Clip::_gui_input(Ref<InputEvent> p_event) {
+	p_event->SetName(get_name());
+	OnEvent(p_event);
+}
 void UI_Clip::_notification(int p_what) {
 	if (!clip_draw_)return;
 	if (p_what == NOTIFICATION_PROCESS && autoplay_ && interval_>0) {

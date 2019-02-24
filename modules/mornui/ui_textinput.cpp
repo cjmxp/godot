@@ -57,6 +57,8 @@ static bool _is_text_char(CharType c) {
 }
 
 void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
+	p_event->SetName(get_name());
+	OnEvent(p_event);
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid() && b->get_button_index() == BUTTON_LEFT) {
 		_reset_caret_blink_timer();
