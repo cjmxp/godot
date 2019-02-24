@@ -13,7 +13,6 @@ public:
 	~UI_Clip();
 	const String& GetSkin()const { return skin_; };
 	virtual void SetSkin(const String& v);
-	virtual Size2 get_minimum_size() const;
 	int GetInterval() { return interval_; };
 	void SetInterval(int v);
 	const String& GetSizeGrid() { return grid_; };
@@ -48,7 +47,6 @@ protected:
 	AxisStretchMode axis_h_{ AXIS_STRETCH_MODE_STRETCH };
 	AxisStretchMode axis_v_{ AXIS_STRETCH_MODE_STRETCH };
 	bool clip_draw_{ true };
-	Size2 minsize_;
 	//static void _bind_methods();
 };
 #endif

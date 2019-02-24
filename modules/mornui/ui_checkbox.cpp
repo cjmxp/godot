@@ -48,7 +48,7 @@ void UI_CheckBox::_gui_input(Ref<InputEvent> p_event) {
 	if (b.is_valid()) {
 		if (b->is_pressed()) {
 			if (clipY_ > 1) {
-				index_ = index_ == 2 ? 1 : 2;
+				index_ = index_ == 1 ? 2 : 1;
 			}
 		}
 		update();
@@ -57,13 +57,13 @@ void UI_CheckBox::_gui_input(Ref<InputEvent> p_event) {
 
 void UI_CheckBox::_notification(int p_what) {
 	if (!checkbox_draw_)return;
-	if (p_what == NOTIFICATION_MOUSE_ENTER && index_ != 2) {
+	if (p_what == NOTIFICATION_MOUSE_ENTER && index_ != 1) {
 		if (clipY_ > 1) {
-			index_ = 1;
+			index_ = 2;
 		}
 		update();
 	}
-	else if (p_what == NOTIFICATION_MOUSE_EXIT && index_ != 2) {
+	else if (p_what == NOTIFICATION_MOUSE_EXIT && index_ != 1) {
 		if (clipY_ > 1) {
 			index_ = 0;
 		}

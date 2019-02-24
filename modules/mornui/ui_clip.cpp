@@ -60,9 +60,6 @@ void UI_Clip::SetSkin(const String& v) {
 	}
 }
 
-Size2 UI_Clip::get_minimum_size() const {
-	return minsize_;
-}
 
 void UI_Clip::SetInterval(int v) {
 	if (interval_!=v && v>0) {

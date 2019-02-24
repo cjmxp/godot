@@ -12,6 +12,12 @@ public:
 	UI_Button();
 	~UI_Button();
 	void InitAttribute(Ref<XMLNode> node,ScriptInstance* self) override;
+	bool GetTabMode() { return tab_mode_; };
+	void SetTabMode(bool v);
+	bool GetSelected() { return selected_; };
+	void SetSelected(bool v);
+	String GetLabel() { return text_; };
+	void SetLabel(const String& v);
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
@@ -20,6 +26,8 @@ protected:
 	//static void _bind_methods();
 	String text_{""};
 	bool button_draw_{ true };
-	bool select_{ false };
+	bool tab_mode_ { true };
+	bool selected_{false};
+
 };
 #endif

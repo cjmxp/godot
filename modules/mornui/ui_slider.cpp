@@ -58,7 +58,7 @@ void UI_Slider::_gui_input(Ref<InputEvent> p_event) {
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed()) {
-			but->SetIndex(2);
+			but->SetIndex(1);
 			loack_ = true;
 			real_t wh = 0.0f;
 			real_t xy = 0.0f;

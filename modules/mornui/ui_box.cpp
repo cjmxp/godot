@@ -1,4 +1,5 @@
 #include "ui_box.h"
+#include "ui_tab.h"
 #include "ui_clip.h"
 #include "ui_button.h"
 #include "ui_checkbox.h"
@@ -98,6 +99,11 @@ void UI_Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 }
 void UI_Box::_gui_input(Ref<InputEvent> p_event) {
 }
+
+Size2 UI_Box::get_minimum_size() const {
+	return minsize_;
+}
+
 void UI_Box::MouseEnabled(bool v) {
 	/*if (v) {
 		set_mouse_filter(Control::MOUSE_FILTER_STOP);
@@ -117,6 +123,11 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 			element->SetXml(child, self);
 			add_child(element);
 		}
+		else if (tag == "tab") {
+			UI_Tab* element = memnew(UI_Tab);
+			element->SetXml(child, self);
+			add_child(element);
+		}
 		else if (tag == "clip") {
 			UI_Clip* element = memnew(UI_Clip);
 			element->SetXml(child, self);
@@ -127,7 +138,7 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 			element->SetXml(child, self);
 			add_child(element);
 		}
-		else if (tag == "checkbox") {
+		else if (tag == "checkbox" || tag == "radiobutton") {
 			UI_CheckBox* element = memnew(UI_CheckBox);
 			element->SetXml(child, self);
 			add_child(element);
