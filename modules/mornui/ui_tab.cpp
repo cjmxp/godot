@@ -77,11 +77,27 @@ void UI_Tab::SetClipY(int v) {
 	}
 }
 void UI_Tab::SetSelectedIndex(int v) {
-	if (selectedindex_ != v) {
-		selectedindex_ = v;
-		setattribute_ = true;
+	if (selectedindex_ != v && v >= 0) {
+		UI_Button* button = nullptr;
+		unsigned count = get_child_count();
+		if (count > 0) {
+			if (v >= count) v = count - 1;
+			if (selectedindex_ !=-1) {
+				button = Object::cast_to<UI_Button>(get_child(selectedindex_));
+				button->SetSelected(false);
+				selectedindex_ = -1;
+			}
+			if (selectedindex_ == -1) {
+				button = Object::cast_to<UI_Button>(get_child(v));
+				button->SetSelected(true);
+			}
+			selectedindex_ = v;
+		}
+		else {
+			selectedindex_ = v;
+			setattribute_ = true;
+		}
 	}
-
 }
 void UI_Tab::_notification(int p_what) {
 	if (setattribute_ && labels_!="") {
@@ -99,7 +115,7 @@ void UI_Tab::_notification(int p_what) {
 		for (unsigned i = 0; i < list.size(); i++) {
 			if (get_child_count() <= i) {
 				button = memnew(UI_Button);
-				button->set_name("ui_table_item");
+				button->set_name("ui_table_item_"+ itos(i));
 				button->SetTabMode(true);
 				add_child(button);
 			}
@@ -165,13 +181,25 @@ void UI_Tab::SetSpace(int v) {
 
 }
 
-void UI_Tab::OnEvent(Ref<InputEvent> e) {
-	if (e->GetName() == "ui_table_item") {
+void UI_Tab::OnEvent(Ref<InputEvent> p_event) {
 
-		return;
+	String name = p_event->GetName();
+	if (name.find("ui_table_item_")!=-1) {
+		Ref<InputEventMouseButton> b = p_event;
+		if (b.is_valid() && b->is_pressed() ) {
+			name = name.replace_first("ui_table_item_", "");
+			unsigned j = name.to_int();
+			SetSelectedIndex(j);
+			UI_Box* p = Parent();
+			if (p) {
+				p_event->SetName(get_name());
+				p->OnEvent(p_event);
+			}
+			return;
+		}
 	}
 	UI_Box* p = Parent();
-	if (p)p->OnEvent(e);
+	if (p)p->OnEvent(p_event);
 }
 
 void UI_Tab::_gui_input(Ref<InputEvent> p_event) {
