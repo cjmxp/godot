@@ -5,20 +5,25 @@ UI_Slider::UI_Slider() {
 	set_focus_mode(FOCUS_ALL);
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
 	set_clip_contents(false);
-	but = memnew(UI_Button);
-	but->set_mouse_filter(Control::MOUSE_FILTER_PASS);
-	but->set_name("ui_slider_item");
-	add_child(but);
+	bar_ = memnew(UI_Button);
+	bar_->set_mouse_filter(Control::MOUSE_FILTER_PASS);
+	bar_->set_name("ui_slider_item");
+	add_child(bar_);
 }
 UI_Slider::~UI_Slider() {
 }
 
 void UI_Slider::SetSkin(const String& v) {
-	skin_ = v;
-	texture_ = ResourceLoader::load(v);
-	but->SetClipY(3);
-	but->SetSkin(skin_.replace(".png", "$bar.png"));
-	update();
+	if (skin_!=v && v!="") {
+		skin_ = v;
+		texture_ = ResourceLoader::load(v);
+		bar_->SetClipY(3);
+		bar_->SetSkin(skin_.replace(".png", "$bar.png"));
+		layout_ = true;
+		set_process(true);
+		update();
+	}
+	
 }
 
 void UI_Slider::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
@@ -67,18 +72,18 @@ void UI_Slider::_gui_input(Ref<InputEvent> p_event) {
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed()) {
-			but->SetIndex(1);
+			bar_->SetIndex(1);
 			loack_ = true;
 			real_t wh = 0.0f;
 			real_t xy = 0.0f;
 			real_t swh = 0.0f;
 			if (hv_) {
-				wh = but->get_size().width / 2;
+				wh = bar_->get_size().width / 2;
 				xy = b->get_position().x;
 				swh = get_size().width;
 			}
 			else {
-				wh = but->get_size().height / 2;
+				wh = bar_->get_size().height / 2;
 				xy = b->get_position().y;
 				swh = get_size().height;
 			}
@@ -103,12 +108,12 @@ void UI_Slider::_gui_input(Ref<InputEvent> p_event) {
 			real_t xy = 0.0f;
 			real_t swh = 0.0f;
 			if (hv_) {
-				wh = but->get_size().width / 2;
+				wh = bar_->get_size().width / 2;
 				xy = mm->get_position().x;
 				swh = get_size().width;
 			}
 			else {
-				wh = but->get_size().height / 2;
+				wh = bar_->get_size().height / 2;
 				xy = mm->get_position().y;
 				swh = get_size().height;
 			}
@@ -137,66 +142,48 @@ void UI_Slider::SetValue(float v) {
 	if (v < 0)v = 0;
 	if (v > 1)v = 1;
 	Size2 size = get_size();
-	Size2 bsize = but->get_size();
+	Size2 bsize = bar_->get_size();
 	real_t length = 0.0f;
 	real_t x = 0.0f;
 	real_t y = 0.0f;
-	if (hv_) {
-		length = size.width - bsize.width;
-		x = length * v;
-		y = (size.height - bsize.height)*0.5;
+	if(size.width>0 && size.height>0 && bsize.width>0 && bsize.height>0) {
+		if (hv_) {
+			length = size.width - bsize.width;
+			x = length * v;
+			y = (size.height - bsize.height)*0.5;
+		}
+		else {
+			length = size.height - bsize.height;
+			x = (size.width - bsize.width)*0.5;
+			y = length * v;
+		}
+		bar_->set_position(Point2(x, y));
 	}
-	else {
-		length = size.height - bsize.height;
-		x = (size.width - bsize.width)*0.5;
-		y = length * v; 
-	}
-	but->set_position(Point2(x, y));
 	value_ = v;
 }
 
 void UI_Slider::_notification(int p_what) {
 	if (!hslider_draw_)return;
-
+	if (layout_) {
+		Size2 size = get_size();
+		Size2 bsize = bar_->get_size();
+		if (size.width > 0 && size.height>0 && bsize.width > 0 && bsize.height > 0) {
+			SetValue(value_);
+			layout_ = false;
+			set_process(false);
+		}
+	}
 	if (p_what == NOTIFICATION_MOUSE_ENTER) {
 		if (clipY_ > 1) {
 			index_ = 1;
+			update();
 		}
-		update();
 	}
 	else if (p_what == NOTIFICATION_MOUSE_EXIT) {
 		if (clipY_ > 1) {
 			index_ = 0;
+			update();
 		}
-		update();
-	}
-	if (p_what == NOTIFICATION_DRAW) {
-		if (!init_) {
-			if (get_size().width != 0 && but->get_size().width > 0) {
-				init_ = true;
-				SetValue(value_);
-			}
-		}
-		/*
-		RID ci = get_canvas_item();
-		Size2 size = get_size();
-		Color color;
-		Ref<Font> font = get_font("font");
-		int text_clip = size.width;
-		
-	//	but->setpo
-
-		Vector<String> list =  xl_text.split("\n");
-		real_t h = font->get_ascent()*list.size();
-		real_t of = (size.height - h)*0.5;
-
-		for (unsigned i = 0; i < list.size(); i++) {
-			Point2 text_ofs = (size - font->get_string_size(list[i]));
-			text_ofs.x *= 0.5;
-			text_ofs.y = font->get_ascent() + of;
-			of += font->get_ascent()+1;
-			font->draw(ci, text_ofs.floor(), list[i], color, text_clip);
-		}*/
 	}
 }
 

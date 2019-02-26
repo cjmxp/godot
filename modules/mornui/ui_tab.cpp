@@ -40,8 +40,8 @@ void UI_Tab::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		else if (tag == "space") {
 			SetSpace(attribute->value().to_int());
 		}
-		
 	}
+	setattribute_ = true;
 }
 void UI_Tab::SetLabels(const String& v) {
 	if (labels_ != v) {

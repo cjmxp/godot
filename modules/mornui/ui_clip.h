@@ -1,7 +1,6 @@
 
 #ifndef UI_CLIP_H
 #define UI_CLIP_H
-#include "modules/pugixml/pugixml_exporter.h"
 #include "ui_box.h"
 
 class UI_Clip : public UI_Box {

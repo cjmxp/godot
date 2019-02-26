@@ -1,7 +1,6 @@
 
 #ifndef UI_CHECKBOX_H
 #define UI_CHECKBOX_H
-#include "modules/pugixml/pugixml_exporter.h"
 #include "ui_button.h"
 
 class UI_CheckBox  : public UI_Button {

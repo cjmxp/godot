@@ -1,7 +1,6 @@
 
 #ifndef UI_VIEW_H
 #define UI_VIEW_H
-#include "modules/pugixml/pugixml_exporter.h"
 #include "ui_box.h"
 
 class UI_View : public UI_Box {

@@ -15,14 +15,17 @@ public:
 	void SetXml(Ref<XMLNode> node, ScriptInstance* self);
 	virtual void InitAttribute(Ref<XMLNode> node,ScriptInstance* self);
 	void MouseEnabled(bool v);
-	void InitChilds(Ref<XMLNode> node,ScriptInstance* self);
+	virtual void InitChilds(Ref<XMLNode> node,ScriptInstance* self);
 	virtual Size2 get_minimum_size() const;
 	virtual void OnEvent(Ref<InputEvent> e);
 	UI_Box* Parent();
+	virtual void SetDataSource(const Variant& db);
 protected:
 	static void _bind_methods();
 	virtual void _gui_input(Ref<InputEvent> p_event);
 	Ref<XMLDocument> dom;
 	Size2 minsize_;
+	bool setattribute_{ false };
+	bool layout_{ false };
 };
 #endif

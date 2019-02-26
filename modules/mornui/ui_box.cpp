@@ -1,12 +1,13 @@
 #include "ui_box.h"
 #include "ui_tab.h"
+#include "ui_list.h"
 #include "ui_clip.h"
 #include "ui_button.h"
 #include "ui_checkbox.h"
 #include "ui_label.h"
 #include "ui_textinput.h"
 #include "ui_slider.h"
-
+#include "ui_scrollbar.h"
 UI_Box::UI_Box() {
 
 	set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
@@ -40,7 +41,7 @@ void UI_Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		Ref<XMLAttribute> attribute = array[i];
 		String tag = attribute->name().to_lower();
 		if (tag == "var") {
-			self->set(attribute->value(), Variant(this));
+			if(self!=nullptr)self->set(attribute->value(), Variant(this));
 		}
 		else if (tag=="name") {
 			set_name(attribute->value());
@@ -59,11 +60,13 @@ void UI_Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 			Size2 size = get_size();
 			size.width = attribute->value().to_float();
 			set_size(size);
+			setattribute_ = true;
 		}
 		else if (tag == "height") {
 			Size2 size = get_size();
 			size.height = attribute->value().to_float();
 			set_size(size);
+			setattribute_ = true;
 		}
 		else if (tag == "scalex") {
 			Vector2 scale = get_scale();
@@ -115,6 +118,7 @@ void UI_Box::OnEvent(Ref<InputEvent> e) {
 	if (p)p->OnEvent(e);
 }
 void UI_Box::MouseEnabled(bool v) {
+	setattribute_ = true;
 	/*if (v) {
 		set_mouse_filter(Control::MOUSE_FILTER_STOP);
 	}
@@ -135,6 +139,11 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 		}
 		else if (tag == "tab") {
 			UI_Tab* element = memnew(UI_Tab);
+			element->SetXml(child, self);
+			add_child(element);
+		}
+		else if (tag == "list") {
+			UI_List* element = memnew(UI_List);
 			element->SetXml(child, self);
 			add_child(element);
 		}
@@ -175,7 +184,23 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 			element->SetXml(child, self);
 			add_child(element);
 		}
+		else if (tag == "hscrollbar") {
+			UI_ScrollBar* element = memnew(UI_ScrollBar);
+			element->SetDirection("horizontal");
+			element->SetXml(child, self);
+			add_child(element);
+		}
+		else if (tag == "vscrollbar") {
+			UI_ScrollBar* element = memnew(UI_ScrollBar);
+			element->SetDirection("vertical");
+			element->SetXml(child, self);
+			add_child(element);
+		}
 	}
+}
+
+void UI_Box::SetDataSource(const Variant& db) {
+
 }
 
 void UI_Box::_bind_methods() {

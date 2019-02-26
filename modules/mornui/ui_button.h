@@ -1,7 +1,6 @@
 
 #ifndef UI_BUTTON_H
 #define UI_BUTTON_H
-#include "modules/pugixml/pugixml_exporter.h"
 #include "ui_clip.h"
 
 class UI_Button : public UI_Clip {
@@ -26,7 +25,7 @@ protected:
 	//static void _bind_methods();
 	String text_{""};
 	bool button_draw_{ true };
-	bool tab_mode_ { true };
+	bool tab_mode_ { false };
 	bool selected_{false};
 
 };

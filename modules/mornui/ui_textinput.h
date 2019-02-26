@@ -1,7 +1,6 @@
 
 #ifndef UI_TEXTINPUT_H
 #define UI_TEXTINPUT_H
-#include "modules/pugixml/pugixml_exporter.h"
 #include "ui_clip.h"
 
 class UI_TextInput : public UI_Clip {

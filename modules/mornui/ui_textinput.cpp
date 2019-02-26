@@ -49,6 +49,7 @@ void UI_TextInput::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 			}
 		}
 	}*/
+	setattribute_ = true;
 }
 
 static bool _is_text_char(CharType c) {

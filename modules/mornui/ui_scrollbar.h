@@ -1,18 +1,18 @@
 
-#ifndef UI_TAB_H
-#define UI_TAB_H
+#ifndef UI_SCROLLBAR_H
+#define UI_SCROLLBAR_H
 #include "ui_box.h"
+#include "ui_button.h"
+#include "ui_slider.h"
+class UI_ScrollBar : public UI_Box {
 
-class UI_Tab : public UI_Box {
-
-	GDCLASS(UI_Tab, UI_Box);
+	GDCLASS(UI_ScrollBar, UI_Box);
 	OBJ_CATEGORY("GUI Nodes");
 public:
-	UI_Tab();
-	~UI_Tab();
+	UI_ScrollBar();
+	~UI_ScrollBar();
 	void InitAttribute(Ref<XMLNode> node,ScriptInstance* self) override;
-	void SetLabels(const String& v);
-	String GetLabels() { return labels_; };
+	
 	const String& GetSizeGrid() { return grid_; };
 	void SetSizeGrid(const String& rect);
 	const String& GetSkin()const { return skin_; };
@@ -21,22 +21,19 @@ public:
 	void SetClipX(int);
 	int GetClipY() { return clipY_; };
 	void SetClipY(int);
-	int GetSelectedIndex() { return selectedindex_; }
-	void SetSelectedIndex(int v);
 	void SetDirection(String v);
-	void SetSpace(int v);
 	void OnEvent(Ref<InputEvent> e) override;
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
-	String labels_{""};
+	UI_Button* up_{ nullptr };
+	UI_Slider* slider_{ nullptr };
+	UI_Button* down_{ nullptr };
 	String grid_{ "" };
 	String skin_{ "" };
 	int clipX_{ 1 };
 	int clipY_{ 3 };
-	int selectedindex_{ -1 };
 	bool hv_{ true };
-	int space_{ 1 };
 };
 #endif

@@ -1,7 +1,6 @@
 
 #ifndef UI_LABEL_H
 #define UI_LABEL_H
-#include "modules/pugixml/pugixml_exporter.h"
 #include "ui_clip.h"
 
 class UI_Label : public UI_Clip {

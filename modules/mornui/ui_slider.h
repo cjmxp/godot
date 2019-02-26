@@ -1,7 +1,6 @@
 
 #ifndef UI_SLIDER_H
 #define UI_SLIDER_H
-#include "modules/pugixml/pugixml_exporter.h"
 #include "ui_clip.h"
 #include "ui_button.h"
 class UI_Slider : public UI_Clip {
@@ -25,10 +24,10 @@ protected:
 	//static void _bind_methods();
 	bool hslider_draw_{true};
 private:
-	UI_Button* but{ nullptr };
-	bool init_{ false };
+	UI_Button* bar_{ nullptr };
 	float value_{ 0.0 };
 	bool loack_{ false };
 	bool hv_{ true };
+	bool layout_{ false };
 };
 #endif
