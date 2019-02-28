@@ -7,7 +7,7 @@ UI_Slider::UI_Slider() {
 	set_clip_contents(false);
 	bar_ = memnew(UI_Button);
 	bar_->set_mouse_filter(Control::MOUSE_FILTER_PASS);
-	bar_->set_name("ui_slider_item");
+	bar_->set_name("ui_slider_bar");
 	add_child(bar_);
 }
 UI_Slider::~UI_Slider() {
@@ -28,47 +28,27 @@ void UI_Slider::SetSkin(const String& v) {
 
 void UI_Slider::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	UI_Clip::InitAttribute(node, self);
-	/*Vector<Variant> array = node->get_attributes();
+	Vector<Variant> array = node->get_attributes();
 	for(unsigned i = 0;i<array.size();i++){
 		Ref<XMLAttribute> attribute = array[i];
 		String tag = attribute->name().to_lower();
-		if (tag == "skin") {
-			SetSkin(attribute->value());
+		if (tag == "value") {
+			SetValue(attribute->value().to_float());
 		}
-		else if (tag == "sizegrid") {
-			SetSizeGrid(attribute->value());
-		}
-		else if (tag=="clipx") {
-			SetClipX(attribute->value().to_int());
-		}
-		else if (tag == "clipy") {
-			SetClipY(attribute->value().to_int());
-		}
-		else if (tag == "index") {
-			SetIndex(attribute->value().to_int());
-		}
-		else if (tag == "interval") {
-			SetInterval(attribute->value().to_int());
-		}
-		else if (tag == "autoplay") {
-			if (attribute->value() == "true") {
-				SetAutoPlay(true);
-			}
-			else {
-				SetAutoPlay(false);
-			}
-		}
-	}*/
+	
+	}
 }
 void UI_Slider::OnEvent(Ref<InputEvent> e) {
-	if (e->GetName() == "ui_slider_item")return;
+	if (e->GetName() == "ui_slider_bar")return;
 	UI_Box* p = Parent();
-	if (p)p->OnEvent(e);
+	if (p) {
+		e->SetName(get_name());
+		p->OnEvent(e);
+	}
 }
 
 void UI_Slider::_gui_input(Ref<InputEvent> p_event) {
 	p_event->SetName(get_name());
-	OnEvent(p_event);
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed()) {
@@ -89,13 +69,16 @@ void UI_Slider::_gui_input(Ref<InputEvent> p_event) {
 			}
 			if (xy<=wh) {
 				SetValue(0.0f);
+				OnEvent(p_event);
 				return;
 			}
 			if (xy >= swh -wh) {
 				SetValue(1.0f);
+				OnEvent(p_event);
 				return;
 			}
 			SetValue((xy-wh)/(swh - wh*2));
+			OnEvent(p_event);
 		}
 		else {
 			loack_ = false;
@@ -126,6 +109,7 @@ void UI_Slider::_gui_input(Ref<InputEvent> p_event) {
 				return;
 			}
 			SetValue((xy - wh) / (swh - wh * 2));
+			OnEvent(p_event);
 		}
 	}
 	
@@ -139,8 +123,8 @@ void UI_Slider::SetDirection(String v) {
 	}
 }
 void UI_Slider::SetValue(float v) {
-	if (v < 0)v = 0;
-	if (v > 1)v = 1;
+	if (v < 0.0)v = 0.0;
+	if (v > 1.0)v = 1.0;
 	Size2 size = get_size();
 	Size2 bsize = bar_->get_size();
 	real_t length = 0.0f;
@@ -188,6 +172,8 @@ void UI_Slider::_notification(int p_what) {
 }
 
 void UI_Slider::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("GetValue"), &UI_Slider::GetValue);
+	ClassDB::bind_method(D_METHOD("SetValue"), &UI_Slider::SetValue);
 }
 
 

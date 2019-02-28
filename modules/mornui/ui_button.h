@@ -17,16 +17,19 @@ public:
 	void SetSelected(bool v);
 	String GetLabel() { return text_; };
 	void SetLabel(const String& v);
+	String GetColor();
+	void SetColor(const String& v);
+	String GetFont();
+	void SetFont(const String& v);
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
-	//virtual void _unhandled_input(Ref<InputEvent> p_event);
-	//static void _bind_methods();
 	String text_{""};
 	bool button_draw_{ true };
 	bool tab_mode_ { false };
 	bool selected_{false};
-
+	String color_{""};
+	String font_{""};
 };
 #endif

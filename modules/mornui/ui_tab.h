@@ -23,9 +23,15 @@ public:
 	void SetClipY(int);
 	int GetSelectedIndex() { return selectedindex_; }
 	void SetSelectedIndex(int v);
-	void SetDirection(String v);
+	String GetDirection();
+	void SetDirection(const String& v);
+	int GetSpace() { return space_; };
 	void SetSpace(int v);
 	void OnEvent(Ref<InputEvent> e) override;
+	String GetColor() { return color_; };
+	void SetColor(const String& v);
+	String GetFont() { return font_; };
+	void SetFont(const String& v);
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
@@ -33,6 +39,8 @@ protected:
 	String labels_{""};
 	String grid_{ "" };
 	String skin_{ "" };
+	String font_{ "" };
+	String color_{ "" };
 	int clipX_{ 1 };
 	int clipY_{ 3 };
 	int selectedindex_{ -1 };

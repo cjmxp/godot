@@ -92,10 +92,10 @@ void UI_Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		}
 		else if (tag == "mouseenabled") {
 			if (attribute->value() == "true") {
-				MouseEnabled(true);
+				SetMouseEnabled(true);
 			}
 			else {
-				MouseEnabled(false);
+				SetMouseEnabled(false);
 			}
 		}
 	}
@@ -117,8 +117,8 @@ void UI_Box::OnEvent(Ref<InputEvent> e) {
 	UI_Box* p = Parent();
 	if (p)p->OnEvent(e);
 }
-void UI_Box::MouseEnabled(bool v) {
-	setattribute_ = true;
+void UI_Box::SetMouseEnabled(bool v) {
+	mouseEnabled_ = true;
 	/*if (v) {
 		set_mouse_filter(Control::MOUSE_FILTER_STOP);
 	}
@@ -204,8 +204,10 @@ void UI_Box::SetDataSource(const Variant& db) {
 }
 
 void UI_Box::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("Xml"), &UI_Box::Xml);
 	ClassDB::bind_method(D_METHOD("_gui_input"), &UI_Box::_gui_input);
+	ClassDB::bind_method(D_METHOD("Xml"), &UI_Box::Xml);
+	ClassDB::bind_method(D_METHOD("SetMouseEnabled"), &UI_Box::SetMouseEnabled);
+	ClassDB::bind_method(D_METHOD("GetMouseEnabled"), &UI_Box::GetMouseEnabled);
 }
 
 

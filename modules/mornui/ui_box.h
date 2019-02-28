@@ -14,7 +14,8 @@ public:
 	void Xml(const Variant& self, const String &v);
 	void SetXml(Ref<XMLNode> node, ScriptInstance* self);
 	virtual void InitAttribute(Ref<XMLNode> node,ScriptInstance* self);
-	void MouseEnabled(bool v);
+	void SetMouseEnabled(bool v);
+	bool GetMouseEnabled() { return mouseEnabled_; };
 	virtual void InitChilds(Ref<XMLNode> node,ScriptInstance* self);
 	virtual Size2 get_minimum_size() const;
 	virtual void OnEvent(Ref<InputEvent> e);
@@ -27,5 +28,6 @@ protected:
 	Size2 minsize_;
 	bool setattribute_{ false };
 	bool layout_{ false };
+	bool mouseEnabled_{ false };
 };
 #endif

@@ -2,7 +2,7 @@
 #ifndef UI_LIST_H
 #define UI_LIST_H
 #include "ui_box.h"
-
+#include "ui_scrollbar.h"
 class UI_List : public UI_Box {
 
 	GDCLASS(UI_List, UI_Box);
@@ -37,5 +37,9 @@ protected:
 	UI_Box* content_{ nullptr };
 	Ref<XMLNode> render_;
 	Vector<Variant> data_;
+	UI_ScrollBar* scrollbar_{ nullptr };
+private:
+	void scroll(String v);
+	Point2 node_size;
 };
 #endif

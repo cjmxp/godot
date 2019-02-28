@@ -46,7 +46,6 @@ void UI_Button::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 }
 void UI_Button::_gui_input(Ref<InputEvent> p_event) {
 	p_event->SetName(get_name());
-	OnEvent(p_event);
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed() && index_ != 1) {
@@ -60,12 +59,12 @@ void UI_Button::_gui_input(Ref<InputEvent> p_event) {
 				}
 				update();
 			}
+			OnEvent(p_event);
 		}
 		else if(!tab_mode_) {
 			index_ = 2;
 			update();
 		}
-		
 	}
 }
 
@@ -121,6 +120,25 @@ void UI_Button::SetLabel(const String& v) {
 	}
 }
 
+String UI_Button::GetColor() {
+	return color_;
+}
+
+void UI_Button::SetColor(const String& v) {
+	if (color_ != v && v != "") {
+		color_ = v;
+	}
+}
+
+String UI_Button::GetFont() {
+	return font_;
+}
+
+void UI_Button::SetFont(const String& v) {
+	if (font_ != v && v != "") {
+		font_ = v;
+	}
+}
 void UI_Button::SetSelected(bool v) {
 	if (tab_mode_ && selected_!=v) {
 		selected_ = v;
@@ -139,6 +157,16 @@ void UI_Button::SetTabMode(bool v) {
 	}
 }
 void UI_Button::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("GetLabel"), &UI_Button::GetLabel);
+	ClassDB::bind_method(D_METHOD("SetLabel"), &UI_Button::SetLabel);
+	ClassDB::bind_method(D_METHOD("GetColor"), &UI_Button::GetColor);
+	ClassDB::bind_method(D_METHOD("SetColor"), &UI_Button::SetColor);
+	ClassDB::bind_method(D_METHOD("GetFont"), &UI_Button::GetFont);
+	ClassDB::bind_method(D_METHOD("SetFont"), &UI_Button::SetFont);
+	ClassDB::bind_method(D_METHOD("GetSelected"), &UI_Button::GetSelected);
+	ClassDB::bind_method(D_METHOD("SetSelected"), &UI_Button::SetSelected);
+	ClassDB::bind_method(D_METHOD("GetTabMode"), &UI_Button::GetTabMode);
+	ClassDB::bind_method(D_METHOD("SetTabMode"), &UI_Button::SetTabMode);
 }
 
 

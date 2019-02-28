@@ -10,37 +10,44 @@ UI_Label::~UI_Label() {
 
 void UI_Label::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	UI_Clip::InitAttribute(node, self);
-	/*Vector<Variant> array = node->get_attributes();
+	Vector<Variant> array = node->get_attributes();
 	for(unsigned i = 0;i<array.size();i++){
 		Ref<XMLAttribute> attribute = array[i];
 		String tag = attribute->name().to_lower();
-		if (tag == "skin") {
-			SetSkin(attribute->value());
+		if (tag == "text") {
+			SetText(attribute->value());
 		}
-		else if (tag == "sizegrid") {
-			SetSizeGrid(attribute->value());
+		else if (tag == "align")
+		{
+			SetAlign(attribute->value());
 		}
-		else if (tag=="clipx") {
-			SetClipX(attribute->value().to_int());
-		}
-		else if (tag == "clipy") {
-			SetClipY(attribute->value().to_int());
-		}
-		else if (tag == "index") {
-			SetIndex(attribute->value().to_int());
-		}
-		else if (tag == "interval") {
-			SetInterval(attribute->value().to_int());
-		}
-		else if (tag == "autoplay") {
+		else if (tag == "autowrap")
+		{
 			if (attribute->value() == "true") {
-				SetAutoPlay(true);
+				SetAutowrap(true);
 			}
 			else {
-				SetAutoPlay(false);
+				SetAutowrap(false);
 			}
 		}
-	}*/
+		else if (tag == "clip")
+		{
+			if (attribute->value() == "true") {
+				SetClip(true);
+			}
+			else {
+				SetClip(false);
+			}
+		}
+		else if (tag == "color")
+		{
+			SetColor(attribute->value());
+		}		
+		else if (tag == "font")
+		{
+			SetFont(attribute->value());
+		}
+	}
 }
 
 Size2 UI_Label::get_minimum_size() const {
@@ -49,11 +56,11 @@ Size2 UI_Label::get_minimum_size() const {
 	if (word_cache_dirty)
 		const_cast<UI_Label*>(this)->regenerate_word_cache();
 
-	if (autowrap)
-		return Size2(1, clip ? 1 : minsize_.height);
+	if (autowrap_)
+		return Size2(1, clip_ ? 1 : minsize_.height);
 	else {
 		Size2 ms = minsize_;
-		if (clip)
+		if (clip_)
 			ms.width = 1;
 		return ms;
 	}
@@ -90,7 +97,7 @@ void UI_Label::_notification(int p_what) {
 		update();
 	}
 	if (p_what == NOTIFICATION_DRAW) {
-		if (clip) {
+		if (clip_) {
 			VisualServer::get_singleton()->canvas_item_set_clip(get_canvas_item(), true);
 		}
 		if (word_cache_dirty)
@@ -180,7 +187,7 @@ void UI_Label::_notification(int p_what) {
 
 			float x_ofs = 0;
 
-			switch (align) {
+			switch (align_) {
 
 			case ALIGN_FILL:
 			case ALIGN_LEFT: {
@@ -214,7 +221,7 @@ void UI_Label::_notification(int p_what) {
 				if (from->space_count) {
 					/* spacing */
 					x_ofs += space_w * from->space_count;
-					if (can_fill && align == ALIGN_FILL && spaces) {
+					if (can_fill && align_ == ALIGN_FILL && spaces) {
 
 						x_ofs += int((size.width - (taken + space_w * spaces)) / spaces);
 					}
@@ -227,8 +234,8 @@ void UI_Label::_notification(int p_what) {
 					for (int i = 0; i < from->word_len; i++) {
 
 						if (visible_chars < 0 || chars_total_shadow < visible_chars) {
-							CharType c = xl_text[i + pos];
-							CharType n = xl_text[i + pos + 1];
+							CharType c = text_[i + pos];
+							CharType n = text_[i + pos + 1];
 							if (uppercase) {
 								c = String::char_uppercase(c);
 								n = String::char_uppercase(n);
@@ -248,8 +255,8 @@ void UI_Label::_notification(int p_what) {
 				for (int i = 0; i < from->word_len; i++) {
 
 					if (visible_chars < 0 || chars_total < visible_chars) {
-						CharType c = xl_text[i + pos];
-						CharType n = xl_text[i + pos + 1];
+						CharType c = text_[i + pos];
+						CharType n = text_[i + pos + 1];
 						if (uppercase) {
 							c = String::char_uppercase(c);
 							n = String::char_uppercase(n);
@@ -274,9 +281,9 @@ int UI_Label::get_longest_line_width() const {
 	int max_line_width = 0;
 	int line_width = 0;
 
-	for (int i = 0; i < xl_text.size(); i++) {
+	for (int i = 0; i < text_.size(); i++) {
 
-		CharType current = xl_text[i];
+		CharType current = text_[i];
 		if (uppercase)
 			current = String::char_uppercase(current);
 
@@ -292,7 +299,7 @@ int UI_Label::get_longest_line_width() const {
 		else {
 
 			// ceiling to ensure autowrapping does not cut text
-			int char_width = Math::ceil(font->get_char_size(current, xl_text[i + 1]).width);
+			int char_width = Math::ceil(font->get_char_size(current, text_[i + 1]).width);
 			line_width += char_width;
 		}
 	}
@@ -312,7 +319,7 @@ void UI_Label::regenerate_word_cache() {
 		memdelete(current);
 	}
 
-	int width = autowrap ? (get_size().width ) : get_longest_line_width();
+	int width = autowrap_ ? (get_size().width ) : get_longest_line_width();
 	Ref<Font> font = get_font("font");
 
 	int current_word_size = 0;
@@ -327,9 +334,9 @@ void UI_Label::regenerate_word_cache() {
 
 	WordCache *last = NULL;
 
-	for (int i = 0; i <= xl_text.length(); i++) {
+	for (int i = 0; i <= text_.length(); i++) {
 
-		CharType current = i < xl_text.length() ? xl_text[i] : L' '; //always a space at the end, so the algo works
+		CharType current = i < text_.length() ? text_[i] : L' '; //always a space at the end, so the algo works
 
 		if (uppercase)
 			current = String::char_uppercase(current);
@@ -369,7 +376,7 @@ void UI_Label::regenerate_word_cache() {
 				total_char_cache++;
 			}
 
-			if (i < xl_text.length() && xl_text[i] == ' ') {
+			if (i < text_.length() && text_[i] == ' ') {
 				if (line_width > 0 || last == NULL || last->char_pos != WordCache::CHAR_WRAPLINE) {
 					space_count++;
 					line_width += space_width;
@@ -386,13 +393,13 @@ void UI_Label::regenerate_word_cache() {
 				word_pos = i;
 			}
 			// ceiling to ensure autowrapping does not cut text
-			char_width = Math::ceil(font->get_char_size(current, xl_text[i + 1]).width);
+			char_width = Math::ceil(font->get_char_size(current, text_[i + 1]).width);
 			current_word_size += char_width;
 			line_width += char_width;
 			total_char_cache++;
 		}
 
-		if ((autowrap && (line_width >= width) && ((last && last->char_pos >= 0) || separatable)) || insert_newline) {
+		if ((autowrap_ && (line_width >= width) && ((last && last->char_pos >= 0) || separatable)) || insert_newline) {
 			if (separatable) {
 				if (current_word_size > 0) {
 					WordCache *wc = memnew(WordCache);
@@ -432,7 +439,7 @@ void UI_Label::regenerate_word_cache() {
 		}
 	}
 
-	if (!autowrap)
+	if (!autowrap_)
 		minsize_.width = width;
 
 	if (max_lines_visible > 0 && line_count > max_lines_visible) {
@@ -442,14 +449,81 @@ void UI_Label::regenerate_word_cache() {
 		minsize_.height = (font->get_height() * line_count) + (line_spacing * (line_count - 1));
 	}
 
-	if (!autowrap || !clip) {
-		//helps speed up some labels that may change a lot, as no resizing is requested. Do not change.
+	if (!autowrap_ || !clip_) {
 		minimum_size_changed();
 	}
 	word_cache_dirty = false;
 }
 
+String UI_Label::GetAlign() {
+	if (align_ == Align::ALIGN_RIGHT) {
+		return "right";
+	}
+	else if (align_ == Align::ALIGN_CENTER) {
+		return "center";
+	}
+	return "left";
+}
+
+void UI_Label::SetAlign(const String& v)
+{
+	if (v == "right") {
+		align_ = Align::ALIGN_RIGHT;
+	}
+	else if (v == "center") {
+		align_ = Align::ALIGN_CENTER;
+	}
+	else {
+		align_ = Align::ALIGN_LEFT;
+	}
+	update();
+}
+
+void UI_Label::SetText(const String& v) {
+	if (text_ != v) {
+		text_ = v;
+		update();
+	}
+}
+void UI_Label::SetAutowrap(bool v) {
+	if (autowrap_ != v) {
+		autowrap_ = v;
+		update();
+	}
+}
+void UI_Label::SetClip(bool v) {
+	if (clip_ != v) {
+		clip_ = v;
+		update();
+	}
+}
+void UI_Label::SetColor(const String& v) {
+	if (color_ != v && v != "") {
+		color_ = v;
+		update();
+	}
+}
+
+void UI_Label::SetFont(const String& v) {
+	if (font_ != v && v != "") {
+		font_ = v;
+		update();
+	}
+}
+
 void UI_Label::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("GetText"), &UI_Label::GetText);
+	ClassDB::bind_method(D_METHOD("SetText"), &UI_Label::SetText);
+	ClassDB::bind_method(D_METHOD("GetAlign"), &UI_Label::GetAlign);
+	ClassDB::bind_method(D_METHOD("SetAlign"), &UI_Label::SetAlign);
+	ClassDB::bind_method(D_METHOD("GetAutowrap"), &UI_Label::GetAutowrap);
+	ClassDB::bind_method(D_METHOD("SetAutowrap"), &UI_Label::SetAutowrap);
+	ClassDB::bind_method(D_METHOD("GetClip"), &UI_Label::GetClip);
+	ClassDB::bind_method(D_METHOD("SetClip"), &UI_Label::SetClip);
+	ClassDB::bind_method(D_METHOD("GetColor"), &UI_Label::GetColor);
+	ClassDB::bind_method(D_METHOD("SetColor"), &UI_Label::SetColor);
+	ClassDB::bind_method(D_METHOD("GetFont"), &UI_Label::GetFont);
+	ClassDB::bind_method(D_METHOD("SetFont"), &UI_Label::SetFont);
 }
 
 

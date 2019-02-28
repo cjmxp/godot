@@ -21,7 +21,10 @@ public:
 	void SetClipX(int);
 	int GetClipY() { return clipY_; };
 	void SetClipY(int);
-	void SetDirection(String v);
+	String GetDirection();
+	void SetDirection(const String& v);
+	float GetValue() { return value_; };
+	void SetValue(float v);
 	void OnEvent(Ref<InputEvent> e) override;
 protected:
 	static void _bind_methods();
@@ -35,5 +38,6 @@ protected:
 	int clipX_{ 1 };
 	int clipY_{ 3 };
 	bool hv_{ true };
+	float value_{ 0.0 };
 };
 #endif

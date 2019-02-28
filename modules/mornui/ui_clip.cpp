@@ -160,9 +160,22 @@ void UI_Clip::_notification(int p_what) {
 	}
 }
 
-//void Clip::_bind_methods() {
-	//ClassDB::bind_method(D_METHOD("Xml"), &Box::Xml);
-//}
+void UI_Clip::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("GetSkin"), &UI_Clip::GetSkin);
+	ClassDB::bind_method(D_METHOD("SetSkin"), &UI_Clip::SetSkin);
+	ClassDB::bind_method(D_METHOD("GetSizeGrid"), &UI_Clip::GetSizeGrid);
+	ClassDB::bind_method(D_METHOD("SetSizeGrid"), &UI_Clip::SetSizeGrid);
+	ClassDB::bind_method(D_METHOD("GetClipX"), &UI_Clip::GetClipX);
+	ClassDB::bind_method(D_METHOD("SetClipX"), &UI_Clip::SetClipX);
+	ClassDB::bind_method(D_METHOD("GetClipY"), &UI_Clip::GetClipY);
+	ClassDB::bind_method(D_METHOD("SetClipY"), &UI_Clip::SetClipY);
+	ClassDB::bind_method(D_METHOD("GetIndex"), &UI_Clip::GetIndex);
+	ClassDB::bind_method(D_METHOD("SetIndex"), &UI_Clip::SetIndex);
+	ClassDB::bind_method(D_METHOD("GetInterval"), &UI_Clip::GetInterval);
+	ClassDB::bind_method(D_METHOD("SetInterval"), &UI_Clip::SetInterval);
+	ClassDB::bind_method(D_METHOD("GetAutoPlay"), &UI_Clip::GetAutoPlay);
+	ClassDB::bind_method(D_METHOD("SetAutoPlay"), &UI_Clip::SetAutoPlay);
+}
 
 
 

@@ -11,7 +11,19 @@ public:
 	UI_Label();
 	~UI_Label();
 	virtual Size2 get_minimum_size() const override;
-	void InitAttribute(Ref<XMLNode> node,ScriptInstance* self) override;
+	void InitAttribute(Ref<XMLNode> node, ScriptInstance* self) override;
+	String GetAlign();
+	void SetAlign(const String& v);
+	bool GetAutowrap() { return autowrap_; };
+	void SetAutowrap(bool v);
+	bool GetClip() { return clip_; };
+	void SetClip(bool v);
+	String GetText() { return text_; };
+	void SetText(const String& v);
+	String GetColor() { return color_; };
+	void SetColor(const String& v);
+	String GetFont() { return font_; };
+	void SetFont(const String& v);
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
@@ -19,7 +31,7 @@ protected:
 	//virtual void _unhandled_input(Ref<InputEvent> p_event);
 	//static void _bind_methods();
 	bool label_draw_{ true };
-	String xl_text{"abcd"};
+	String text_{""};
 private:
 	enum Align {
 		ALIGN_LEFT,
@@ -27,9 +39,9 @@ private:
 		ALIGN_RIGHT,
 		ALIGN_FILL
 	};
-	Align align{ ALIGN_LEFT };
-	bool autowrap{ false };
-	bool clip{ false };
+	Align align_{ ALIGN_LEFT };
+	bool autowrap_{ false };
+	bool clip_{ false };
 	int line_count{ 0 };
 	bool uppercase{ false };
 	int total_char_cache{ 0 };
@@ -37,7 +49,8 @@ private:
 	bool word_cache_dirty{ true };
 	int lines_skipped{ 0 };
 	int visible_chars{ -1 };
-
+	String font_{ "" };
+	String color_{ "" };
 
 	struct WordCache {
 

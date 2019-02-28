@@ -139,12 +139,14 @@ void UI_List::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 				UI_ScrollBar* element = memnew(UI_ScrollBar);
 				element->SetDirection("horizontal");
 				element->SetXml(child, self);
+				element->set_name("ui_list_hscrollbar");
 				add_child(element);
 			}
 			else if (tag == "vscrollbar") {
 				UI_ScrollBar* element = memnew(UI_ScrollBar);
 				element->SetDirection("vertical");
 				element->SetXml(child, self);
+				element->set_name("ui_list_vscrollbar");
 				add_child(element);
 			}
 		}
@@ -214,6 +216,7 @@ void UI_List::_notification(int p_what) {
 		real_t y = 0;
 		UI_Box* node = nullptr;
 		Size2 size;
+		Size2 max;
 		for (unsigned i = 0; i < count; i++) {
 			node = Object::cast_to<UI_Box>(box_->get_child(i));
 			size = node->get_size();
@@ -222,33 +225,91 @@ void UI_List::_notification(int p_what) {
 			x = size.width * rx + rx * spacex_;
 			y = size.height * ry + ry * spacey_;
 			node->set_position(Point2(x, y));
+			max.width = x + size.width;
+			max.height = y + size.height;
 		}
+		max.width -= spacex_;
+		max.height -= spacey_;
+		node_size.width = size.width + spacex_;
+		node_size.height = size.height + spacey_;
+		size = get_size();
+		if (size.width > max.width)max.width = size.width;
+		if (size.height > max.height)max.height = size.height;
+		box_->set_size(max);
 		layout_ = false;
 		set_process(false);
 	}
 }
 
 void UI_List::OnEvent(Ref<InputEvent> p_event) {
-/*
 	String name = p_event->GetName();
-	if (name.find("ui_table_item_")!=-1) {
-		Ref<InputEventMouseButton> b = p_event;
-		if (b.is_valid() && b->is_pressed() ) {
-			name = name.replace_first("ui_table_item_", "");
-			unsigned j = name.to_int();
-			SetSelectedIndex(j);
-			UI_Box* p = Parent();
-			if (p) {
-				p_event->SetName(get_name());
-				p->OnEvent(p_event);
-			}
-			return;
-		}
+	if (name == "ui_list_hscrollbar" || name == "ui_list_hscrollbar_up" || name == "ui_list_hscrollbar_down" || name == "ui_list_vscrollbar" || name == "ui_list_vscrollbar_up" || name == "ui_list_vscrollbar_down") {
+		scroll(name);
 	}
 	UI_Box* p = Parent();
-	if (p)p->OnEvent(p_event);*/
+	if (p)p->OnEvent(p_event);
 }
-
+void UI_List::scroll(String name) {
+	if (scrollbar_ == nullptr) {
+		if (name.find("ui_list_hscrollbar")!=-1) {
+			String node_key = "ui_list_hscrollbar";
+			scrollbar_ = Object::cast_to<UI_ScrollBar>(get_node(node_key));
+		}
+		else if (name.find("ui_list_vscrollbar")!=-1) {
+			String node_key = "ui_list_vscrollbar";
+			scrollbar_ = Object::cast_to<UI_ScrollBar>(get_node(node_key));
+		}
+	}
+	if (scrollbar_ != nullptr) {
+		Size2 size = get_size();
+		Size2 size2 = box_->get_size();
+		Point2 p = box_->get_position();
+		float max = 0.0f;
+		float v = scrollbar_->GetValue();
+		if (name == "ui_list_hscrollbar" && size2.width > size.width) {
+			size2.width = size2.width - size.width;
+			p.x = -size2.width*v;
+			box_->set_position(p);
+		}
+		else if (name == "ui_list_hscrollbar_up" && size2.width > size.width) {
+			max = size2.width - size.width;
+			size2.width = node_size.width /max;
+			scrollbar_->SetValue(v - size2.width);
+			v = scrollbar_->GetValue();
+			p.x = max *v;
+			box_->set_position(p);
+		}
+		else if (name == "ui_list_hscrollbar_down" && size2.width > size.width) {
+			max = size2.width - size.width;
+			size2.width = node_size.width / max;
+			scrollbar_->SetValue(v + size2.width);
+			v = scrollbar_->GetValue();
+			p.x = max * v;
+			box_->set_position(p);
+		}
+		else if (name == "ui_list_vscrollbar" && size2.height > size.height) {
+			size2.height = size2.height - size.height;
+			p.y = -size2.height*v;
+			box_->set_position(p);
+		}
+		else if (name == "ui_list_vscrollbar_up" && size2.height > size.height) {
+			max = size2.height - size.height;
+			size2.height = node_size.height / max;
+			scrollbar_->SetValue(v - size2.height);
+			v = scrollbar_->GetValue();
+			p.y = -max * v;
+			box_->set_position(p);
+		}
+		else if (name == "ui_list_vscrollbar_down" && size2.height > size.height) {
+			max = size2.height - size.height;
+			size2.height = node_size.height / max;
+			scrollbar_->SetValue(v + size2.height);
+			v = scrollbar_->GetValue();
+			p.y = -max * v;
+			box_->set_position(p);
+		}
+	}
+}
 void UI_List::_gui_input(Ref<InputEvent> p_event) {
 	p_event->SetName(get_name());
 	OnEvent(p_event);

@@ -46,6 +46,6 @@ protected:
 	AxisStretchMode axis_h_{ AXIS_STRETCH_MODE_STRETCH };
 	AxisStretchMode axis_v_{ AXIS_STRETCH_MODE_STRETCH };
 	bool clip_draw_{ true };
-	//static void _bind_methods();
+	static void _bind_methods();
 };
 #endif
