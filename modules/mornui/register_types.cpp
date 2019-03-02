@@ -1,5 +1,6 @@
 #include "register_types.h"
 #include "core/class_db.h"
+#include "core/engine.h"
 #include "ui_box.h"
 #include "ui_view.h"
 #include "ui_tab.h"
@@ -11,7 +12,7 @@
 #include "ui_slider.h"
 #include "ui_textinput.h"
 #include "ui_scrollbar.h"
-
+#include "morn.h"
 void register_mornui_types() {
 
 	ClassDB::register_class<UI_Box>();
@@ -25,7 +26,9 @@ void register_mornui_types() {
 	ClassDB::register_class<UI_Slider>();
 	ClassDB::register_class<UI_TextInput>();
 	ClassDB::register_class<UI_ScrollBar>();
+	ClassDB::register_class<_Morn>();
 	
+	Engine::get_singleton()->add_singleton(Engine::Singleton("Morn", _Morn::get_singleton()));
 }
 
 void unregister_mornui_types() {

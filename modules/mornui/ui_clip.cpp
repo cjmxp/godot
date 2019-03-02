@@ -1,5 +1,6 @@
 #include "ui_clip.h"
 #include "core/os/os.h"
+#include "morn.h"
 
 UI_Clip::UI_Clip() {
 	margin_[0] = 0;
@@ -53,10 +54,9 @@ void UI_Clip::SetSkin(const String& v) {
 		//Ref<AtlasTexture> t = memnew(AtlasTexture);
 		//t->set_atlas(ResourceLoader::load(v));
 		//t->set_region(Rect2(0,0,64,64));
-		texture_ = ResourceLoader::load(v);//t;
+		texture_ = _Morn::get_singleton()->GetTexture(v); //t;ResourceLoader::load(v);
 		update();
-		//emit_signal("texture_changed");
-		//_change_notify("texture");
+
 	}
 }
 
