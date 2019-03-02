@@ -2,19 +2,20 @@
 #ifndef MRES_H
 #define MRES_H
 #include "core/object.h"
-#include "scene/resources/texture.h"
+#include "core/reference.h"
+#include "core/os/file_access.h"
 
 class MRes : public Reference {
 	GDCLASS(MRes, Reference);
 public:
 	MRes();
 	~MRes();
-	virtual void Load() {};
-	virtual void Write() {};
+	virtual bool Load();
+	virtual bool Fill(PoolByteArray db);
+	String GetUrl(const String& root) { return root+"/"+ path_; };
 	String GetPath() { return path_; };
 	void SetPath(const String& v);
 	void SetKey(const String& v);
-	bool exists();
 protected:
 	String path_{ "" };
 	String key_{ "" };
