@@ -7,7 +7,8 @@
 MUI::MUI() {
 }
 MUI::~MUI() {
-	
+	//map_.clear();
+	//imgs_.clear();
 }
 
 bool MUI::Load() {

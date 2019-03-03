@@ -4,14 +4,14 @@
 #include "mres.h"
 #include "mui.h"
 #include "scene/resources/texture.h"
-#include "core/object.h"
+#include "scene/main/node.h"
 #include "core/io/http_client.h"
-class _Morn : public Object {
-	GDCLASS(_Morn, Object);
+class Morn : public Node {
+	GDCLASS(Morn, Node);
 public:
-	_Morn();
-	~_Morn();
-	static _Morn *get_singleton();
+	Morn();
+	~Morn();
+	static Morn *get_singleton();
 	void Init(const Variant& m);
 	Ref<Texture> GetSkin(const String& skin);
 	Ref<MRes> GetRes(const String& skin);
@@ -48,13 +48,13 @@ private:
 	PoolByteArray body;
 	Mutex* mutex_;
 	Thread* thread{ NULL };
-	static _Morn* singleton;
+	static Morn* singleton;
 	bool exit_{ false };
 	Vector<String> n_;
 	Vector<Ref<MRes>> list_;
 	Map<String, Ref<MRes>> res_;
 	Ref<HTTPClient> client_;
-	Object* main_{NULL};
+	Node* main_{NULL};
 	static void _thread_func(void *ud);
 	void _thread();
 	Ref<MRes> find(const String& v);

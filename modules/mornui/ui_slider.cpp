@@ -17,7 +17,7 @@ UI_Slider::~UI_Slider() {
 void UI_Slider::SetSkin(const String& v) {
 	if (skin_!=v && v!="") {
 		skin_ = v;
-		texture_ = _Morn::get_singleton()->GetSkin(v);
+		texture_ = Morn::get_singleton()->GetSkin(v);
 		bar_->SetClipY(3);
 		bar_->SetSkin(skin_.replace(".png", "$bar.png"));
 		layout_ = true;

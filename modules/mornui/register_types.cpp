@@ -28,10 +28,10 @@ void register_mornui_types() {
 	ClassDB::register_class<UI_Slider>();
 	ClassDB::register_class<UI_TextInput>();
 	ClassDB::register_class<UI_ScrollBar>();
-	ClassDB::register_class<_Morn>();
+	ClassDB::register_class<Morn>();
 	ClassDB::register_class<MRes>();
 	ClassDB::register_class<MUI>();
-	Engine::get_singleton()->add_singleton(Engine::Singleton("Morn", _Morn::get_singleton()));
+	Engine::get_singleton()->add_singleton(Engine::Singleton("Morn", Morn::get_singleton()));
 }
 
 void unregister_mornui_types() {

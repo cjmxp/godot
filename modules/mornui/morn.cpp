@@ -2,23 +2,24 @@
 #include "mui.h"
 #include "core/os/os.h"
 
-_Morn* _Morn::singleton = NULL;
-_Morn* _Morn::get_singleton() {
+Morn* Morn::singleton = NULL;
+Morn* Morn::get_singleton() {
 	if (singleton == NULL) {
-		singleton = memnew(_Morn);
+		singleton = memnew(Morn);
 	}
 	return singleton;
 }
-void _Morn::Init(const Variant& m) {
+void Morn::Init(const Variant& m) {
 	main_ = m;
+	main_->add_child(this);
 }
-_Morn::_Morn() {
+Morn::Morn() {
 	mutex_ = Mutex::create();
 }
-_Morn::~_Morn() {
+Morn::~Morn() {
 }
 
-Error _Morn::_parse_url(const String &p_url) {
+Error Morn::_parse_url(const String &p_url) {
 
 	url = p_url;
 	use_ssl = false;
@@ -71,7 +72,7 @@ Error _Morn::_parse_url(const String &p_url) {
 	return OK;
 }
 
-bool _Morn::_handle_response(bool *ret_value) {
+bool Morn::_handle_response(bool *ret_value) {
 
 	if (!client_->has_response()) {
 		*ret_value = true;
@@ -134,13 +135,13 @@ bool _Morn::_handle_response(bool *ret_value) {
 
 	return 2;
 }
-void _Morn::sleep(int msec) {
+void Morn::sleep(int msec) {
 	OS::get_singleton()->delay_usec(msec * 1000);
 }
-Error _Morn::_request() {
+Error Morn::_request() {
 	return client_->connect_to_host(url, port, use_ssl, false);
 }
-PoolByteArray _Morn::HTTPGet(const String& url_) {
+PoolByteArray Morn::HTTPGet(const String& url_) {
 	response_code = -1;
 	_parse_url(url_);
 	client_->set_blocking_mode(false);
@@ -273,11 +274,11 @@ PoolByteArray _Morn::HTTPGet(const String& url_) {
 	return PoolByteArray();
 }
 
-void _Morn::SetUrl(const String& v) {
+void Morn::SetUrl(const String& v) {
 	root_ = v;
 }
 
-void _Morn::LoadRes(Ref<MRes> res) {
+void Morn::LoadRes(Ref<MRes> res) {
 	if (client_.is_null()) {
 		client_.instance();
 	}
@@ -294,23 +295,23 @@ void _Morn::LoadRes(Ref<MRes> res) {
 	}
 }
 
-Ref<Texture> _Morn::GetSkin(const String& skin) {
+Ref<Texture> Morn::GetSkin(const String& skin) {
 	if (!mui_.is_null()) {
 		return mui_->GetSkin(skin);
 	}
 	return NULL;
 }
 
-Ref<MRes> _Morn::GetRes(const String& v) {
+Ref<MRes> Morn::GetRes(const String& v) {
 	return find(v);
 }
 
-void _Morn::_thread_func(void *ud) {
-	_Morn *erp = (_Morn *)ud;
+void Morn::_thread_func(void *ud) {
+	Morn *erp = (Morn *)ud;
 	erp->_thread();
 }
 
-void _Morn::_thread() {
+void Morn::_thread() {
 	while (true) {
 		Ref<MRes> res = pop();
 		if (res.is_null()) {
@@ -339,7 +340,7 @@ void _Morn::_thread() {
 }
 
 
-void _Morn::OnComplete(Ref<MRes> res) {
+void Morn::OnComplete(Ref<MRes> res) {
 	res->Init();
 	if (main_ != NULL && main_->get_script_instance()) {
 		if (main_->get_script_instance()->has_method("onComplete")) {
@@ -348,7 +349,7 @@ void _Morn::OnComplete(Ref<MRes> res) {
 	}
 }
 
-void _Morn::OnError(const String& v) {
+void Morn::OnError(const String& v) {
 	if (main_ != NULL && main_->get_script_instance()) {
 		if (main_->get_script_instance()->has_method("onError")) {
 			main_->get_script_instance()->call("onError", v);
@@ -356,7 +357,7 @@ void _Morn::OnError(const String& v) {
 	}
 }
 
-Ref<MRes> _Morn::find(const String& v) {
+Ref<MRes> Morn::find(const String& v) {
 	Ref<MRes> res = NULL;
 	mutex_->lock();
 	for (unsigned i = 0; i < list_.size(); i++) {
@@ -375,7 +376,7 @@ Ref<MRes> _Morn::find(const String& v) {
 	return res;
 }
 
-Ref<MRes> _Morn::pop() {
+Ref<MRes> Morn::pop() {
 	Ref<MRes> res = NULL;
 	mutex_->lock();
 	if (list_.size() > 0) {
@@ -386,7 +387,7 @@ Ref<MRes> _Morn::pop() {
 	return res;
 }
 
-void _Morn::push(Ref<MRes> res) {
+void Morn::push(Ref<MRes> res) {
 	if (res != NULL) {
 		mutex_->lock();
 		list_.push_back(res);
@@ -394,12 +395,12 @@ void _Morn::push(Ref<MRes> res) {
 	}
 }
 
-void _Morn::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("Init"), &_Morn::Init);
-	ClassDB::bind_method(D_METHOD("LoadRes"), &_Morn::LoadRes);
-	ClassDB::bind_method(D_METHOD("GetRes"), &_Morn::GetRes);
-	ClassDB::bind_method(D_METHOD("GetUrl"), &_Morn::GetUrl);
-	ClassDB::bind_method(D_METHOD("SetUrl"), &_Morn::SetUrl);
-	ClassDB::bind_method(D_METHOD("OnComplete"), &_Morn::OnComplete);
-	ClassDB::bind_method(D_METHOD("OnError"), &_Morn::OnError);
+void Morn::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("Init"), &Morn::Init);
+	ClassDB::bind_method(D_METHOD("LoadRes"), &Morn::LoadRes);
+	ClassDB::bind_method(D_METHOD("GetRes"), &Morn::GetRes);
+	ClassDB::bind_method(D_METHOD("GetUrl"), &Morn::GetUrl);
+	ClassDB::bind_method(D_METHOD("SetUrl"), &Morn::SetUrl);
+	ClassDB::bind_method(D_METHOD("OnComplete"), &Morn::OnComplete);
+	ClassDB::bind_method(D_METHOD("OnError"), &Morn::OnError);
 }

@@ -118,13 +118,13 @@ void UI_Box::OnEvent(Ref<InputEvent> e) {
 	if (p)p->OnEvent(e);
 }
 void UI_Box::SetMouseEnabled(bool v) {
-	mouseEnabled_ = true;
-	/*if (v) {
+	mouseEnabled_ = v;
+	if (v) {
 		set_mouse_filter(Control::MOUSE_FILTER_STOP);
 	}
 	else {
 		set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
-	}*/
+	}
 }
 
 void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
@@ -147,7 +147,7 @@ void UI_Box::InitChilds(Ref<XMLNode> node, ScriptInstance* self) {
 			element->SetXml(child, self);
 			add_child(element);
 		}
-		else if (tag == "clip") {
+		else if (tag == "clip" || tag=="image") {
 			UI_Clip* element = memnew(UI_Clip);
 			element->SetXml(child, self);
 			add_child(element);

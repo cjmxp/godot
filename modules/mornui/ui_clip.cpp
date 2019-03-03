@@ -51,7 +51,7 @@ void UI_Clip::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 void UI_Clip::SetSkin(const String& v) {
 	if (v != "" && skin_ != v) {
 		skin_ = v;
-		texture_ = _Morn::get_singleton()->GetSkin(v);
+		texture_ = Morn::get_singleton()->GetSkin(v);
 		update();
 
 	}

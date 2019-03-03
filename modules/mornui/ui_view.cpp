@@ -2,7 +2,7 @@
 
 UI_View::UI_View() {
 
-	set_mouse_filter(Control::MOUSE_FILTER_STOP);
+	set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
 
 }
 UI_View::~UI_View() {
