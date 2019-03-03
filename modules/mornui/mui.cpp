@@ -1,4 +1,5 @@
 #include "mui.h"
+#include "morn.h"
 #include "core/io/file_access_encrypted.h"
 #include "core/io/file_access_memory.h"
 #include "core/io/image_loader.h"
@@ -11,14 +12,15 @@ MUI::~MUI() {
 
 bool MUI::Load() {
 	if (MRes::Load()) {
-		FileAccess *file = FileAccess::open("user://" + path_, FileAccess::WRITE);
+		Error err;
+		FileAccess *file = FileAccess::open("user://" + path_, FileAccess::READ, &err);
 		if (key_!="") {
 			FileAccessEncrypted *fae = memnew(FileAccessEncrypted);
-			Error err = fae->open_and_parse_password(file, key_,  FileAccessEncrypted::MODE_WRITE_AES256);
+			err = fae->open_and_parse_password(file, key_, FileAccessEncrypted::MODE_READ);
 			if (err) {
 				memdelete(fae);
 				if(file)memdelete(file);
-				file = nullptr;
+				file = NULL;
 				return false;
 			}
 			else {
@@ -28,9 +30,27 @@ bool MUI::Load() {
 		if (file) {
 			PoolByteArray temp;
 			FileAccessMemory* buff = memnew(FileAccessMemory);
-			uint16_t count = file->get_16();
+			uint16_t count = 0;
 			uint32_t size = 0;
 			String key = "";
+			uint32_t id = 0;
+			Rect2 region;
+
+			count = file->get_16();
+			for (unsigned i = 0; i < count; i++) {
+				Ref <MAtlasTexture> texture = memnew(MAtlasTexture);
+				texture->i = file->get_8();
+				texture->key = file->get_line();
+				id = texture->key.hash();
+				region.position.x = file->get_16();
+				region.position.y = file->get_16();
+				region.size.x = file->get_16();
+				region.size.y = file->get_16();
+				texture->set_region(region);
+				map_.insert(id, texture);
+			}
+
+			count = file->get_8();
 			for (unsigned i = 0; i < count; i++) {
 				key = file->get_line();
 				size = file->get_32();
@@ -41,28 +61,48 @@ bool MUI::Load() {
 				buff->open_custom(r.ptr(), size);
 				Ref<Image> image = memnew(Image);
 				buff->seek(0);
-				if (ImageLoader::load_image(key, image, buff) != OK) {
+				if (ImageLoader::load_image("img."+ key, image, buff) != OK) {
 					break;
 				}
+				imgs_.push_back(image);
 			}
-
 			
-
-			//buff->open_custom();
-			
-			
-			//file->get_buffer(w.ptr(), buff.size());
 			buff->close();
 			file->close();
 			memdelete(file);
-			file = nullptr;
-			buff = nullptr;
+			file = NULL;
+			buff = NULL;
 			return true;
 		}
 	}
 	return false;
 }
+
 bool MUI::Fill(PoolByteArray db) {
 	MRes::Fill(db);
+	return Load();
+}
+
+void MUI::Init() {
+	for (Map<uint32_t, Ref<MAtlasTexture>>::Element *E = map_.front(); E; E = E->next()) {
+		if (imgs_.size() > E->value()->i) {
+			Ref<ImageTexture> texture = memnew(ImageTexture);
+			texture->create_from_image(imgs_[E->value()->i], Texture::FLAG_REPEAT);
+			E->value()->set_atlas(texture);
+		}
+		else {
+			return;
+		}
+	}
+	ready = true;
+}
+
+Ref<Texture> MUI::GetSkin(const String& v) {
+	if (!ready)return NULL;
+	Map<uint32_t, Ref<MAtlasTexture>>::Element* E = map_.find(v.hash());
+	if (E != NULL) {
+		return E->value();
+	}
+	return NULL;
 }
 

@@ -1,10 +1,10 @@
 
 #ifndef MORN_H
 #define MORN_H
-#include "core/object.h"
 #include "mres.h"
-//#include "core/os/thread.h"
+#include "mui.h"
 #include "scene/resources/texture.h"
+#include "core/object.h"
 #include "core/io/http_client.h"
 class _Morn : public Object {
 	GDCLASS(_Morn, Object);
@@ -12,12 +12,15 @@ public:
 	_Morn();
 	~_Morn();
 	static _Morn *get_singleton();
-	Ref<Texture> GetTexture(const String& skin);
+	void Init(const Variant& m);
+	Ref<Texture> GetSkin(const String& skin);
 	Ref<MRes> GetRes(const String& skin);
 	void LoadRes(Ref<MRes> res);
 	void SetUrl(const String& v);
 	String GetUrl() { return root_; };
 	PoolByteArray HTTPGet(const String& url);
+	void OnComplete(Ref<MRes> res);
+	void OnError(const String& v);
 protected:
 	static void _bind_methods();
 	Error _parse_url(const String &p_url);
@@ -38,24 +41,25 @@ private:
 	bool use_ssl{ false };
 	bool request_sent{ false };
 	bool got_response{ false };
+	Ref<MUI> mui_{ NULL };
 
 	Vector<String> headers;
 	PoolVector<String> response_headers;
 	PoolByteArray body;
-
 	Mutex* mutex_;
-	Thread* thread{ nullptr };
+	Thread* thread{ NULL };
 	static _Morn* singleton;
-	static void _thread_func(void *ud);
-	void _thread();
 	bool exit_{ false };
 	Vector<String> n_;
 	Vector<Ref<MRes>> list_;
+	Map<String, Ref<MRes>> res_;
+	Ref<HTTPClient> client_;
+	Object* main_{NULL};
+	static void _thread_func(void *ud);
+	void _thread();
 	Ref<MRes> find(const String& v);
 	Ref<MRes> pop();
 	void push(Ref<MRes> res);
-	Map<String, Ref<MRes>> res_;
-	Ref<HTTPClient> client_;
-	
+
 };
 #endif

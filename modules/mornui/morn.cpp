@@ -2,17 +2,18 @@
 #include "mui.h"
 #include "core/os/os.h"
 
-_Morn* _Morn::singleton = nullptr;
+_Morn* _Morn::singleton = NULL;
 _Morn* _Morn::get_singleton() {
-	if (singleton == nullptr) {
+	if (singleton == NULL) {
 		singleton = memnew(_Morn);
 	}
 	return singleton;
 }
-
+void _Morn::Init(const Variant& m) {
+	main_ = m;
+}
 _Morn::_Morn() {
 	mutex_ = Mutex::create();
-	
 }
 _Morn::~_Morn() {
 }
@@ -269,6 +270,7 @@ PoolByteArray _Morn::HTTPGet(const String& url_) {
 			}
 		}
 	}
+	return PoolByteArray();
 }
 
 void _Morn::SetUrl(const String& v) {
@@ -280,17 +282,23 @@ void _Morn::LoadRes(Ref<MRes> res) {
 		client_.instance();
 	}
 	if (res.is_null())return;
-	if (find(res->GetPath()) == nullptr) {
+	Ref<MUI> mui = res;
+	if (!mui.is_null() && mui.is_valid()) {
+		mui_ = mui;
+	}
+	if (find(res->GetPath()) == NULL) {
 		push(res);
-		if (thread == nullptr) {
+		if (thread == NULL) {
 			thread = Thread::create(_thread_func, this);
 		}
 	}
 }
 
-Ref<Texture> _Morn::GetTexture(const String& skin) {
-	Ref<Texture> texture = nullptr;
-	return texture;
+Ref<Texture> _Morn::GetSkin(const String& skin) {
+	if (!mui_.is_null()) {
+		return mui_->GetSkin(skin);
+	}
+	return NULL;
 }
 
 Ref<MRes> _Morn::GetRes(const String& v) {
@@ -312,14 +320,44 @@ void _Morn::_thread() {
 		if (!res->Load()) {
 			PoolByteArray db = HTTPGet(res->GetUrl(GetUrl()));
 			if (db.size() > 0) {
-				res->Fill(db);
+				if (res->Fill(db)) {
+					call_deferred("OnComplete", res);
+				}
+				else {
+					call_deferred("OnError", res->GetPath());
+				}
 			}
+			else {
+				call_deferred("OnError", res->GetPath());
+			}
+		}
+		else {
+			call_deferred("OnComplete", res);
+			
+		}
+	}
+}
+
+
+void _Morn::OnComplete(Ref<MRes> res) {
+	res->Init();
+	if (main_ != NULL && main_->get_script_instance()) {
+		if (main_->get_script_instance()->has_method("onComplete")) {
+			main_->get_script_instance()->call("onComplete", res->GetPath());
+		}
+	}
+}
+
+void _Morn::OnError(const String& v) {
+	if (main_ != NULL && main_->get_script_instance()) {
+		if (main_->get_script_instance()->has_method("onError")) {
+			main_->get_script_instance()->call("onError", v);
 		}
 	}
 }
 
 Ref<MRes> _Morn::find(const String& v) {
-	Ref<MRes> res = nullptr;
+	Ref<MRes> res = NULL;
 	mutex_->lock();
 	for (unsigned i = 0; i < list_.size(); i++) {
 		Ref<MRes> item = list_[i];
@@ -338,7 +376,7 @@ Ref<MRes> _Morn::find(const String& v) {
 }
 
 Ref<MRes> _Morn::pop() {
-	Ref<MRes> res = nullptr;
+	Ref<MRes> res = NULL;
 	mutex_->lock();
 	if (list_.size() > 0) {
 		res = list_[0];
@@ -349,7 +387,7 @@ Ref<MRes> _Morn::pop() {
 }
 
 void _Morn::push(Ref<MRes> res) {
-	if (res != nullptr) {
+	if (res != NULL) {
 		mutex_->lock();
 		list_.push_back(res);
 		mutex_->unlock();
@@ -357,8 +395,11 @@ void _Morn::push(Ref<MRes> res) {
 }
 
 void _Morn::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("Init"), &_Morn::Init);
 	ClassDB::bind_method(D_METHOD("LoadRes"), &_Morn::LoadRes);
 	ClassDB::bind_method(D_METHOD("GetRes"), &_Morn::GetRes);
 	ClassDB::bind_method(D_METHOD("GetUrl"), &_Morn::GetUrl);
 	ClassDB::bind_method(D_METHOD("SetUrl"), &_Morn::SetUrl);
+	ClassDB::bind_method(D_METHOD("OnComplete"), &_Morn::OnComplete);
+	ClassDB::bind_method(D_METHOD("OnError"), &_Morn::OnError);
 }

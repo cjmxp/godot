@@ -33,11 +33,11 @@ protected:
 	int spacey_{ 0 };
 	int repeatx_{ 1 };
 	int repeaty_{ 1 };
-	UI_Box* box_{ nullptr };
-	UI_Box* content_{ nullptr };
+	UI_Box* box_{ NULL };
+	UI_Box* content_{ NULL };
 	Ref<XMLNode> render_;
 	Vector<Variant> data_;
-	UI_ScrollBar* scrollbar_{ nullptr };
+	UI_ScrollBar* scrollbar_{ NULL };
 private:
 	void scroll(String v);
 	Point2 node_size;

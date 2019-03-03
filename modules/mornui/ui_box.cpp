@@ -17,12 +17,12 @@ UI_Box::~UI_Box() {
 }
 
 void UI_Box::Xml(const Variant& self, const String &v) {
-	if(dom==nullptr){
+	if(dom==NULL){
 		dom.instance();
 	}
 	if (dom->load_string(v)==OK) {
 		Object* obj = self;
-		if (obj != nullptr) {
+		if (obj != NULL) {
 			Ref<XMLNode> node = dom->first_child();
 			ScriptInstance* script = obj->get_script_instance();
 			InitAttribute(node, script);
@@ -41,7 +41,7 @@ void UI_Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		Ref<XMLAttribute> attribute = array[i];
 		String tag = attribute->name().to_lower();
 		if (tag == "var") {
-			if(self!=nullptr)self->set(attribute->value(), Variant(this));
+			if(self!=NULL)self->set(attribute->value(), Variant(this));
 		}
 		else if (tag=="name") {
 			set_name(attribute->value());
@@ -110,7 +110,7 @@ Size2 UI_Box::get_minimum_size() const {
 }
 
 UI_Box* UI_Box::Parent() {
-	if (!get_parent())return nullptr;
+	if (!get_parent())return NULL;
 	return Object::cast_to<UI_Box>(get_parent());
 }
 void UI_Box::OnEvent(Ref<InputEvent> e) {

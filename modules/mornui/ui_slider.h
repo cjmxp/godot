@@ -24,7 +24,7 @@ protected:
 	//static void _bind_methods();
 	bool hslider_draw_{true};
 private:
-	UI_Button* bar_{ nullptr };
+	UI_Button* bar_{ NULL };
 	float value_{ 0.0 };
 	bool loack_{ false };
 	bool hv_{ true };

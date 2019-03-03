@@ -71,8 +71,7 @@ void UI_CheckBox::_notification(int p_what) {
 		}
 		update();
 	}
-	
-	if (p_what == NOTIFICATION_DRAW) {
+	else if (p_what == NOTIFICATION_DRAW) {
 
 		RID ci = get_canvas_item();
 		Size2 size = get_size();
@@ -85,8 +84,6 @@ void UI_CheckBox::_notification(int p_what) {
 			int x = index_ % clipX_;
 
 			Rect2 rect = Rect2(Point2(0, (size.height-w)), Point2(w,h));
-			Rect2 src_rect;
-			texture_->get_rect_region(rect, src_rect, rect, src_rect);
 			if (index_ < 0) {
 				index_ = 0;
 
@@ -95,14 +92,7 @@ void UI_CheckBox::_notification(int p_what) {
 			{
 				index_ = 0;
 			}
-
-			
-			src_rect.position.x += (x * w);
-			src_rect.position.y += (y * h);
-			src_rect.size.x = w;
-			src_rect.size.y = h;
-
-			texture_->draw_rect_region(ci, rect, src_rect);
+			texture_->draw_rect_region(ci, rect, Rect2(x * w, y * h,w,h));
 		}
 		if (text_ != "") {
 			Color color;
@@ -119,11 +109,6 @@ void UI_CheckBox::_notification(int p_what) {
 	}
 }
 
-Size2 UI_CheckBox::get_minimum_size() const {
-	
-		return minsize_;
-
-}
 void UI_CheckBox::_bind_methods() {
 }
 

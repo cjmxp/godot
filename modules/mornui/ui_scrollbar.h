@@ -30,9 +30,9 @@ protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
-	UI_Button* up_{ nullptr };
-	UI_Slider* slider_{ nullptr };
-	UI_Button* down_{ nullptr };
+	UI_Button* up_{ NULL };
+	UI_Slider* slider_{ NULL };
+	UI_Button* down_{ NULL };
 	String grid_{ "" };
 	String skin_{ "" };
 	int clipX_{ 1 };

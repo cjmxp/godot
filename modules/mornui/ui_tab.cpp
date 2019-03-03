@@ -53,7 +53,7 @@ void UI_Tab::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 void UI_Tab::_notification(int p_what) {
 	if (setattribute_ && labels_!="") {
 		setattribute_ = false;
-		UI_Button* button = nullptr;
+		UI_Button* button = NULL;
 		unsigned count = get_child_count();
 		for (unsigned i = 0; i < count; i++) {
 			button = Object::cast_to<UI_Button>(get_child(i));
@@ -86,7 +86,7 @@ void UI_Tab::_notification(int p_what) {
 		return;
 	}
 	if (layout_) {
-		UI_Button* button = nullptr;
+		UI_Button* button = NULL;
 		unsigned count = get_child_count();
 		real_t width = 0.0f;
 		real_t height = 0.0f;
@@ -158,7 +158,7 @@ void UI_Tab::SetClipY(int v) {
 
 void UI_Tab::SetSelectedIndex(int v) {
 	if (selectedindex_ != v && v >= 0) {
-		UI_Button* button = nullptr;
+		UI_Button* button = NULL;
 		unsigned count = get_child_count();
 		if (count > 0) {
 			if (v >= count) v = count - 1;

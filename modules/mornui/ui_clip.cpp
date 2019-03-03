@@ -51,10 +51,7 @@ void UI_Clip::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 void UI_Clip::SetSkin(const String& v) {
 	if (v != "" && skin_ != v) {
 		skin_ = v;
-		//Ref<AtlasTexture> t = memnew(AtlasTexture);
-		//t->set_atlas(ResourceLoader::load(v));
-		//t->set_region(Rect2(0,0,64,64));
-		texture_ = _Morn::get_singleton()->GetTexture(v); //t;ResourceLoader::load(v);
+		texture_ = _Morn::get_singleton()->GetSkin(v);
 		update();
 
 	}

@@ -17,7 +17,7 @@ bool MRes::Fill(PoolByteArray db) {
 	if (err) {
 		if (file) {
 			memdelete(file);
-			file = nullptr;
+			file = NULL;
 		}
 		return false;
 	}
@@ -27,11 +27,16 @@ bool MRes::Fill(PoolByteArray db) {
 		file->flush();
 		file->close();
 		memdelete(file);
-		file = nullptr;
+		file = NULL;
 		return true;
 	}
 	return false;
 }
+
+void MRes::Init() {
+
+}
+
 void MRes::SetPath(const String& v) {
 	if (path_ == "" && v != "") {
 		path_ = v;
@@ -41,3 +46,8 @@ void MRes::SetKey(const String& v) {
 	key_ = v;
 }
 
+void MRes::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("GetPath"), &MRes::GetPath);
+	ClassDB::bind_method(D_METHOD("SetPath"), &MRes::SetPath);
+	ClassDB::bind_method(D_METHOD("SetKey"), &MRes::SetKey);
+}

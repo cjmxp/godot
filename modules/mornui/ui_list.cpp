@@ -158,7 +158,7 @@ void UI_List::SetSelectedIndex(int v) {
 
 	}
 	/*if (selectedindex_ != v && v >= 0) {
-		UI_Button* button = nullptr;
+		UI_Button* button = NULL;
 		unsigned count = get_child_count();
 		if (count > 0) {
 			if (v >= count) v = count - 1;
@@ -184,7 +184,7 @@ void UI_List::_notification(int p_what) {
 	if (setattribute_) {
 		content_->set_size(get_size());
 		unsigned count = box_->get_child_count();
-		UI_Box* node = nullptr;
+		UI_Box* node = NULL;
 		for (unsigned i = 0; i < count; i++) {
 			node = Object::cast_to<UI_Box>(box_->get_child(i));
 			if (node) {
@@ -195,7 +195,7 @@ void UI_List::_notification(int p_what) {
 		for (unsigned i = 0; i < len; i++) {
 			if (box_->get_child_count() <= i) {
 				node = memnew(UI_Box);
-				node->SetXml(render_, nullptr);
+				node->SetXml(render_, NULL);
 				node->set_name("ui_list_item_" + itos(i));
 				box_->add_child(node);
 			}
@@ -214,7 +214,7 @@ void UI_List::_notification(int p_what) {
 		int ry = 0;
 		real_t x = 0;
 		real_t y = 0;
-		UI_Box* node = nullptr;
+		UI_Box* node = NULL;
 		Size2 size;
 		Size2 max;
 		for (unsigned i = 0; i < count; i++) {
@@ -250,7 +250,7 @@ void UI_List::OnEvent(Ref<InputEvent> p_event) {
 	if (p)p->OnEvent(p_event);
 }
 void UI_List::scroll(String name) {
-	if (scrollbar_ == nullptr) {
+	if (scrollbar_ == NULL) {
 		if (name.find("ui_list_hscrollbar")!=-1) {
 			String node_key = "ui_list_hscrollbar";
 			scrollbar_ = Object::cast_to<UI_ScrollBar>(get_node(node_key));
@@ -260,7 +260,7 @@ void UI_List::scroll(String name) {
 			scrollbar_ = Object::cast_to<UI_ScrollBar>(get_node(node_key));
 		}
 	}
-	if (scrollbar_ != nullptr) {
+	if (scrollbar_ != NULL) {
 		Size2 size = get_size();
 		Size2 size2 = box_->get_size();
 		Point2 p = box_->get_position();

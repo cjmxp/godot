@@ -12,6 +12,7 @@ public:
 	~MRes();
 	virtual bool Load();
 	virtual bool Fill(PoolByteArray db);
+	virtual void Init();
 	String GetUrl(const String& root) { return root+"/"+ path_; };
 	String GetPath() { return path_; };
 	void SetPath(const String& v);
@@ -19,5 +20,7 @@ public:
 protected:
 	String path_{ "" };
 	String key_{ "" };
+	bool ready{ false };
+	static void _bind_methods();
 };
 #endif

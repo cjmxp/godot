@@ -10,7 +10,6 @@ class UI_CheckBox  : public UI_Button {
 public:
 	UI_CheckBox();
 	~UI_CheckBox();
-	virtual Size2 get_minimum_size() const override;
 	void InitAttribute(Ref<XMLNode> node,ScriptInstance* self) override;
 protected:
 	static void _bind_methods();

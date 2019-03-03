@@ -14,6 +14,7 @@
 #include "ui_scrollbar.h"
 #include "morn.h"
 #include "mres.h"
+#include "mui.h"
 void register_mornui_types() {
 
 	ClassDB::register_class<UI_Box>();
@@ -29,6 +30,7 @@ void register_mornui_types() {
 	ClassDB::register_class<UI_ScrollBar>();
 	ClassDB::register_class<_Morn>();
 	ClassDB::register_class<MRes>();
+	ClassDB::register_class<MUI>();
 	Engine::get_singleton()->add_singleton(Engine::Singleton("Morn", _Morn::get_singleton()));
 }
 
