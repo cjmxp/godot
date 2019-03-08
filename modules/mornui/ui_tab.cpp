@@ -2,7 +2,16 @@
 #include "ui_button.h"
 
 UI_Tab::UI_Tab() {
-
+    labels_="";
+	grid_= "";
+	skin_= "";
+	font_= "";
+	color_= "";
+	clipX_= 1;
+	clipY_= 3;
+	selectedindex_= -1;
+	hv_= true;
+	space_= 1;
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
 
 }

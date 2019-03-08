@@ -1,8 +1,6 @@
 #include "morn.h"
 #include "mui.h"
 #include "core/os/os.h"
-#include "scene/resources/dynamic_font.h"
-#include "scene/resources/dynamic_font_stb.h"
 
 
 Morn* Morn::singleton = NULL;
@@ -19,6 +17,24 @@ void Morn::Init(const Variant& m) {
 Morn::Morn() {
 	MUIClass = StaticCString::create("MUI");
 	mutex_ = Mutex::create();
+	thread = NULL;
+ 	root_="";
+	url="";
+	request_string="";
+	request_data="";
+	port= 80;
+	body_len= -1;
+	downloaded= 0;
+	redirections= 0;
+	response_code= 0;
+	max_redirects= 8;
+	use_ssl= false;
+	request_sent= false;
+	got_response= false;
+	exit_= false;
+	main_ = NULL;
+
+
 }
 Morn::~Morn() {
 }
@@ -306,19 +322,25 @@ Ref<Texture> Morn::GetSkin(const String& skin) {
 	return NULL;
 }
 Ref<Font> Morn::GetFont(const String& f, int s)  {
-	String ttf = f+ Variant(s);
+	/*String ttf = f+ Variant(s);
 	uint32_t id = ttf.hash();
 
 	if (!fonts_.has(id)) {
+		Ref<DynamicFontData> font;
+		font.instance();
+		font->set_font_path("res://kaiti.ttf");
 		Ref<DynamicFont> font;
 		font.instance();
 		font->set_size(s);
+		font->set_font_data(SampledFont);
+		
 		RES font_data = ResourceLoader::load("res://kaiti.ttf");
 		font->set_font_data(font_data);
-
+		
 		fonts_.insert(id, font);
 	}
-	return fonts_.find(id)->get();
+	return fonts_.find(id)->get();*/
+	return NULL;
 }
 
 Ref<MRes> Morn::GetRes(const String& v) {

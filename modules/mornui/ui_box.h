@@ -26,8 +26,8 @@ protected:
 	virtual void _gui_input(Ref<InputEvent> p_event);
 	Ref<XMLDocument> dom;
 	Size2 minsize_;
-	bool setattribute_{ false };
-	bool layout_{ false };
-	bool mouseEnabled_{ false };
+	bool setattribute_;
+	bool layout_;
+	bool mouseEnabled_;
 };
 #endif

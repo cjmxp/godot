@@ -36,15 +36,15 @@ protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
-	String labels_{""};
-	String grid_{ "" };
-	String skin_{ "" };
-	String font_{ "" };
-	String color_{ "" };
-	int clipX_{ 1 };
-	int clipY_{ 3 };
-	int selectedindex_{ -1 };
-	bool hv_{ true };
-	int space_{ 1 };
+	String labels_;
+	String grid_;
+	String skin_;
+	String font_;
+	String color_;
+	int clipX_;
+	int clipY_;
+	int selectedindex_;
+	bool hv_;
+	int space_;
 };
 #endif

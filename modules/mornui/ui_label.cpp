@@ -3,6 +3,22 @@
 
 UI_Label::UI_Label() {
 	set_clip_contents(true);
+	label_draw_= true;
+	text_="";
+	align_ = ALIGN_LEFT;
+	autowrap_ = false;
+	clip_ = false;
+	line_count = 0;
+	uppercase = false;
+	total_char_cache= 0;
+	max_lines_visible= -1;
+	word_cache_dirty= true;
+	lines_skipped= 0;
+	visible_chars= -1;
+	font_= "";
+	color_= "";
+	font_size_= 12;
+	word_cache=NULL;
 }
 UI_Label::~UI_Label() {
 }

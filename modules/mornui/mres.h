@@ -18,9 +18,9 @@ public:
 	void SetPath(const String& v);
 	void SetKey(const String& v);
 protected:
-	String path_{ "" };
-	String key_{ "" };
-	bool ready{ false };
+	String path_;
+	String key_;
+	bool ready;
 	static void _bind_methods();
 };
 #endif

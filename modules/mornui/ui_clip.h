@@ -37,16 +37,16 @@ protected:
 	String skin_;
 	String grid_;
 	Ref<Texture> texture_;
-	int interval_{ 128 };
-	int clipX_{ 1 };
-	int clipY_{ 1 };
-	int index_{ 0 };
+	int interval_;
+	int clipX_;
+	int clipY_;
+	int index_;
 	int margin_[4];
-	bool autoplay_{false};
-	uint32_t ctimer_{0};
-	AxisStretchMode axis_h_{ AXIS_STRETCH_MODE_STRETCH };
-	AxisStretchMode axis_v_{ AXIS_STRETCH_MODE_STRETCH };
-	bool clip_draw_{ true };
+	bool autoplay_;
+	uint32_t ctimer_;
+	AxisStretchMode axis_h_;
+	AxisStretchMode axis_v_;
+	bool clip_draw_;
 	static void _bind_methods();
 };
 #endif

@@ -30,14 +30,14 @@ protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
-	UI_Button* up_{ NULL };
-	UI_Slider* slider_{ NULL };
-	UI_Button* down_{ NULL };
-	String grid_{ "" };
-	String skin_{ "" };
-	int clipX_{ 1 };
-	int clipY_{ 3 };
-	bool hv_{ true };
-	float value_{ 0.0 };
+	UI_Button* up_;
+	UI_Slider* slider_;
+	UI_Button* down_;
+	String grid_;
+	String skin_;
+	int clipX_;
+	int clipY_;
+	bool hv_;
+	float value_;
 };
 #endif

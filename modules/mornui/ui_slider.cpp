@@ -2,6 +2,12 @@
 #include "core/os/os.h"
 
 UI_Slider::UI_Slider() {
+	hslider_draw_=true;
+	bar_= NULL;
+	value_= 0.0;
+	loack_= false;
+	hv_= true;
+	layout_= false;
 	set_focus_mode(FOCUS_ALL);
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
 	set_clip_contents(false);

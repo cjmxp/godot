@@ -1,6 +1,15 @@
 #include "ui_scrollbar.h"
 
 UI_ScrollBar::UI_ScrollBar() {
+	up_= NULL;
+	slider_= NULL;
+	down_= NULL;
+	grid_= "";
+	skin_= "";
+	clipX_= 1;
+	clipY_= 3;
+	hv_= true;
+	value_= 0.0;
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
 	slider_ = memnew(UI_Slider);
 	slider_->set_name("ui_scrollbar_slider");

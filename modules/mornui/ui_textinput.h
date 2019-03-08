@@ -56,9 +56,9 @@ protected:
 	void _gui_input(Ref<InputEvent> p_event) override;
 	//virtual void _unhandled_input(Ref<InputEvent> p_event);
 	//static void _bind_methods();
-	String xl_text{"input"};
-	bool textinput_draw_{ true };
-	bool select_{ false };
+	String xl_text;
+	bool textinput_draw_;
+	bool select_;
 private:
 	struct Selection {
 
@@ -71,39 +71,39 @@ private:
 		bool drag_attempt;
 	} selection;
 
-	Align align{ ALIGN_LEFT };
-	bool editable{ true };
-	bool pass{ true };
-	bool text_changed_dirty{ false };
-	int window_pos{ 0 };
-	int cached_width{ 0 };
-	int cached_placeholder_width{ 0 };
-	int cursor_pos{ 0 };
-	bool caret_blink_enabled{ false };
-	bool draw_caret{ true };
-	bool window_has_focus{ true };
-	bool expand_to_text_length{ false };
-	int max_length{0}; // 0 for no maximum
-	float placeholder_alpha{ 0.6f };
+	Align align;
+	bool editable;
+	bool pass;
+	bool text_changed_dirty;
+	int window_pos;
+	int cached_width;
+	int cached_placeholder_width;
+	int cursor_pos;
+	bool caret_blink_enabled;
+	bool draw_caret;
+	bool window_has_focus;
+	bool expand_to_text_length;
+	int max_length; // 0 for no maximum
+	float placeholder_alpha;
 	String ime_text;
 	Point2 ime_selection;
-	bool clear_button_enabled{ false };
+	bool clear_button_enabled;
 	struct TextOperation {
 		int cursor_pos;
 		String text;
 	};
 	List<TextOperation> undo_stack;
 	List<TextOperation>::Element *undo_stack_pos;
-	String text_{""};
-	String color_{ "" };
-	String font_{ "" };
-	int font_size_{ 12 };
-	Ref<Font> cfont{ NULL };
+	String text_;
+	String color_;
+	String font_;
+	int font_size_;
+	Ref<Font> cfont;
 
 	String placeholder;
 	String undo_text;
-	String secret_character{"*"};
-	uint32_t blink_ctimer_{ 0 };
+	String secret_character;
+	uint32_t blink_ctimer_;
 
 	Color selection_color_;
 	Color font_color_;

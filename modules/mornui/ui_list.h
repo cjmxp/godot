@@ -28,16 +28,16 @@ protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
-	int selectedindex_{ -1 };
-	int spacex_{ 0 };
-	int spacey_{ 0 };
-	int repeatx_{ 1 };
-	int repeaty_{ 1 };
-	UI_Box* box_{ NULL };
-	UI_Box* content_{ NULL };
+	int selectedindex_;
+	int spacex_;
+	int spacey_;
+	int repeatx_;
+	int repeaty_;
+	UI_Box* box_;
+	UI_Box* content_;
 	Ref<XMLNode> render_;
 	Vector<Variant> data_;
-	UI_ScrollBar* scrollbar_{ NULL };
+	UI_ScrollBar* scrollbar_;
 private:
 	void scroll(String v);
 	Point2 node_size;

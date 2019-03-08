@@ -3,7 +3,9 @@
 MRes::MRes() {
 }
 MRes::~MRes() {
-	
+	path_ = "";
+	key_ = "";
+	ready = false;
 }
 bool MRes::Load() {
 	if (FileAccess::exists("user://" + path_)) {

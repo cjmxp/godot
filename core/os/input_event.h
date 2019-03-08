@@ -163,7 +163,7 @@ class InputEvent : public Resource {
 
 protected:
 	static void _bind_methods();
-	String data{""};
+	String data;
 public:
 	void set_device(int p_device);
 	int get_device() const;

@@ -28,14 +28,14 @@ protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
-	String text_{""};
-	bool button_draw_{ true };
-	bool tab_mode_ { false };
-	bool selected_{false};
-	String color_{""};
+	String text_;
+	bool button_draw_;
+	bool tab_mode_;
+	bool selected_;
+	String color_;
 	Color font_color_;
-	String font_{""};
-	int font_size_{ 12 };
-	Ref<Font> cfont{ NULL };
+	String font_;
+	int font_size_;
+	Ref<Font> cfont;
 };
 #endif

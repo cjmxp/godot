@@ -4,6 +4,31 @@
 #include "core/message_queue.h"
 
 UI_TextInput::UI_TextInput() {
+	xl_text = "";
+	textinput_draw_= true;
+	select_= false;
+ 	align= ALIGN_LEFT;
+	editable= true;
+	pass= false;
+	text_changed_dirty= false;
+	window_pos= 0;
+	cached_width= 0;
+	cached_placeholder_width= 0;
+	cursor_pos= 0;
+	caret_blink_enabled= false;
+	draw_caret= true;
+	window_has_focus= true;
+	expand_to_text_length= false;
+	max_length=0; // 0 for no maximum
+	placeholder_alpha= 0.6f;
+	clear_button_enabled= false;
+	text_="";
+	color_= "";
+	font_= "";
+	font_size_= 12;
+	secret_character="*";
+	blink_ctimer_ = 0;
+
 	set_focus_mode(FOCUS_ALL);
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
 	set_default_cursor_shape(CURSOR_IBEAM);
@@ -208,7 +233,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 				set_cursor_position(0);
 			} break;
 			case (KEY_RIGHT): { // Go to end of text - like END key
-				set_cursor_position(text.length());
+				set_cursor_position(text_.length());
 			} break;
 #endif
 			default: {
@@ -342,7 +367,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 
 #ifdef APPLE_STYLE_KEYS
 				if (k->get_command()) {
-					set_cursor_position(text.length());
+					set_cursor_position(text_.length());
 				}
 				else if (k->get_alt()) {
 #else

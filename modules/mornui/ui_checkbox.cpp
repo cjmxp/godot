@@ -4,6 +4,7 @@
 UI_CheckBox::UI_CheckBox() {
 	clip_draw_ = false;
 	button_draw_ = false;
+	checkbox_draw_=true;
 }
 UI_CheckBox::~UI_CheckBox() {
 }

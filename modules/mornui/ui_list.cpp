@@ -11,6 +11,14 @@
 
 UI_List::UI_List() {
 
+	selectedindex_= -1;
+	spacex_= 0;
+	spacey_= 0;
+	repeatx_= 1;
+	repeaty_= 1;
+	box_= NULL;
+	content_= NULL;
+	scrollbar_= NULL;
 	set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
 	content_ = memnew(UI_Box);
 	content_->set_clip_contents(true);

@@ -6,6 +6,19 @@ UI_Clip::UI_Clip() {
 	margin_[1] = 0;
 	margin_[2] = 0;
 	margin_[3] = 0;
+
+ 	skin_="";
+	grid_="";
+	interval_= 128;
+	clipX_= 1;
+	clipY_= 1;
+	index_= 0;
+	autoplay_=false;
+	ctimer_=0;
+	axis_h_= AXIS_STRETCH_MODE_STRETCH;
+	axis_v_= AXIS_STRETCH_MODE_STRETCH;
+	clip_draw_= true;
+
 	set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
 }
 UI_Clip::~UI_Clip() {

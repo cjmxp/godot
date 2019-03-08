@@ -85,7 +85,7 @@ bool MUI::Fill(PoolByteArray db) {
 }
 
 void MUI::Init() {
-	for (Map<uint32_t, Ref<MAtlasTexture>>::Element *E = map_.front(); E; E = E->next()) {
+	for (Map<uint32_t, Ref<MAtlasTexture> >::Element *E = map_.front(); E; E = E->next()) {
 		if (imgs_.size() > E->value()->i) {
 			Ref<ImageTexture> texture = memnew(ImageTexture);
 			texture->create_from_image(imgs_[E->value()->i], Texture::FLAG_REPEAT);
@@ -100,7 +100,7 @@ void MUI::Init() {
 
 Ref<Texture> MUI::GetSkin(const String& v) {
 	if (!ready)return NULL;
-	Map<uint32_t, Ref<MAtlasTexture>>::Element* E = map_.find(v.hash());
+	Map<uint32_t, Ref<MAtlasTexture> >::Element* E = map_.find(v.hash());
 	if (E != NULL) {
 		return E->value();
 	}

@@ -2,6 +2,13 @@
 #include "core/os/os.h"
 
 UI_Button::UI_Button() {
+	text_="";
+	button_draw_= true;
+	tab_mode_ = false;
+	selected_=false;
+	color_="";
+	font_= "";
+	font_size_= 12;
 	set_focus_mode(FOCUS_ALL);
 	set_mouse_filter(Control::MOUSE_FILTER_STOP);
 	set_clip_contents(true);

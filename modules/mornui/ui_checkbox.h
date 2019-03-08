@@ -16,6 +16,6 @@ protected:
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
 	//virtual void _unhandled_input(Ref<InputEvent> p_event);
-	bool checkbox_draw_{ true };
+	bool checkbox_draw_;
 };
 #endif

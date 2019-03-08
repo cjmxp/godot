@@ -13,8 +13,8 @@ public:
 	virtual bool Load() override;
 	virtual bool Fill(PoolByteArray db) override;
 	virtual void Init() override;
-	Vector<Ref<Image>> imgs_;
-	Map<uint32_t, Ref<MAtlasTexture>> map_;
+	Vector<Ref<Image> > imgs_;
+	Map<uint32_t, Ref<MAtlasTexture> > map_;
 
 };
 #endif

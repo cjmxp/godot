@@ -7,8 +7,7 @@
 #include "scene/main/node.h"
 #include "core/io/http_client.h"
 #include "scene/resources/font.h"
-
-class DynamicFontData;
+//#include "scene/resources/dynamic_font.h"
 
 class Morn : public Node {
 	GDCLASS(Morn, Node);
@@ -33,38 +32,38 @@ protected:
 	Error _request();
 	bool _handle_response(bool *ret_value);
 	void sleep(int msec);
-	String root_{ "" };
+	String root_;
 private:
-	String url{ "" };
-	String request_string{ "" };
-	String request_data{ "" };
-	int port{ 80 };
-	int body_len{ -1 };
-	volatile int downloaded{ 0 };
-	int redirections{ 0 };
-	int response_code{ 0 };
-	int max_redirects{ 8 };
-	bool use_ssl{ false };
-	bool request_sent{ false };
-	bool got_response{ false };
-	Ref<MUI> mui_{ NULL };
+	String url;
+	String request_string;
+	String request_data;
+	int port;
+	int body_len;
+	volatile int downloaded;
+	int redirections;
+	int response_code;
+	int max_redirects;
+	bool use_ssl;
+	bool request_sent;
+	bool got_response;
+	Ref<MUI> mui_;
 
 	Vector<String> headers;
 	PoolVector<String> response_headers;
 	PoolByteArray body;
 	Mutex* mutex_;
-	Thread* thread{ NULL };
+	Thread* thread;
 	static Morn* singleton;
-	bool exit_{ false };
+	bool exit_;
 	Vector<String> n_;
-	Vector<Ref<MRes>> list_;
+	Vector<Ref<MRes> > list_;
 
-	Map<uint32_t, Ref<MRes>> res_;
-	Map<uint32_t, Ref<Font>> fonts_;
-	Map<uint32_t, Ref<DynamicFontData>> ttfs_;
+	Map<uint32_t, Ref<MRes> > res_;
+	Map<uint32_t, Ref<Font> > fonts_;
+	//Map<uint32_t, Ref<DynamicFontData>> ttfs_;
 
 	Ref<HTTPClient> client_;
-	Node* main_{NULL};
+	Node* main_;
 	static void _thread_func(void *ud);
 	void _thread();
 	Ref<MRes> find(const String& v);

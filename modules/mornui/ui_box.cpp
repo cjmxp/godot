@@ -9,7 +9,9 @@
 #include "ui_slider.h"
 #include "ui_scrollbar.h"
 UI_Box::UI_Box() {
-
+	setattribute_= false;
+	layout_= false;
+	mouseEnabled_= false ;
 	set_mouse_filter(Control::MOUSE_FILTER_IGNORE);
 
 }

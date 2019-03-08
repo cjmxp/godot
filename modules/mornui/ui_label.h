@@ -35,8 +35,8 @@ protected:
 	void _gui_input(Ref<InputEvent> p_event) override;
 	//virtual void _unhandled_input(Ref<InputEvent> p_event);
 	//static void _bind_methods();
-	bool label_draw_{ true };
-	String text_{""};
+	bool label_draw_;
+	String text_;
 private:
 	enum Align {
 		ALIGN_LEFT,
@@ -44,21 +44,21 @@ private:
 		ALIGN_RIGHT,
 		ALIGN_FILL
 	};
-	Align align_{ ALIGN_LEFT };
-	bool autowrap_{ false };
-	bool clip_{ false };
-	int line_count{ 0 };
-	bool uppercase{ false };
-	int total_char_cache{ 0 };
-	int max_lines_visible{ -1 };
-	bool word_cache_dirty{ true };
-	int lines_skipped{ 0 };
-	int visible_chars{ -1 };
-	String font_{ "" };
-	String color_{ "" };
-	int font_size_{ 12 };
+	Align align_;
+	bool autowrap_;
+	bool clip_;
+	int line_count;
+	bool uppercase;
+	int total_char_cache;
+	int max_lines_visible;
+	bool word_cache_dirty;
+	int lines_skipped;
+	int visible_chars;
+	String font_;
+	String color_;
+	int font_size_;
 
-	Ref<Font> cfont{NULL};
+	Ref<Font> cfont;
 
 	struct WordCache {
 
@@ -70,16 +70,16 @@ private:
 		int word_len;
 		int pixel_width;
 		int space_count;
-		WordCache *next{ NULL };
+		WordCache *next;
 		WordCache() {
 			char_pos = 0;
 			word_len = 0;
 			pixel_width = 0;
-			next = 0;
+			next = NULL;
 			space_count = 0;
 		}
 	};
-	WordCache *word_cache{ NULL };
+	WordCache *word_cache;
 	int get_longest_line_width() const;
 	void regenerate_word_cache();
 };

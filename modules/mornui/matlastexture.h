@@ -8,8 +8,8 @@ class MAtlasTexture : public AtlasTexture {
 public:
 	MAtlasTexture();
 	~MAtlasTexture();
-	uint8_t i{ 0 };
-	uint32_t id{ 0 };
-	String key{ "" };
+	uint8_t i;
+	uint32_t id;
+	String key;
 };
 #endif

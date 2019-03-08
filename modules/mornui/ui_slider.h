@@ -22,12 +22,12 @@ protected:
 	void _gui_input(Ref<InputEvent> p_event) override;
 	//virtual void _unhandled_input(Ref<InputEvent> p_event);
 	//static void _bind_methods();
-	bool hslider_draw_{true};
+	bool hslider_draw_;
 private:
-	UI_Button* bar_{ NULL };
-	float value_{ 0.0 };
-	bool loack_{ false };
-	bool hv_{ true };
-	bool layout_{ false };
+	UI_Button* bar_;
+	float value_;
+	bool loack_;
+	bool hv_;
+	bool layout_;
 };
 #endif

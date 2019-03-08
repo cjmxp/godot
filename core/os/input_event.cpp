@@ -135,7 +135,7 @@ void InputEvent::_bind_methods() {
 }
 
 InputEvent::InputEvent() {
-
+	data="";
 	device = 0;
 }
 
