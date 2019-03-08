@@ -1,7 +1,7 @@
 #include "morn.h"
 #include "mui.h"
 #include "core/os/os.h"
-
+#include "scene/resources/dynamic_font.h"
 
 Morn* Morn::singleton = NULL;
 Morn* Morn::get_singleton() {
@@ -322,6 +322,17 @@ Ref<Texture> Morn::GetSkin(const String& skin) {
 	return NULL;
 }
 Ref<Font> Morn::GetFont(const String& f, int s)  {
+	Ref<DynamicFontData> fdb;
+		fdb.instance();
+		fdb->set_font_path("res://kaiti.ttf");
+		fdb->set_force_autohinter(true); //just looks better..i think?
+		Ref<DynamicFont> font;
+		font.instance();
+		font->set_size(s);
+		font->set_font_data(fdb);		
+
+		
+		//RES font_data = ResourceLoader::load("res://kaiti.ttf");
 	/*String ttf = f+ Variant(s);
 	uint32_t id = ttf.hash();
 

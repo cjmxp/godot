@@ -7,7 +7,7 @@
 #include "scene/main/node.h"
 #include "core/io/http_client.h"
 #include "scene/resources/font.h"
-//#include "scene/resources/dynamic_font.h"
+class DynamicFontData;
 
 class Morn : public Node {
 	GDCLASS(Morn, Node);
@@ -60,7 +60,7 @@ private:
 
 	Map<uint32_t, Ref<MRes> > res_;
 	Map<uint32_t, Ref<Font> > fonts_;
-	//Map<uint32_t, Ref<DynamicFontData>> ttfs_;
+	Map<uint32_t, Ref<DynamicFontData> > ttfs_;
 
 	Ref<HTTPClient> client_;
 	Node* main_;
