@@ -1,6 +1,9 @@
 #include "morn.h"
 #include "mui.h"
 #include "core/os/os.h"
+#include "scene/resources/dynamic_font.h"
+#include "scene/resources/dynamic_font_stb.h"
+
 
 Morn* Morn::singleton = NULL;
 Morn* Morn::get_singleton() {
@@ -14,6 +17,7 @@ void Morn::Init(const Variant& m) {
 	main_->add_child(this);
 }
 Morn::Morn() {
+	MUIClass = StaticCString::create("MUI");
 	mutex_ = Mutex::create();
 }
 Morn::~Morn() {
@@ -301,6 +305,21 @@ Ref<Texture> Morn::GetSkin(const String& skin) {
 	}
 	return NULL;
 }
+Ref<Font> Morn::GetFont(const String& f, int s)  {
+	String ttf = f+ Variant(s);
+	uint32_t id = ttf.hash();
+
+	if (!fonts_.has(id)) {
+		Ref<DynamicFont> font;
+		font.instance();
+		font->set_size(s);
+		RES font_data = ResourceLoader::load("res://kaiti.ttf");
+		font->set_font_data(font_data);
+
+		fonts_.insert(id, font);
+	}
+	return fonts_.find(id)->get();
+}
 
 Ref<MRes> Morn::GetRes(const String& v) {
 	return find(v);
@@ -342,6 +361,10 @@ void Morn::_thread() {
 
 void Morn::OnComplete(Ref<MRes> res) {
 	res->Init();
+
+	if (res->get_class_name() != MUIClass) {
+		res_.insert(res->GetPath().hash(), res);
+	}
 	if (main_ != NULL && main_->get_script_instance()) {
 		if (main_->get_script_instance()->has_method("onComplete")) {
 			main_->get_script_instance()->call("onComplete", res->GetPath());
@@ -367,12 +390,13 @@ Ref<MRes> Morn::find(const String& v) {
 			break;
 		}
 	}
+	mutex_->unlock();
 	if (res.is_null()) {
-		if (res_.has(v)) {
-			res = res_.find(v)->get();
+		uint32_t id = v.hash();
+		if (res_.has(id)) {
+			res = res_.find(id)->get();
 		}
 	}
-	mutex_->unlock();
 	return res;
 }
 

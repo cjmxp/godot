@@ -40,6 +40,16 @@ public:
 	void delete_char();
 	bool cursor_get_blink_enabled() const;
 	void cursor_set_blink_enabled(const bool p_enabled);
+
+	String GetText() { return text_; };
+	void SetText(const String& v);
+	String GetColor() { return color_; };
+	void SetColor(const String& v);
+	String GetFont() { return font_; };
+	void SetFont(const String& v);
+	int GetFontSize() { return font_size_; };
+	void SetFontSize(int v);
+	Ref<Font> get_font(const StringName &p_name, const StringName &p_type = StringName()) const;
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
@@ -84,11 +94,21 @@ private:
 	};
 	List<TextOperation> undo_stack;
 	List<TextOperation>::Element *undo_stack_pos;
-	String text;
+	String text_{""};
+	String color_{ "" };
+	String font_{ "" };
+	int font_size_{ 12 };
+	Ref<Font> cfont{ NULL };
+
 	String placeholder;
 	String undo_text;
 	String secret_character{"*"};
 	uint32_t blink_ctimer_{ 0 };
+
+	Color selection_color_;
+	Color font_color_;
+	Color font_color_selected_;
+	Color cursor_color_;
 
 	void _clear_undo_stack();
 	void _clear_redo();

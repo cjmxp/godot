@@ -227,6 +227,18 @@ void Color::contrast() {
 	b = Math::fmod(b + 0.5, 1.0);
 }
 
+Color Color::hex_rgba(uint32_t p_hex) {
+
+	float r = (p_hex & 0xFF) / 255.0;
+	float g = (p_hex & 0xFF) / 255.0;
+	p_hex >>= 8;
+	float b = (p_hex & 0xFF) / 255.0;
+	p_hex >>= 8;
+	float a = (p_hex & 0xFF) / 255.0;
+	p_hex >>= 8;
+	return Color(r, g, b, a);
+}
+
 Color Color::hex(uint32_t p_hex) {
 
 	float a = (p_hex & 0xFF) / 255.0;

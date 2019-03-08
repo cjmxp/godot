@@ -1,6 +1,5 @@
 #include "ui_slider.h"
 #include "core/os/os.h"
-#include "morn.h"
 
 UI_Slider::UI_Slider() {
 	set_focus_mode(FOCUS_ALL);

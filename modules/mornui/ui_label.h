@@ -3,6 +3,8 @@
 #define UI_LABEL_H
 #include "ui_clip.h"
 
+
+
 class UI_Label : public UI_Clip {
 
 	GDCLASS(UI_Label, UI_Clip);
@@ -24,6 +26,9 @@ public:
 	void SetColor(const String& v);
 	String GetFont() { return font_; };
 	void SetFont(const String& v);
+	int GetFontSize() { return font_size_; };
+	void SetFontSize(int v);
+	Ref<Font> get_font(const StringName &p_name, const StringName &p_type = StringName()) const;
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
@@ -51,6 +56,9 @@ private:
 	int visible_chars{ -1 };
 	String font_{ "" };
 	String color_{ "" };
+	int font_size_{ 12 };
+
+	Ref<Font> cfont{NULL};
 
 	struct WordCache {
 

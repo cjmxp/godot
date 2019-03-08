@@ -15,32 +15,10 @@ void UI_CheckBox::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	for(unsigned i = 0;i<array.size();i++){
 		Ref<XMLAttribute> attribute = array[i];
 		String tag = attribute->name().to_lower();
-		if (tag == "skin") {
-			SetSkin(attribute->value());
+		if (tag == "font") {
+			SetFont(attribute->value());
 		}
-		else if (tag == "sizegrid") {
-			SetSizeGrid(attribute->value());
-		}
-		else if (tag=="clipx") {
-			SetClipX(attribute->value().to_int());
-		}
-		else if (tag == "clipy") {
-			SetClipY(attribute->value().to_int());
-		}
-		else if (tag == "index") {
-			SetIndex(attribute->value().to_int());
-		}
-		else if (tag == "interval") {
-			SetInterval(attribute->value().to_int());
-		}
-		else if (tag == "autoplay") {
-			if (attribute->value() == "true") {
-				SetAutoPlay(true);
-			}
-			else {
-				SetAutoPlay(false);
-			}
-		}
+		
 	}*/
 }
 void UI_CheckBox::_gui_input(Ref<InputEvent> p_event) {

@@ -6,14 +6,20 @@
 #include "scene/resources/texture.h"
 #include "scene/main/node.h"
 #include "core/io/http_client.h"
+#include "scene/resources/font.h"
+
+class DynamicFontData;
+
 class Morn : public Node {
 	GDCLASS(Morn, Node);
 public:
 	Morn();
 	~Morn();
+	StringName MUIClass;
 	static Morn *get_singleton();
 	void Init(const Variant& m);
 	Ref<Texture> GetSkin(const String& skin);
+	Ref<Font> GetFont(const String& f,int s);
 	Ref<MRes> GetRes(const String& skin);
 	void LoadRes(Ref<MRes> res);
 	void SetUrl(const String& v);
@@ -52,7 +58,11 @@ private:
 	bool exit_{ false };
 	Vector<String> n_;
 	Vector<Ref<MRes>> list_;
-	Map<String, Ref<MRes>> res_;
+
+	Map<uint32_t, Ref<MRes>> res_;
+	Map<uint32_t, Ref<Font>> fonts_;
+	Map<uint32_t, Ref<DynamicFontData>> ttfs_;
+
 	Ref<HTTPClient> client_;
 	Node* main_{NULL};
 	static void _thread_func(void *ud);

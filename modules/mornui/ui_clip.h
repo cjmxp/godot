@@ -2,6 +2,7 @@
 #ifndef UI_CLIP_H
 #define UI_CLIP_H
 #include "ui_box.h"
+#include "morn.h"
 
 class UI_Clip : public UI_Box {
 

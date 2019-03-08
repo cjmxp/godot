@@ -47,6 +47,10 @@ void UI_Label::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		{
 			SetFont(attribute->value());
 		}
+		else if (tag == "size")
+		{
+			SetFontSize(attribute->value().to_int());
+		}
 	}
 }
 
@@ -503,12 +507,24 @@ void UI_Label::SetColor(const String& v) {
 		update();
 	}
 }
-
+void UI_Label::SetFontSize(int v) {
+	if (font_size_ != v && v > 0 && font_ != "") {
+		cfont = Morn::get_singleton()->GetFont(font_, font_size_);
+		update();
+	}
+}
 void UI_Label::SetFont(const String& v) {
 	if (font_ != v && v != "") {
 		font_ = v;
+		cfont = Morn::get_singleton()->GetFont(font_,font_size_);
 		update();
 	}
+}
+Ref<Font> UI_Label::get_font(const StringName &p_name, const StringName &p_type) const {
+	if (cfont.is_null()) {
+		return Control::get_font(p_name);
+	}
+	return cfont;
 }
 
 void UI_Label::_bind_methods() {

@@ -189,6 +189,7 @@ struct Color {
 	}
 
 	static Color hex(uint32_t p_hex);
+	static Color hex_rgba(uint32_t p_hex);
 	static Color hex64(uint64_t p_hex);
 	static Color html(const String &p_color);
 	static bool html_is_valid(const String &p_color);

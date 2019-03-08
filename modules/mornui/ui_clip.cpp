@@ -1,6 +1,5 @@
 #include "ui_clip.h"
 #include "core/os/os.h"
-#include "morn.h"
 
 UI_Clip::UI_Clip() {
 	margin_[0] = 0;
@@ -109,7 +108,7 @@ void UI_Clip::_gui_input(Ref<InputEvent> p_event) {
 	OnEvent(p_event);
 }
 void UI_Clip::_notification(int p_what) {
-	if (!clip_draw_)return;
+	if (!clip_draw_ )return;
 	if (p_what == NOTIFICATION_PROCESS && autoplay_ && interval_>0) {
 		uint32_t v = OS::get_singleton()->get_ticks_msec();
 		if (ctimer_ == 0) {
@@ -119,18 +118,16 @@ void UI_Clip::_notification(int p_what) {
 			ctimer_ = v;
 			SetIndex(index_ + 1);
 		}
+		
 	}
 	else if (p_what == NOTIFICATION_DRAW) {
-
 		if (texture_.is_null())
 			return;
-		
 		Rect2 rect = Rect2(Point2(), get_size());
 		Rect2 src_rect;
 		texture_->get_rect_region(rect, src_rect, rect, src_rect);
 		if (index_ < 0) {
 			index_ = 0;
-			
 		}
 		else if (index_ >= clipX_ * clipY_)
 		{

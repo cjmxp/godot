@@ -11,6 +11,11 @@ UI_TextInput::UI_TextInput() {
 	_create_undo_state();
 	cursor_set_blink_enabled(true);
 	set_clip_contents(true);
+
+	selection_color_ = Color(0, 0.4, 0.8f);
+	font_color_ = Color(1, 0, 0);
+	font_color_selected_ = Color(1, 1, 1);
+	cursor_color_ = Color(0, 0, 0);
 }
 UI_TextInput::~UI_TextInput() {
 }
@@ -18,37 +23,23 @@ UI_TextInput::~UI_TextInput() {
 
 void UI_TextInput::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	UI_Clip::InitAttribute(node, self);
-	/*Vector<Variant> array = node->get_attributes();
+	Vector<Variant> array = node->get_attributes();
 	for(unsigned i = 0;i<array.size();i++){
 		Ref<XMLAttribute> attribute = array[i];
 		String tag = attribute->name().to_lower();
-		if (tag == "skin") {
-			SetSkin(attribute->value());
+		if (tag == "text") {
+			SetText(attribute->value());
 		}
-		else if (tag == "sizegrid") {
-			SetSizeGrid(attribute->value());
+		else if (tag == "font") {
+			SetFont(attribute->value());
 		}
-		else if (tag=="clipx") {
-			SetClipX(attribute->value().to_int());
+		else if (tag == "color") {
+			SetColor(attribute->value());
 		}
-		else if (tag == "clipy") {
-			SetClipY(attribute->value().to_int());
+		else if (tag == "size") {
+			SetFontSize(attribute->value().to_int());
 		}
-		else if (tag == "index") {
-			SetIndex(attribute->value().to_int());
-		}
-		else if (tag == "interval") {
-			SetInterval(attribute->value().to_int());
-		}
-		else if (tag == "autoplay") {
-			if (attribute->value() == "true") {
-				SetAutoPlay(true);
-			}
-			else {
-				SetAutoPlay(false);
-			}
-		}
-	}*/
+	}
 	setattribute_ = true;
 }
 
@@ -78,7 +69,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 
 					selection.enabled = true;
 					selection.begin = 0;
-					selection.end = text.length();
+					selection.end = text_.length();
 					selection.doubleclick = true;
 				}
 
@@ -105,7 +96,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 			selection.doubleclick = false;
 
 			if (OS::get_singleton()->has_virtual_keyboard())
-				OS::get_singleton()->show_virtual_keyboard(text, get_global_rect());
+				OS::get_singleton()->show_virtual_keyboard(text_, get_global_rect());
 		}
 
 		update();
@@ -175,14 +166,14 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 				if (editable) {
 
 					deselect();
-					text = text.substr(cursor_pos, text.length() - cursor_pos);
+					text_ = text_.substr(cursor_pos, text_.length() - cursor_pos);
 
 					Ref<Font> font = get_font("font");
 
 					cached_width = 0;
 					if (font != NULL) {
-						for (int i = 0; i < text.length(); i++)
-							cached_width += font->get_char_size(text[i]).width;
+						for (int i = 0; i < text_.length(); i++)
+							cached_width += font->get_char_size(text_[i]).width;
 					}
 
 					set_cursor_position(0);
@@ -204,7 +195,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 				if (editable) {
 
 					deselect();
-					text = text.substr(0, cursor_pos);
+					text_ = text_.substr(0, cursor_pos);
 					_text_changed();
 				}
 
@@ -269,7 +260,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 					bool prev_char = false;
 
 					while (cc > 0) {
-						bool ischar = _is_text_char(text[cc - 1]);
+						bool ischar = _is_text_char(text_[cc - 1]);
 
 						if (prev_char && !ischar)
 							break;
@@ -319,7 +310,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 					int cc = cursor_pos;
 
 					while (cc > 0) {
-						bool ischar = _is_text_char(text[cc - 1]);
+						bool ischar = _is_text_char(text_[cc - 1]);
 
 						if (prev_char && !ischar)
 							break;
@@ -364,8 +355,8 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 					bool prev_char = false;
 					int cc = cursor_pos;
 
-					while (cc < text.length()) {
-						bool ischar = _is_text_char(text[cc]);
+					while (cc < text_.length()) {
+						bool ischar = _is_text_char(text_[cc]);
 
 						if (prev_char && !ischar)
 							break;
@@ -394,8 +385,8 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 			case KEY_DOWN: {
 
 				shift_selection_check_pre(k->get_shift());
-				if (get_cursor_position() == text.length()) handled = false;
-				set_cursor_position(text.length());
+				if (get_cursor_position() == text_.length()) handled = false;
+				set_cursor_position(text_.length());
 				shift_selection_check_post(k->get_shift());
 			} break;
 			case KEY_DELETE: {
@@ -413,7 +404,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 					break;
 				}
 
-				int text_len = text.length();
+				int text_len = text_.length();
 
 				if (cursor_pos == text_len)
 					break; // nothing to do
@@ -431,9 +422,9 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 
 					bool prev_char = false;
 
-					while (cc < text.length()) {
+					while (cc < text_.length()) {
 
-						bool ischar = _is_text_char(text[cc]);
+						bool ischar = _is_text_char(text_[cc]);
 
 						if (prev_char && !ischar)
 							break;
@@ -473,7 +464,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 			case KEY_END: {
 
 				shift_selection_check_pre(k->get_shift());
-				set_cursor_position(text.length());
+				set_cursor_position(text_.length());
 				shift_selection_check_post(k->get_shift());
 			} break;
 
@@ -578,7 +569,7 @@ void UI_TextInput::_notification(int p_what) {
 		}
 
 		int x_ofs = 0;
-		bool using_placeholder = text.empty();
+		bool using_placeholder = text_.empty();
 		int cached_text_width = using_placeholder ? cached_placeholder_width : cached_width;
 		switch (align) {
 
@@ -607,12 +598,10 @@ void UI_TextInput::_notification(int p_what) {
 
 		int font_ascent = font->get_ascent();
 
-		Color selection_color = Color(0, 0.4, 0.8f);
-		Color font_color = Color(1, 0, 0);
-		Color font_color_selected = Color(1, 1, 1);
-		Color cursor_color = Color(0, 0, 0);
+		Color font_color = font_color_;
+	
 
-		const String &t = using_placeholder ? placeholder : text;
+		const String &t = using_placeholder ? placeholder : text_;
 		// draw placeholder color
 		if (using_placeholder)
 			font_color.a *= placeholder_alpha;
@@ -631,8 +620,8 @@ void UI_TextInput::_notification(int p_what) {
 						if (ofs >= ime_text.length())
 							break;
 
-						CharType cchar = (pass && !text.empty()) ? secret_character[0] : ime_text[ofs];
-						CharType next = (pass && !text.empty()) ? secret_character[0] : ime_text[ofs + 1];
+						CharType cchar = (pass && !text_.empty()) ? secret_character[0] : ime_text[ofs];
+						CharType next = (pass && !text_.empty()) ? secret_character[0] : ime_text[ofs + 1];
 						int im_char_width = font->get_char_size(cchar, next).width;
 
 						if ((x_ofs + im_char_width) > ofs_max)
@@ -654,8 +643,8 @@ void UI_TextInput::_notification(int p_what) {
 				}
 			}
 
-			CharType cchar = (pass && !text.empty()) ? secret_character[0] : t[char_ofs];
-			CharType next = (pass && !text.empty()) ? secret_character[0] : t[char_ofs + 1];
+			CharType cchar = (pass && !text_.empty()) ? secret_character[0] : t[char_ofs];
+			CharType next = (pass && !text_.empty()) ? secret_character[0] : t[char_ofs + 1];
 			int char_width = font->get_char_size(cchar, next).width;
 			// end of widget, break!
 			if ((x_ofs + char_width) > ofs_max)
@@ -664,15 +653,15 @@ void UI_TextInput::_notification(int p_what) {
 			bool selected = selection.enabled && char_ofs >= selection.begin && char_ofs < selection.end;
 
 			if (selected)
-				VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs), Size2(char_width, caret_height)), selection_color);
+				VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs), Size2(char_width, caret_height)), selection_color_);
 
 			int yofs = y_ofs + (caret_height - font->get_height()) / 2;
-			drawer.draw_char(ci, Point2(x_ofs, yofs + font_ascent), cchar, next, selected ? font_color_selected : font_color);
+			drawer.draw_char(ci, Point2(x_ofs, yofs + font_ascent), cchar, next, selected ? font_color_selected_ : font_color);
 
 			if (char_ofs == cursor_pos && draw_caret) {
 				if (ime_text.length() == 0) {
 
-					VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs), Size2(1, caret_height)), cursor_color);
+					VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs), Size2(1, caret_height)), cursor_color_);
 
 				}
 			}
@@ -688,8 +677,8 @@ void UI_TextInput::_notification(int p_what) {
 					if (ofs >= ime_text.length())
 						break;
 
-					CharType cchar = (pass && !text.empty()) ? secret_character[0] : ime_text[ofs];
-					CharType next = (pass && !text.empty()) ? secret_character[0] : ime_text[ofs + 1];
+					CharType cchar = (pass && !text_.empty()) ? secret_character[0] : ime_text[ofs];
+					CharType next = (pass && !text_.empty()) ? secret_character[0] : ime_text[ofs + 1];
 					int im_char_width = font->get_char_size(cchar, next).width;
 
 					if ((x_ofs + im_char_width) > ofs_max)
@@ -714,7 +703,7 @@ void UI_TextInput::_notification(int p_what) {
 		if (char_ofs == cursor_pos && draw_caret) { //may be at the end
 			if (ime_text.length() == 0) {
 
-				VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs), Size2(1, caret_height)), cursor_color);
+				VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(x_ofs, y_ofs), Size2(1, caret_height)), cursor_color_);
 
 			}
 		}
@@ -737,7 +726,7 @@ void UI_TextInput::_notification(int p_what) {
 		OS::get_singleton()->set_ime_position(get_global_position() + cursor_pos);
 
 		if (OS::get_singleton()->has_virtual_keyboard())
-			OS::get_singleton()->show_virtual_keyboard(text, get_global_rect());
+			OS::get_singleton()->show_virtual_keyboard(text_, get_global_rect());
 
 	} break;
 	case NOTIFICATION_FOCUS_EXIT: {
@@ -798,7 +787,7 @@ void UI_TextInput::select(int p_from, int p_to) {
 		return;
 	}
 
-	int len = text.length();
+	int len = text_.length();
 	if (p_from < 0)
 		p_from = 0;
 	if (p_from > len)
@@ -819,25 +808,25 @@ void UI_TextInput::select(int p_from, int p_to) {
 
 void UI_TextInput::select_all() {
 
-	if (!text.length())
+	if (!text_.length())
 		return;
 
 	selection.begin = 0;
-	selection.end = text.length();
+	selection.end = text_.length();
 	selection.enabled = true;
 	update();
 }
 
 void UI_TextInput::delete_char() {
 
-	if ((text.length() <= 0) || (cursor_pos == 0)) return;
+	if ((text_.length() <= 0) || (cursor_pos == 0)) return;
 
 	Ref<Font> font = get_font("font");
 	if (font != NULL) {
-		cached_width -= font->get_char_size(text[cursor_pos - 1]).width;
+		cached_width -= font->get_char_size(text_[cursor_pos - 1]).width;
 	}
 
-	text.erase(cursor_pos - 1, 1);
+	text_.erase(cursor_pos - 1, 1);
 
 	set_cursor_position(get_cursor_position() - 1);
 
@@ -875,7 +864,7 @@ void UI_TextInput::undo() {
 	}
 	undo_stack_pos = undo_stack_pos->prev();
 	TextOperation op = undo_stack_pos->get();
-	text = op.text;
+	text_ = op.text;
 	set_cursor_position(op.cursor_pos);
 	_emit_text_change();
 }
@@ -889,7 +878,7 @@ void UI_TextInput::redo() {
 	}
 	undo_stack_pos = undo_stack_pos->next();
 	TextOperation op = undo_stack_pos->get();
-	text = op.text;
+	text_ = op.text;
 	set_cursor_position(op.cursor_pos);
 	_emit_text_change();
 }
@@ -897,7 +886,7 @@ void UI_TextInput::redo() {
 void UI_TextInput::cut_text() {
 
 	if (selection.enabled && !pass) {
-		OS::get_singleton()->set_clipboard(text.substr(selection.begin, selection.end - selection.begin));
+		OS::get_singleton()->set_clipboard(text_.substr(selection.begin, selection.end - selection.begin));
 		selection_delete();
 	}
 }
@@ -905,7 +894,7 @@ void UI_TextInput::cut_text() {
 void UI_TextInput::copy_text() {
 
 	if (selection.enabled && !pass) {
-		OS::get_singleton()->set_clipboard(text.substr(selection.begin, selection.end - selection.begin));
+		OS::get_singleton()->set_clipboard(text_.substr(selection.begin, selection.end - selection.begin));
 	}
 }
 
@@ -929,23 +918,23 @@ void UI_TextInput::paste_text() {
 
 void UI_TextInput::delete_text(int p_from_column, int p_to_column) {
 
-	if (text.size() > 0) {
+	if (text_.size() > 0) {
 		Ref<Font> font = get_font("font");
 		if (font != NULL) {
 			for (int i = p_from_column; i < p_to_column; i++)
-				cached_width -= font->get_char_size(text[i]).width;
+				cached_width -= font->get_char_size(text_[i]).width;
 		}
 	}
 	else {
 		cached_width = 0;
 	}
 
-	text.erase(p_from_column, p_to_column - p_from_column);
+	text_.erase(p_from_column, p_to_column - p_from_column);
 	cursor_pos -= CLAMP(cursor_pos - p_from_column, 0, p_to_column - p_from_column);
 
-	if (cursor_pos >= text.length()) {
+	if (cursor_pos >= text_.length()) {
 
-		cursor_pos = text.length();
+		cursor_pos = text_.length();
 	}
 	if (window_pos > cursor_pos) {
 
@@ -1003,7 +992,7 @@ void UI_TextInput::clear_internal() {
 	cursor_pos = 0;
 	window_pos = 0;
 	undo_text = "";
-	text = "";
+	text_ = "";
 	update();
 }
 
@@ -1015,7 +1004,7 @@ void UI_TextInput::_clear_undo_stack() {
 
 void UI_TextInput::_create_undo_state() {
 	TextOperation op;
-	op.text = text;
+	op.text = text_;
 	op.cursor_pos = cursor_pos;
 	undo_stack.push_back(op);
 }
@@ -1088,11 +1077,11 @@ void UI_TextInput::set_cursor_at_pixel_pos(int p_x) {
 		} break;
 	}
 
-	while (ofs < text.length()) {
+	while (ofs < text_.length()) {
 
 		int char_w = 0;
 		if (font != NULL) {
-			char_w = font->get_char_size(text[ofs]).width;
+			char_w = font->get_char_size(text_[ofs]).width;
 		}
 		pixel_ofs += char_w;
 
@@ -1108,8 +1097,8 @@ void UI_TextInput::set_cursor_at_pixel_pos(int p_x) {
 
 void UI_TextInput::set_cursor_position(int p_pos) {
 
-	if (p_pos > (int)text.length())
-		p_pos = text.length();
+	if (p_pos > (int)text_.length())
+		p_pos = text_.length();
 
 	if (p_pos < 0)
 		p_pos = 0;
@@ -1145,12 +1134,12 @@ void UI_TextInput::set_cursor_position(int p_pos) {
 
 			for (int i = cursor_pos; i >= window_pos; i--) {
 
-				if (i >= text.length()) {
+				if (i >= text_.length()) {
 					//do not do this, because if the cursor is at the end, its just fine that it takes no space
 					//accum_width = font->get_char_size(' ').width; //anything should do
 				}
 				else {
-					accum_width += font->get_char_size(text[i], i + 1 < text.length() ? text[i + 1] : 0).width; //anything should do
+					accum_width += font->get_char_size(text_[i], i + 1 < text_.length() ? text_[i + 1] : 0).width; //anything should do
 				}
 				if (accum_width > window_width)
 					break;
@@ -1167,7 +1156,7 @@ void UI_TextInput::set_cursor_position(int p_pos) {
 
 void UI_TextInput::append_at_cursor(String p_text) {
 
-	if ((max_length <= 0) || (text.length() + p_text.length() <= max_length)) {
+	if ((max_length <= 0) || (text_.length() + p_text.length() <= max_length)) {
 
 		Ref<Font> font = get_font("font");
 		if (font != NULL) {
@@ -1178,9 +1167,9 @@ void UI_TextInput::append_at_cursor(String p_text) {
 			cached_width = 0;
 		}
 
-		String pre = text.substr(0, cursor_pos);
-		String post = text.substr(cursor_pos, text.length() - cursor_pos);
-		text = pre + p_text + post;
+		String pre = text_.substr(0, cursor_pos);
+		String post = text_.substr(cursor_pos, text_.length() - cursor_pos);
+		text_ = pre + p_text + post;
 		set_cursor_position(cursor_pos + p_text.length());
 	}
 }
@@ -1191,6 +1180,44 @@ void UI_TextInput::set_window_pos(int p_pos) {
 	if (window_pos < 0) window_pos = 0;
 }
 void UI_TextInput::_bind_methods() {
+}
+
+Ref<Font> UI_TextInput::get_font(const StringName &p_name, const StringName &p_type) const {
+	if (cfont.is_null()) {
+		return Control::get_font(p_name);
+	}
+	return cfont;
+}
+
+void UI_TextInput::SetText(const String& v) {
+	if (text_ != v && v != "") {
+		text_ = v;
+		clear_internal();
+		update();
+		cursor_pos = 0;
+		window_pos = 0;
+	}
+}
+
+void UI_TextInput::SetColor(const String& v) {
+	if (color_ != v && v != "") {
+		color_ = v;
+		font_color_ = Color::hex_rgba(v.hex_to_int());
+		update();
+	}
+}
+void UI_TextInput::SetFontSize(int v) {
+	if (font_size_ != v && v > 0 && font_ != "") {
+		cfont = Morn::get_singleton()->GetFont(font_, font_size_);
+		update();
+	}
+}
+void UI_TextInput::SetFont(const String& v) {
+	if (font_ != v && v != "") {
+		font_ = v;
+		cfont = Morn::get_singleton()->GetFont(font_, font_size_);
+		update();
+	}
 }
 
 

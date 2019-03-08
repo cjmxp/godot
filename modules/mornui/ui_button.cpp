@@ -19,6 +19,18 @@ void UI_Button::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 		if (tag == "label") {
 			SetLabel(attribute->value());
 		}
+		else if (tag == "statenum") {
+			SetClipY(attribute->value().to_int());
+		}
+		else if (tag == "labelfont") {
+			SetFont(attribute->value());
+		}
+		else if (tag == "labelsize") {
+			SetFontSize(attribute->value().to_int());
+		}
+		else if (tag == "labelcolors") {
+			SetColor(attribute->value());
+		}
 	}
 }
 void UI_Button::_gui_input(Ref<InputEvent> p_event) {
@@ -63,7 +75,6 @@ void UI_Button::_notification(int p_what) {
 
 		RID ci = get_canvas_item();
 		Size2 size = get_size();
-		Color color;
 		Ref<Font> font = get_font("font");
 		int text_clip = size.width;
 
@@ -80,7 +91,7 @@ void UI_Button::_notification(int p_what) {
 			text_ofs.x *= 0.5;
 			text_ofs.y = font->get_ascent() + of;
 			of += font->get_ascent()+1;
-			font->draw(ci, text_ofs.floor(), list[i], color, text_clip);
+			font->draw(ci, text_ofs.floor(), list[i], font_color_, text_clip);
 		}
 		if (tab_mode_) {
 			minsize_.width = char_w > minsize_.width ? char_w : minsize_.width;
@@ -104,9 +115,19 @@ String UI_Button::GetColor() {
 void UI_Button::SetColor(const String& v) {
 	if (color_ != v && v != "") {
 		color_ = v;
+		font_color_ = Color::hex_rgba(v.hex_to_int());
+		update();
 	}
 }
-
+void UI_Button::SetFontSize(int v) {
+	if (font_size_ != v && v > 0 ) {
+		font_size_ = v;
+		if (font_ != "") {
+			cfont = Morn::get_singleton()->GetFont(font_, font_size_);
+			update();
+		}
+	}
+}
 String UI_Button::GetFont() {
 	return font_;
 }
@@ -114,7 +135,15 @@ String UI_Button::GetFont() {
 void UI_Button::SetFont(const String& v) {
 	if (font_ != v && v != "") {
 		font_ = v;
+		cfont = Morn::get_singleton()->GetFont(font_, font_size_);
+		update();
 	}
+}
+Ref<Font> UI_Button::get_font(const StringName &p_name, const StringName &p_type) const {
+	if (cfont.is_null()) {
+		return Control::get_font(p_name);
+	}
+	return cfont;
 }
 void UI_Button::SetSelected(bool v) {
 	if (tab_mode_ && selected_!=v) {

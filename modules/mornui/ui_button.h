@@ -19,8 +19,11 @@ public:
 	void SetLabel(const String& v);
 	String GetColor();
 	void SetColor(const String& v);
+	int GetFontSize() { return font_size_; };
+	void SetFontSize(int v);
 	String GetFont();
 	void SetFont(const String& v);
+	Ref<Font> get_font(const StringName &p_name, const StringName &p_type = StringName()) const;
 protected:
 	static void _bind_methods();
 	void _notification(int p_what);
@@ -30,6 +33,9 @@ protected:
 	bool tab_mode_ { false };
 	bool selected_{false};
 	String color_{""};
+	Color font_color_;
 	String font_{""};
+	int font_size_{ 12 };
+	Ref<Font> cfont{ NULL };
 };
 #endif
