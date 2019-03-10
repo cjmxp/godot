@@ -7,7 +7,8 @@
 #include "scene/main/node.h"
 #include "core/io/http_client.h"
 #include "scene/resources/font.h"
-class DynamicFontData;
+
+class DynamicFont;
 
 class Morn : public Node {
 	GDCLASS(Morn, Node);
@@ -18,7 +19,7 @@ public:
 	static Morn *get_singleton();
 	void Init(const Variant& m);
 	Ref<Texture> GetSkin(const String& skin);
-	Ref<Font> GetFont(const String& f,int s);
+	Ref<Font> GetFont(const String& f,int size);
 	Ref<MRes> GetRes(const String& skin);
 	void LoadRes(Ref<MRes> res);
 	void SetUrl(const String& v);
@@ -57,11 +58,8 @@ private:
 	bool exit_;
 	Vector<String> n_;
 	Vector<Ref<MRes> > list_;
-
 	Map<uint32_t, Ref<MRes> > res_;
-	Map<uint32_t, Ref<Font> > fonts_;
-	Map<uint32_t, Ref<DynamicFontData> > ttfs_;
-
+	Map<uint32_t, Ref<Font> >fonts_;
 	Ref<HTTPClient> client_;
 	Node* main_;
 	static void _thread_func(void *ud);
@@ -69,6 +67,5 @@ private:
 	Ref<MRes> find(const String& v);
 	Ref<MRes> pop();
 	void push(Ref<MRes> res);
-
 };
 #endif

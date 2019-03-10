@@ -54,8 +54,6 @@ protected:
 	static void _bind_methods();
 	void _notification(int p_what);
 	void _gui_input(Ref<InputEvent> p_event) override;
-	//virtual void _unhandled_input(Ref<InputEvent> p_event);
-	//static void _bind_methods();
 	String xl_text;
 	bool textinput_draw_;
 	bool select_;
@@ -109,6 +107,7 @@ private:
 	Color font_color_;
 	Color font_color_selected_;
 	Color cursor_color_;
+	bool focus_;
 
 	void _clear_undo_stack();
 	void _clear_redo();

@@ -146,12 +146,14 @@ void UI_Button::SetFont(const String& v) {
 		update();
 	}
 }
+
 Ref<Font> UI_Button::get_font(const StringName &p_name, const StringName &p_type) const {
 	if (cfont.is_null()) {
 		return Control::get_font(p_name);
 	}
 	return cfont;
 }
+
 void UI_Button::SetSelected(bool v) {
 	if (tab_mode_ && selected_!=v) {
 		selected_ = v;
@@ -172,14 +174,16 @@ void UI_Button::SetTabMode(bool v) {
 void UI_Button::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("GetLabel"), &UI_Button::GetLabel);
 	ClassDB::bind_method(D_METHOD("SetLabel"), &UI_Button::SetLabel);
-	ClassDB::bind_method(D_METHOD("GetColor"), &UI_Button::GetColor);
-	ClassDB::bind_method(D_METHOD("SetColor"), &UI_Button::SetColor);
-	ClassDB::bind_method(D_METHOD("GetFont"), &UI_Button::GetFont);
-	ClassDB::bind_method(D_METHOD("SetFont"), &UI_Button::SetFont);
 	ClassDB::bind_method(D_METHOD("GetSelected"), &UI_Button::GetSelected);
 	ClassDB::bind_method(D_METHOD("SetSelected"), &UI_Button::SetSelected);
 	ClassDB::bind_method(D_METHOD("GetTabMode"), &UI_Button::GetTabMode);
 	ClassDB::bind_method(D_METHOD("SetTabMode"), &UI_Button::SetTabMode);
+	ClassDB::bind_method(D_METHOD("GetColor"), &UI_Button::GetColor);
+	ClassDB::bind_method(D_METHOD("SetColor"), &UI_Button::SetColor);
+	ClassDB::bind_method(D_METHOD("GetFont"), &UI_Button::GetFont);
+	ClassDB::bind_method(D_METHOD("SetFont"), &UI_Button::SetFont);
+	ClassDB::bind_method(D_METHOD("GetFontSize"), &UI_Button::GetFontSize);
+	ClassDB::bind_method(D_METHOD("SetFontSize"), &UI_Button::SetFontSize);
 }
 
 

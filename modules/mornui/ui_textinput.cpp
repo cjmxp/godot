@@ -45,6 +45,10 @@ UI_TextInput::UI_TextInput() {
 UI_TextInput::~UI_TextInput() {
 }
 
+static bool _is_text_char(CharType c) {
+
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
+}
 
 void UI_TextInput::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	UI_Clip::InitAttribute(node, self);
@@ -68,10 +72,6 @@ void UI_TextInput::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	setattribute_ = true;
 }
 
-static bool _is_text_char(CharType c) {
-
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
-}
 
 void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 	p_event->SetName(get_name());
@@ -528,6 +528,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 void UI_TextInput::_notification(int p_what) {
 	if (!textinput_draw_)return;
 	if (p_what == NOTIFICATION_PROCESS && caret_blink_enabled) {
+		focus_ = has_focus();
 		uint32_t v = OS::get_singleton()->get_ticks_msec();
 		if (blink_ctimer_ == 0) {
 			blink_ctimer_ = v;
@@ -535,6 +536,9 @@ void UI_TextInput::_notification(int p_what) {
 		else if (v - blink_ctimer_ >= 600) {
 			blink_ctimer_ = v;
 			_toggle_draw_caret();
+		}
+		if (selection.enabled && !focus_) {
+			deselect();
 		}
 	}
 	else if (p_what == NOTIFICATION_MOUSE_ENTER) {
@@ -569,7 +573,8 @@ void UI_TextInput::_notification(int p_what) {
 		update();
 	} break;
 	case NOTIFICATION_DRAW: {
-		if (!has_focus()  || !window_has_focus) {
+		focus_ = has_focus();
+		if (!focus_ || !window_has_focus) {
 			draw_caret = false;
 		}
 		int width, height;
@@ -589,7 +594,7 @@ void UI_TextInput::_notification(int p_what) {
 
 		Ref<Font> font = get_font("font");
 
-		if (has_focus()) {
+		if (focus_) {
 			index_ = 3;
 		}
 
@@ -733,7 +738,7 @@ void UI_TextInput::_notification(int p_what) {
 			}
 		}
 
-		if (has_focus()) {
+		if (focus_) {
 
 			OS::get_singleton()->set_ime_active(true);
 			OS::get_singleton()->set_ime_position(get_global_position() + Point2(using_placeholder ? 0 : x_ofs, y_ofs + caret_height));
@@ -766,8 +771,8 @@ void UI_TextInput::_notification(int p_what) {
 
 	} break;
 	case MainLoop::NOTIFICATION_OS_IME_UPDATE: {
-
-		if (has_focus()) {
+		focus_ = has_focus();
+		if (focus_) {
 			ime_text = OS::get_singleton()->get_ime_text();
 			ime_selection = OS::get_singleton()->get_ime_selection();
 			update();
@@ -1059,7 +1064,6 @@ void UI_TextInput::cursor_set_blink_enabled(const bool p_enabled) {
 }
 
 void UI_TextInput::set_editable(bool p_editable) {
-
 	editable = p_editable;
 	update();
 }
@@ -1204,12 +1208,10 @@ void UI_TextInput::set_window_pos(int p_pos) {
 	window_pos = p_pos;
 	if (window_pos < 0) window_pos = 0;
 }
-void UI_TextInput::_bind_methods() {
-}
 
 Ref<Font> UI_TextInput::get_font(const StringName &p_name, const StringName &p_type) const {
 	if (cfont.is_null()) {
-		return Control::get_font(p_name);
+		return  Control::get_font(p_name);
 	}
 	return cfont;
 }
@@ -1243,6 +1245,19 @@ void UI_TextInput::SetFont(const String& v) {
 		cfont = Morn::get_singleton()->GetFont(font_, font_size_);
 		update();
 	}
+}
+
+void UI_TextInput::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("GetText"), &UI_TextInput::GetText);
+	ClassDB::bind_method(D_METHOD("SetText"), &UI_TextInput::SetText);
+	//ClassDB::bind_method(D_METHOD("GetAlign"), &UI_TextInput::GetAlign);
+	//ClassDB::bind_method(D_METHOD("SetAlign"), &UI_TextInput::SetAlign);
+	ClassDB::bind_method(D_METHOD("GetColor"), &UI_TextInput::GetColor);
+	ClassDB::bind_method(D_METHOD("SetColor"), &UI_TextInput::SetColor);
+	ClassDB::bind_method(D_METHOD("GetFont"), &UI_TextInput::GetFont);
+	ClassDB::bind_method(D_METHOD("SetFont"), &UI_TextInput::SetFont);
+	ClassDB::bind_method(D_METHOD("GetFontSize"), &UI_TextInput::GetFontSize);
+	ClassDB::bind_method(D_METHOD("SetFontSize"), &UI_TextInput::SetFontSize);
 }
 
 

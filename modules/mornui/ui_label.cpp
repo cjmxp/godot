@@ -556,6 +556,8 @@ void UI_Label::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("SetColor"), &UI_Label::SetColor);
 	ClassDB::bind_method(D_METHOD("GetFont"), &UI_Label::GetFont);
 	ClassDB::bind_method(D_METHOD("SetFont"), &UI_Label::SetFont);
+	ClassDB::bind_method(D_METHOD("GetFontSize"), &UI_Label::GetFontSize);
+	ClassDB::bind_method(D_METHOD("SetFontSize"), &UI_Label::SetFontSize);
 }
 
 

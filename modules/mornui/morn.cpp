@@ -1,7 +1,6 @@
 #include "morn.h"
 #include "mui.h"
 #include "core/os/os.h"
-#include "scene/resources/dynamic_font.h"
 
 Morn* Morn::singleton = NULL;
 Morn* Morn::get_singleton() {
@@ -321,37 +320,25 @@ Ref<Texture> Morn::GetSkin(const String& skin) {
 	}
 	return NULL;
 }
-Ref<Font> Morn::GetFont(const String& f, int s)  {
-	Ref<DynamicFontData> fdb;
-		fdb.instance();
-		fdb->set_font_path("res://kaiti.ttf");
-		fdb->set_force_autohinter(true); //just looks better..i think?
-		Ref<DynamicFont> font;
-		font.instance();
-		font->set_size(s);
-		font->set_font_data(fdb);		
-
-		
-		//RES font_data = ResourceLoader::load("res://kaiti.ttf");
-	/*String ttf = f+ Variant(s);
+Ref<Font> Morn::GetFont(const String& f,int s)  {
+	String ttf = f + Variant(s);
 	uint32_t id = ttf.hash();
-
+	ttf = "user://";
+	ttf = ttf + f;
 	if (!fonts_.has(id)) {
-		Ref<DynamicFontData> font;
-		font.instance();
-		font->set_font_path("res://kaiti.ttf");
-		Ref<DynamicFont> font;
-		font.instance();
-		font->set_size(s);
-		font->set_font_data(SampledFont);
+		RES res = ResourceLoader::load(ttf);
+		if (res.is_null()) {
+			return NULL;
+		}
+		Object* font = ClassDB::instance("DynamicFont");
+		if (font == NULL)return NULL;
 		
-		RES font_data = ResourceLoader::load("res://kaiti.ttf");
-		font->set_font_data(font_data);
-		
-		fonts_.insert(id, font);
+		font->call("set_font_data", res);
+		font->call("set_size", s);
+		Ref<Font> ft = Object::cast_to<Font>(font);
+		fonts_.insert(id, ft);
 	}
-	return fonts_.find(id)->get();*/
-	return NULL;
+	return fonts_.find(id)->get();
 }
 
 Ref<MRes> Morn::GetRes(const String& v) {
