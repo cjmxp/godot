@@ -104,21 +104,21 @@ void UI_ScrollBar::_notification(int p_what) {
 }
 
 void UI_ScrollBar::OnEvent(Ref<InputEvent> p_event) {
-	String name = p_event->GetTaget();
+	String name = p_event->GetTarget();
 	UI_Box* p = Parent();
 	if (name=="ui_scrollbar_slider" || name=="ui_scrollbar_up" || name == "ui_scrollbar_down") {
 		value_ = slider_->GetValue();
 		String key = get_name();
 		if (name == "ui_scrollbar_up") {
 			
-			p_event->SetTaget(key + "_up");
+			p_event->SetTarget(key + "_up");
 		}
 		else if(name == "ui_scrollbar_down")
 		{
-			p_event->SetTaget(key + "_down");
+			p_event->SetTarget(key + "_down");
 		}
 		else if(name == "ui_scrollbar_slider") {
-			p_event->SetTaget(key);
+			p_event->SetTarget(key);
 		}
 		if (p)p->OnEvent(p_event);
 		return;
@@ -127,7 +127,7 @@ void UI_ScrollBar::OnEvent(Ref<InputEvent> p_event) {
 }
 
 void UI_ScrollBar::_gui_input(Ref<InputEvent> p_event) {
-	p_event->SetTaget(get_name());
+	p_event->SetTarget(get_name());
 	OnEvent(p_event);
 }
 

@@ -29,7 +29,7 @@ void UI_CheckBox::_gui_input(Ref<InputEvent> p_event) {
 			if (clipY_ > 1) {
 				index_ = index_ == 1 ? 2 : 1;
 			}
-			p_event->SetTaget(get_name());
+			p_event->SetTarget(get_name());
 			OnEvent(p_event);
 		}
 		update();

@@ -229,7 +229,7 @@ void UI_Tab::SetFont(const String& v) {
 
 void UI_Tab::OnEvent(Ref<InputEvent> p_event) {
 
-	String name = p_event->GetTaget();
+	String name = p_event->GetTarget();
 	if (name.find("ui_table_item_")!=-1) {
 		Ref<InputEventMouseButton> b = p_event;
 		if (b.is_valid() && b->is_pressed() ) {
@@ -238,7 +238,7 @@ void UI_Tab::OnEvent(Ref<InputEvent> p_event) {
 			SetSelectedIndex(j);
 			UI_Box* p = Parent();
 			if (p) {
-				p_event->SetTaget(get_name());
+				p_event->SetTarget(get_name());
 				p->OnEvent(p_event);
 			}
 			return;
@@ -249,7 +249,7 @@ void UI_Tab::OnEvent(Ref<InputEvent> p_event) {
 }
 
 void UI_Tab::_gui_input(Ref<InputEvent> p_event) {
-	p_event->SetTaget(get_name());
+	p_event->SetTarget(get_name());
 	OnEvent(p_event);
 }
 

@@ -45,16 +45,16 @@ void UI_Slider::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	}
 }
 void UI_Slider::OnEvent(Ref<InputEvent> e) {
-	if (e->GetTaget() == "ui_slider_bar")return;
+	if (e->GetTarget() == "ui_slider_bar")return;
 	UI_Box* p = Parent();
 	if (p) {
-		e->SetTaget(get_name());
+		e->SetTarget(get_name());
 		p->OnEvent(e);
 	}
 }
 
 void UI_Slider::_gui_input(Ref<InputEvent> p_event) {
-	p_event->SetTaget(get_name());
+	p_event->SetTarget(get_name());
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed()) {

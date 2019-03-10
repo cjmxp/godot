@@ -103,7 +103,7 @@ void UI_Box::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	}
 }
 void UI_Box::_gui_input(Ref<InputEvent> p_event) {
-	p_event->SetTaget(get_name());
+	p_event->SetTarget(get_name());
 	OnEvent(p_event);
 }
 

@@ -175,8 +175,8 @@ public:
 	bool is_action_pressed(const StringName &p_action) const;
 	bool is_action_released(const StringName &p_action) const;
 	float get_action_strength(const StringName &p_action) const;
-	String GetTaget();
-	void SetTaget(const String& v);
+	String GetTarget();
+	void SetTarget(const String& v);
 	// To be removed someday, since they do not make sense for all events
 	virtual bool is_pressed() const;
 	virtual bool is_echo() const;

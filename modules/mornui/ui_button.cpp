@@ -54,7 +54,7 @@ void UI_Button::_gui_input(Ref<InputEvent> p_event) {
 				}
 				update();
 			}
-			p_event->SetTaget(get_name());
+			p_event->SetTarget(get_name());
 			OnEvent(p_event);
 		}
 		else if(!tab_mode_) {

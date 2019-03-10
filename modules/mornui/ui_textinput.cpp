@@ -109,7 +109,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 					selection.drag_attempt = true;
 				}
 			}
-			p_event->SetTaget(get_name());
+			p_event->SetTarget(get_name());
 			OnEvent(p_event);
 		}
 		else {
@@ -519,7 +519,7 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 
 			update();
 		}
-		p_event->SetTaget(get_name());
+		p_event->SetTarget(get_name());
 		OnEvent(p_event);
 		return;
 	}

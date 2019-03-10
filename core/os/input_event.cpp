@@ -90,10 +90,10 @@ String InputEvent::as_text() const {
 
 	return String();
 }
-String InputEvent::GetTaget(){
+String InputEvent::GetTarget(){
 	return data;
 }
-void InputEvent::SetTaget(const String& v) {
+void InputEvent::SetTarget(const String& v) {
 	data = v;
 }
 bool InputEvent::action_match(const Ref<InputEvent> &p_event, bool *p_pressed, float *p_strength, float p_deadzone) const {
@@ -112,7 +112,7 @@ bool InputEvent::is_action_type() const {
 }
 
 void InputEvent::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("GetTaget"), &InputEvent::GetTaget);
+	ClassDB::bind_method(D_METHOD("GetTarget"), &InputEvent::GetTarget);
 	ClassDB::bind_method(D_METHOD("set_device", "device"), &InputEvent::set_device);
 	ClassDB::bind_method(D_METHOD("get_device"), &InputEvent::get_device);
 

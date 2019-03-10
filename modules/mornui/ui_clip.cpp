@@ -117,7 +117,7 @@ void UI_Clip::SetAutoPlay(bool v) {
 	}
 }
 void UI_Clip::_gui_input(Ref<InputEvent> p_event) {
-	p_event->SetTaget(get_name());
+	p_event->SetTarget(get_name());
 	OnEvent(p_event);
 }
 void UI_Clip::_notification(int p_what) {

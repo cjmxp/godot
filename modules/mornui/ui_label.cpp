@@ -93,7 +93,7 @@ void UI_Label::_gui_input(Ref<InputEvent> p_event) {
 			if (clipY_ > 1) {
 				index_ = 2;
 			}
-			p_event->SetTaget(get_name());
+			p_event->SetTarget(get_name());
 			OnEvent(p_event);
 		}
 		else {
