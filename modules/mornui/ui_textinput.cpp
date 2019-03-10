@@ -74,8 +74,6 @@ void UI_TextInput::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 
 
 void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
-	p_event->SetName(get_name());
-	OnEvent(p_event);
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid() && b->get_button_index() == BUTTON_LEFT) {
 		_reset_caret_blink_timer();
@@ -111,7 +109,8 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 					selection.drag_attempt = true;
 				}
 			}
-
+			p_event->SetTaget(get_name());
+			OnEvent(p_event);
 		}
 		else {
 			if ((!selection.creating) && (!selection.doubleclick)) {
@@ -123,7 +122,6 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 			if (OS::get_singleton()->has_virtual_keyboard())
 				OS::get_singleton()->show_virtual_keyboard(text_, get_global_rect());
 		}
-
 		update();
 	}
 
@@ -520,8 +518,9 @@ void UI_TextInput::_gui_input(Ref<InputEvent> p_event) {
 			}
 
 			update();
-			}
-
+		}
+		p_event->SetTaget(get_name());
+		OnEvent(p_event);
 		return;
 	}
 }

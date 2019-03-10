@@ -41,7 +41,6 @@ void UI_Button::InitAttribute(Ref<XMLNode> node,ScriptInstance* self) {
 	}
 }
 void UI_Button::_gui_input(Ref<InputEvent> p_event) {
-	p_event->SetName(get_name());
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed() && index_ != 1) {
@@ -55,6 +54,7 @@ void UI_Button::_gui_input(Ref<InputEvent> p_event) {
 				}
 				update();
 			}
+			p_event->SetTaget(get_name());
 			OnEvent(p_event);
 		}
 		else if(!tab_mode_) {

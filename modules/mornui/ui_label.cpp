@@ -87,14 +87,14 @@ Size2 UI_Label::get_minimum_size() const {
 }
 
 void UI_Label::_gui_input(Ref<InputEvent> p_event) {
-	p_event->SetName(get_name());
-	OnEvent(p_event);
 	Ref<InputEventMouseButton> b = p_event;
 	if (b.is_valid()) {
 		if (b->is_pressed()) {
 			if (clipY_ > 1) {
 				index_ = 2;
 			}
+			p_event->SetTaget(get_name());
+			OnEvent(p_event);
 		}
 		else {
 			index_ = 1;

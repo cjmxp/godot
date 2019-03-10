@@ -250,7 +250,7 @@ void UI_List::_notification(int p_what) {
 }
 
 void UI_List::OnEvent(Ref<InputEvent> p_event) {
-	String name = p_event->GetName();
+	String name = p_event->GetTaget();
 	if (name == "ui_list_hscrollbar" || name == "ui_list_hscrollbar_up" || name == "ui_list_hscrollbar_down" || name == "ui_list_vscrollbar" || name == "ui_list_vscrollbar_up" || name == "ui_list_vscrollbar_down") {
 		scroll(name);
 	}
@@ -319,7 +319,7 @@ void UI_List::scroll(String name) {
 	}
 }
 void UI_List::_gui_input(Ref<InputEvent> p_event) {
-	p_event->SetName(get_name());
+	p_event->SetTaget(get_name());
 	OnEvent(p_event);
 }
 
