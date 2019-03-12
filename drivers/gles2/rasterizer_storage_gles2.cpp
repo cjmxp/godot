@@ -1137,7 +1137,7 @@ void RasterizerStorageGLES2::sky_set_texture(RID p_sky, RID p_panorama, int p_ra
 	glGenTextures(1, &sky->radiance);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, sky->radiance);
 
-	int size = p_radiance_size / 4; //divide by four because its a cubemap (this is an approximation because GLES3 uses a dual paraboloid)
+	int size = p_radiance_size / 2; //divide by two because its a cubemap (this is an approximation because GLES3 uses a dual paraboloid)
 
 	GLenum internal_format = GL_RGB;
 	GLenum format = GL_RGB;
@@ -1176,7 +1176,7 @@ void RasterizerStorageGLES2::sky_set_texture(RID p_sky, RID p_panorama, int p_ra
 	int mipmaps = 6;
 	int lod = 0;
 	int mm_level = mipmaps;
-	size = p_radiance_size / 4;
+	size = p_radiance_size / 2;
 	shaders.cubemap_filter.set_conditional(CubemapFilterShaderGLES2::USE_SOURCE_PANORAMA, true);
 	shaders.cubemap_filter.set_conditional(CubemapFilterShaderGLES2::USE_DIRECT_WRITE, true);
 	shaders.cubemap_filter.bind();
@@ -5469,7 +5469,9 @@ void RasterizerStorageGLES2::initialize() {
 #ifdef GLES_OVER_GL
 	//this needs to be enabled manually in OpenGL 2.1
 
-	glEnable(_EXT_TEXTURE_CUBE_MAP_SEAMLESS);
+	if (config.extensions.has("GL_ARB_seamless_cube_map")) {
+		glEnable(_EXT_TEXTURE_CUBE_MAP_SEAMLESS);
+	}
 	glEnable(GL_POINT_SPRITE);
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 #endif
