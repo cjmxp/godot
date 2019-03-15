@@ -740,7 +740,7 @@ void UI_TextInput::_notification(int p_what) {
 		if (focus_) {
 
 			OS::get_singleton()->set_ime_active(true);
-			OS::get_singleton()->set_ime_position(get_global_position() + Point2(using_placeholder ? 0 : x_ofs, y_ofs + caret_height));
+			OS::get_singleton()->set_ime_position(get_global_position() + Point2(using_placeholder ? 0 : x_ofs, y_ofs));
 		}
 
 	}break;
