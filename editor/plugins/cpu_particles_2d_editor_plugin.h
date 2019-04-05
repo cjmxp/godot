@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  midi_driver.cpp                                                      */
+/*  cpu_particles_2d_editor_plugin.h                                     */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,85 +28,65 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#include "midi_driver.h"
+#ifndef CPU_PARTICLES_2D_EDITOR_PLUGIN_H
+#define CPU_PARTICLES_2D_EDITOR_PLUGIN_H
 
-#include "core/os/os.h"
-#include "main/input_default.h"
+#include "editor/editor_node.h"
+#include "editor/editor_plugin.h"
+#include "scene/2d/collision_polygon_2d.h"
+#include "scene/2d/cpu_particles_2d.h"
+#include "scene/gui/box_container.h"
+#include "scene/gui/file_dialog.h"
 
-MIDIDriver *MIDIDriver::singleton = NULL;
-MIDIDriver *MIDIDriver::get_singleton() {
+class CPUParticles2DEditorPlugin : public EditorPlugin {
 
-	return singleton;
-}
+	GDCLASS(CPUParticles2DEditorPlugin, EditorPlugin);
 
-void MIDIDriver::set_singleton() {
+	enum {
+		MENU_LOAD_EMISSION_MASK,
+		MENU_CLEAR_EMISSION_MASK
+	};
 
-	singleton = this;
-}
+	enum EmissionMode {
+		EMISSION_MODE_SOLID,
+		EMISSION_MODE_BORDER,
+		EMISSION_MODE_BORDER_DIRECTED
+	};
 
-void MIDIDriver::receive_input_packet(uint64_t timestamp, uint8_t *data, uint32_t length) {
+	CPUParticles2D *particles;
 
-	Ref<InputEventMIDI> event;
-	event.instance();
+	EditorFileDialog *file;
+	EditorNode *editor;
 
-	if (length >= 1) {
-		event->set_channel(data[0] & 0xF);
-		event->set_message(data[0] >> 4);
-	}
+	HBoxContainer *toolbar;
+	MenuButton *menu;
 
-	switch (event->get_message()) {
-		case MIDI_MESSAGE_AFTERTOUCH:
-			if (length >= 3) {
-				event->set_pitch(data[1]);
-				event->set_pressure(data[2]);
-			}
-			break;
+	SpinBox *epoints;
 
-		case MIDI_MESSAGE_CONTROL_CHANGE:
-			if (length >= 3) {
-				event->set_controller_number(data[1]);
-				event->set_controller_value(data[2]);
-			}
-			break;
+	ConfirmationDialog *emission_mask;
+	OptionButton *emission_mask_mode;
+	CheckBox *emission_colors;
 
-		case MIDI_MESSAGE_NOTE_ON:
-		case MIDI_MESSAGE_NOTE_OFF:
-		case MIDI_MESSAGE_PITCH_BEND:
-			if (length >= 3) {
-				event->set_pitch(data[1]);
-				event->set_velocity(data[2]);
+	String source_emission_file;
 
-				if (event->get_message() == MIDI_MESSAGE_NOTE_ON && event->get_velocity() == 0) {
-					// https://www.midi.org/forum/228-writing-midi-software-send-note-off,-or-zero-velocity-note-on
-					event->set_message(MIDI_MESSAGE_NOTE_OFF);
-				}
-			}
-			break;
+	UndoRedo *undo_redo;
+	void _file_selected(const String &p_file);
+	void _menu_callback(int p_idx);
+	void _generate_emission_mask();
 
-		case MIDI_MESSAGE_PROGRAM_CHANGE:
-			if (length >= 2) {
-				event->set_instrument(data[1]);
-			}
-			break;
+protected:
+	void _notification(int p_what);
+	static void _bind_methods();
 
-		case MIDI_MESSAGE_CHANNEL_PRESSURE:
-			if (length >= 2) {
-				event->set_pressure(data[1]);
-			}
-			break;
-	}
+public:
+	virtual String get_name() const { return "CPUParticles2D"; }
+	bool has_main_screen() const { return false; }
+	virtual void edit(Object *p_object);
+	virtual bool handles(Object *p_object) const;
+	virtual void make_visible(bool p_visible);
 
-	InputDefault *id = Object::cast_to<InputDefault>(Input::get_singleton());
-	id->parse_input_event(event);
-}
+	CPUParticles2DEditorPlugin(EditorNode *p_node);
+	~CPUParticles2DEditorPlugin();
+};
 
-PoolStringArray MIDIDriver::get_connected_inputs() {
-
-	PoolStringArray list;
-	return list;
-}
-
-MIDIDriver::MIDIDriver() {
-
-	set_singleton();
-}
+#endif // CPU_PARTICLES_2D_EDITOR_PLUGIN_H
