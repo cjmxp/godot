@@ -211,12 +211,14 @@ void EditorProperty::_notification(int p_what) {
 		}
 
 		int ofs = 0;
+		int text_limit = text_size;
+
 		if (checkable) {
 			Ref<Texture> checkbox;
 			if (checked)
-				checkbox = get_icon("checked", "CheckBox");
+				checkbox = get_icon("GuiChecked", "EditorIcons");
 			else
-				checkbox = get_icon("unchecked", "CheckBox");
+				checkbox = get_icon("GuiUnchecked", "EditorIcons");
 
 			Color color2(1, 1, 1);
 			if (check_hover) {
@@ -228,11 +230,10 @@ void EditorProperty::_notification(int p_what) {
 			draw_texture(checkbox, check_rect.position, color2);
 			ofs += get_constant("hseparator", "Tree");
 			ofs += checkbox->get_width();
+			text_limit -= ofs;
 		} else {
 			check_rect = Rect2();
 		}
-
-		int text_limit = text_size;
 
 		if (can_revert) {
 			Ref<Texture> reload_icon = get_icon("ReloadSmall", "EditorIcons");
@@ -803,6 +804,9 @@ void EditorProperty::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_focusable_focused"), &EditorProperty::_focusable_focused);
 
 	ClassDB::bind_method(D_METHOD("get_tooltip_text"), &EditorProperty::get_tooltip_text);
+
+	ClassDB::bind_method(D_METHOD("add_focusable", "control"), &EditorProperty::add_focusable);
+	ClassDB::bind_method(D_METHOD("set_bottom_editor", "editor"), &EditorProperty::set_bottom_editor);
 
 	ClassDB::bind_method(D_METHOD("emit_changed", "property", "value", "field", "changing"), &EditorProperty::emit_changed, DEFVAL(StringName()), DEFVAL(false));
 
@@ -1527,7 +1531,7 @@ void EditorInspector::update_tree() {
 					if (E) {
 						descr = E->get().brief_description;
 					}
-					class_descr_cache[type2] = descr.word_wrap(80);
+					class_descr_cache[type2] = descr;
 				}
 
 				category->set_tooltip(p.name + "::" + (class_descr_cache[type2] == "" ? "" : class_descr_cache[type2]));
@@ -1679,7 +1683,7 @@ void EditorInspector::update_tree() {
 				while (F && descr == String()) {
 					for (int i = 0; i < F->get().properties.size(); i++) {
 						if (F->get().properties[i].name == propname.operator String()) {
-							descr = F->get().properties[i].description.strip_edges().word_wrap(80);
+							descr = F->get().properties[i].description.strip_edges();
 							break;
 						}
 					}
