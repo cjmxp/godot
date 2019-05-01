@@ -825,6 +825,9 @@ void TextEdit::_notification(int p_what) {
 			// get the highlighted words
 			String highlighted_text = get_selection_text();
 
+			// check if highlighted words contains only whitespaces (tabs or spaces)
+			bool only_whitespaces_highlighted = highlighted_text.strip_edges() == String();
+
 			String line_num_padding = line_numbers_zero_padded ? "0" : " ";
 
 			int cursor_wrap_index = get_cursor_wrap_index();
@@ -988,6 +991,24 @@ void TextEdit::_notification(int p_what) {
 							draw_texture_rect(info_icon, Rect2(icon_pos, icon_size));
 						}
 
+						// draw execution marker
+						if (executing_line == line) {
+							if (draw_breakpoint_gutter) {
+								int icon_extra_size = 4;
+								int vertical_gap = (get_row_height() * 40) / 100;
+								int horizontal_gap = (cache.breakpoint_gutter_width * 30) / 100;
+								int marker_height = get_row_height() - (vertical_gap * 2) + icon_extra_size;
+								int marker_width = cache.breakpoint_gutter_width - (horizontal_gap * 2) + icon_extra_size;
+								cache.executing_icon->draw_rect(ci, Rect2(cache.style_normal->get_margin(MARGIN_LEFT) + horizontal_gap - 2 - icon_extra_size / 2, ofs_y + vertical_gap - icon_extra_size / 2, marker_width, marker_height), false, Color(cache.executing_line_color.r, cache.executing_line_color.g, cache.executing_line_color.b));
+							} else {
+#ifdef TOOLS_ENABLED
+								VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(xmargin_beg + ofs_x, ofs_y + get_row_height() - EDSCALE, xmargin_end - xmargin_beg, EDSCALE), cache.executing_line_color);
+#else
+								VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(xmargin_beg + ofs_x, ofs_y, xmargin_end - xmargin_beg, get_row_height()), cache.executing_line_color);
+#endif
+							}
+						}
+
 						// draw fold markers
 						if (draw_fold_gutter) {
 							int horizontal_gap = (cache.fold_gutter_width * 30) / 100;
@@ -1105,7 +1126,7 @@ void TextEdit::_notification(int p_what) {
 								VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2i(char_ofs + char_margin + char_w + ofs_x - 1, ofs_y), Size2i(1, get_row_height())), border_color);
 						}
 
-						if (highlight_all_occurrences) {
+						if (highlight_all_occurrences && !only_whitespaces_highlighted) {
 							if (highlighted_text_col != -1) {
 
 								// if we are at the end check for new word on same line
@@ -2009,6 +2030,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 
 				menu->set_position(get_global_transform().xform(get_local_mouse_position()));
 				menu->set_size(Vector2(1, 1));
+				menu->set_scale(get_global_transform().get_scale());
 				menu->popup();
 				grab_focus();
 			}
@@ -4344,7 +4366,27 @@ void TextEdit::clear() {
 
 void TextEdit::set_readonly(bool p_readonly) {
 
+	if (readonly == p_readonly)
+		return;
+
 	readonly = p_readonly;
+
+	// Reorganize context menu.
+	menu->clear();
+	if (!readonly)
+		menu->add_item(RTR("Cut"), MENU_CUT, KEY_MASK_CMD | KEY_X);
+	menu->add_item(RTR("Copy"), MENU_COPY, KEY_MASK_CMD | KEY_C);
+	if (!readonly)
+		menu->add_item(RTR("Paste"), MENU_PASTE, KEY_MASK_CMD | KEY_V);
+	menu->add_separator();
+	menu->add_item(RTR("Select All"), MENU_SELECT_ALL, KEY_MASK_CMD | KEY_A);
+	if (!readonly) {
+		menu->add_item(RTR("Clear"), MENU_CLEAR);
+		menu->add_separator();
+		menu->add_item(RTR("Undo"), MENU_UNDO, KEY_MASK_CMD | KEY_Z);
+		menu->add_item(RTR("Redo"), MENU_REDO, KEY_MASK_CMD | KEY_MASK_SHIFT | KEY_Z);
+	}
+
 	update();
 }
 
@@ -4414,6 +4456,7 @@ void TextEdit::_update_caches() {
 	cache.current_line_color = get_color("current_line_color");
 	cache.line_length_guideline_color = get_color("line_length_guideline_color");
 	cache.breakpoint_color = get_color("breakpoint_color");
+	cache.executing_line_color = get_color("executing_line_color");
 	cache.code_folding_color = get_color("code_folding_color");
 	cache.brace_mismatch_color = get_color("brace_mismatch_color");
 	cache.word_highlighted_color = get_color("word_highlighted_color");
@@ -4431,6 +4474,7 @@ void TextEdit::_update_caches() {
 	cache.folded_icon = get_icon("folded");
 	cache.can_fold_icon = get_icon("fold");
 	cache.folded_eol_icon = get_icon("GuiEllipsis", "EditorIcons");
+	cache.executing_icon = get_icon("MainPlay", "EditorIcons");
 	text.set_font(cache.font);
 
 	if (syntax_highlighter) {
@@ -4996,6 +5040,17 @@ bool TextEdit::is_line_set_as_safe(int p_line) const {
 	return text.is_safe(p_line);
 }
 
+void TextEdit::set_executing_line(int p_line) {
+	ERR_FAIL_INDEX(p_line, text.size());
+	executing_line = p_line;
+	update();
+}
+
+void TextEdit::clear_executing_line() {
+	executing_line = -1;
+	update();
+}
+
 bool TextEdit::is_line_set_as_breakpoint(int p_line) const {
 
 	ERR_FAIL_INDEX_V(p_line, text.size(), false);
@@ -5415,6 +5470,9 @@ void TextEdit::undo() {
 
 	TextOperation op = undo_stack_pos->get();
 	_do_text_op(op, true);
+	if (op.from_line != op.to_line || op.to_column != op.from_column + 1)
+		select(op.from_line, op.from_column, op.to_line, op.to_column);
+
 	current_op.version = op.prev_version;
 	if (undo_stack_pos->get().chain_backward) {
 		while (true) {
@@ -5728,19 +5786,29 @@ void TextEdit::_confirm_completion() {
 	cursor_set_column(cursor.column - completion_base.length(), false);
 	insert_text_at_cursor(completion_current);
 
-	// When inserted into the middle of an existing string, don't add an unnecessary quote
+	// When inserted into the middle of an existing string/method, don't add an unnecessary quote/bracket.
 	String line = text[cursor.line];
 	CharType next_char = line[cursor.column];
 	CharType last_completion_char = completion_current[completion_current.length() - 1];
 
-	if ((last_completion_char == '"' || last_completion_char == '\'') &&
-			last_completion_char == next_char) {
+	if ((last_completion_char == '"' || last_completion_char == '\'') && last_completion_char == next_char) {
 		_base_remove_text(cursor.line, cursor.column, cursor.line, cursor.column + 1);
 	}
 
-	if (last_completion_char == '(' && auto_brace_completion_enabled) {
-		insert_text_at_cursor(")");
-		cursor.column--;
+	if (last_completion_char == '(') {
+
+		if (next_char == last_completion_char) {
+			_base_remove_text(cursor.line, cursor.column - 1, cursor.line, cursor.column);
+		} else if (auto_brace_completion_enabled) {
+			insert_text_at_cursor(")");
+			cursor.column--;
+		}
+	} else if (last_completion_char == ')' && next_char == '(') {
+
+		_base_remove_text(cursor.line, cursor.column - 2, cursor.line, cursor.column);
+		if (line[cursor.column + 1] != ')') {
+			cursor.column--;
+		}
 	}
 
 	end_complex_operation();
@@ -5784,6 +5852,7 @@ void TextEdit::_update_completion_candidates() {
 
 	bool inquote = false;
 	int first_quote = -1;
+	int restore_quotes = -1;
 
 	int c = cofs - 1;
 	while (c >= 0) {
@@ -5791,6 +5860,11 @@ void TextEdit::_update_completion_candidates() {
 			inquote = !inquote;
 			if (first_quote == -1)
 				first_quote = c;
+			restore_quotes = 0;
+		} else if (restore_quotes == 0 && l[c] == '$') {
+			restore_quotes = 1;
+		} else if (restore_quotes == 0 && !_is_whitespace(l[c])) {
+			restore_quotes = -1;
 		}
 		c--;
 	}
@@ -5856,6 +5930,11 @@ void TextEdit::_update_completion_candidates() {
 	for (int i = 0; i < completion_strings.size(); i++) {
 		if (single_quote && completion_strings[i].is_quoted()) {
 			completion_strings.write[i] = completion_strings[i].unquote().quote("'");
+		}
+
+		if (inquote && restore_quotes == 1 && !completion_strings[i].is_quoted()) {
+			String quote = single_quote ? "'" : "\"";
+			completion_strings.write[i] = completion_strings[i].quote(quote);
 		}
 
 		if (completion_strings[i].begins_with(s)) {
@@ -5935,7 +6014,6 @@ void TextEdit::code_complete(const Vector<String> &p_strings, bool p_forced) {
 	completion_current = "";
 	completion_index = 0;
 	_update_completion_candidates();
-	//
 }
 
 String TextEdit::get_word_at_pos(const Vector2 &p_pos) const {
@@ -6352,7 +6430,6 @@ void TextEdit::_bind_methods() {
 
 TextEdit::TextEdit() {
 
-	readonly = false;
 	setting_row = false;
 	draw_tabs = false;
 	override_selected_font_color = false;
@@ -6467,17 +6544,11 @@ TextEdit::TextEdit() {
 	context_menu_enabled = true;
 	menu = memnew(PopupMenu);
 	add_child(menu);
-	menu->add_item(RTR("Cut"), MENU_CUT, KEY_MASK_CMD | KEY_X);
-	menu->add_item(RTR("Copy"), MENU_COPY, KEY_MASK_CMD | KEY_C);
-	menu->add_item(RTR("Paste"), MENU_PASTE, KEY_MASK_CMD | KEY_V);
-	menu->add_separator();
-	menu->add_item(RTR("Select All"), MENU_SELECT_ALL, KEY_MASK_CMD | KEY_A);
-	menu->add_item(RTR("Clear"), MENU_CLEAR);
-	menu->add_separator();
-	menu->add_item(RTR("Undo"), MENU_UNDO, KEY_MASK_CMD | KEY_Z);
-	menu->add_item(RTR("Redo"), MENU_REDO, KEY_MASK_CMD | KEY_MASK_SHIFT | KEY_Z);
+	set_readonly(false);
 	menu->connect("id_pressed", this, "menu_option");
 	first_draw = true;
+
+	executing_line = -1;
 }
 
 TextEdit::~TextEdit() {
