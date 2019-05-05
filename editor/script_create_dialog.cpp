@@ -511,17 +511,15 @@ void ScriptCreateDialog::_update_dialog() {
 
 	// Is Script Valid (order from top to bottom)
 	get_ok()->set_disabled(true);
-	if (!is_built_in) {
-		if (!is_path_valid) {
-			_msg_script_valid(false, TTR("Invalid path."));
-			script_ok = false;
-		}
+	if (!is_built_in && !is_path_valid) {
+		_msg_script_valid(false, TTR("Invalid path."));
+		script_ok = false;
 	}
 	if (has_named_classes && (is_new_script_created && !is_class_name_valid)) {
 		_msg_script_valid(false, TTR("Invalid class name."));
 		script_ok = false;
 	}
-	if (!is_parent_name_valid) {
+	if (!is_parent_name_valid && is_new_script_created) {
 		_msg_script_valid(false, TTR("Invalid inherited parent name or path."));
 		script_ok = false;
 	}
@@ -569,23 +567,22 @@ void ScriptCreateDialog::_update_dialog() {
 		}
 	}
 
-	if (!_can_be_built_in())
-		internal->set_pressed(false);
-
 	/* Is Script created or loaded from existing file */
 
 	if (is_built_in) {
 		get_ok()->set_text(TTR("Create"));
 		parent_name->set_editable(true);
 		parent_browse_button->set_disabled(false);
-		internal->set_disabled(!_can_be_built_in());
+		internal->set_visible(_can_be_built_in());
+		internal_label->set_visible(_can_be_built_in());
 		_msg_path_valid(true, TTR("Built-in script (into scene file)."));
 	} else if (is_new_script_created) {
 		// New Script Created
 		get_ok()->set_text(TTR("Create"));
 		parent_name->set_editable(true);
 		parent_browse_button->set_disabled(false);
-		internal->set_disabled(!_can_be_built_in());
+		internal->set_visible(_can_be_built_in());
+		internal_label->set_visible(_can_be_built_in());
 		if (is_path_valid) {
 			_msg_path_valid(true, TTR("Will create a new script file."));
 		}
@@ -659,32 +656,17 @@ ScriptCreateDialog::ScriptCreateDialog() {
 	status_panel->add_style_override("panel", EditorNode::get_singleton()->get_gui_base()->get_stylebox("bg", "Tree"));
 	status_panel->add_child(vb);
 
-	/* Margins */
+	/* Spacing */
 
-	Control *empty_h = memnew(Control);
-	empty_h->set_name("empty_h"); //duplicate() doesn't like nodes without a name
-	empty_h->set_h_size_flags(Control::SIZE_EXPAND_FILL);
-	empty_h->set_v_size_flags(Control::SIZE_EXPAND_FILL);
-	empty_h->set_custom_minimum_size(Size2(0, 10 * EDSCALE));
-	Control *empty_v = memnew(Control);
-	empty_v->set_name("empty_v");
-	empty_v->set_h_size_flags(Control::SIZE_EXPAND_FILL);
-	empty_v->set_v_size_flags(Control::SIZE_EXPAND_FILL);
-	empty_v->set_custom_minimum_size(Size2(10, 0 * EDSCALE));
+	Control *spacing = memnew(Control);
+	spacing->set_custom_minimum_size(Size2(0, 10 * EDSCALE));
 
 	vb = memnew(VBoxContainer);
-	vb->add_child(empty_h->duplicate());
 	vb->add_child(gc);
-	vb->add_child(empty_h->duplicate());
+	vb->add_child(spacing);
 	vb->add_child(status_panel);
-	vb->add_child(empty_h->duplicate());
 	hb = memnew(HBoxContainer);
-	hb->add_child(empty_v->duplicate());
 	hb->add_child(vb);
-	hb->add_child(empty_v->duplicate());
-
-	memdelete(empty_h);
-	memdelete(empty_v);
 
 	add_child(hb);
 
@@ -693,8 +675,7 @@ ScriptCreateDialog::ScriptCreateDialog() {
 	language_menu = memnew(OptionButton);
 	language_menu->set_custom_minimum_size(Size2(250, 0) * EDSCALE);
 	language_menu->set_h_size_flags(SIZE_EXPAND_FILL);
-	l = memnew(Label);
-	l->set_text(TTR("Language"));
+	l = memnew(Label(TTR("Language")));
 	l->set_align(Label::ALIGN_RIGHT);
 	gc->add_child(l);
 	gc->add_child(language_menu);
@@ -743,8 +724,7 @@ ScriptCreateDialog::ScriptCreateDialog() {
 	parent_browse_button->set_flat(true);
 	parent_browse_button->connect("pressed", this, "_browse_path", varray(true, false));
 	hb->add_child(parent_browse_button);
-	l = memnew(Label);
-	l->set_text(TTR("Inherits"));
+	l = memnew(Label(TTR("Inherits")));
 	l->set_align(Label::ALIGN_RIGHT);
 	gc->add_child(l);
 	gc->add_child(hb);
@@ -755,8 +735,7 @@ ScriptCreateDialog::ScriptCreateDialog() {
 	class_name = memnew(LineEdit);
 	class_name->connect("text_changed", this, "_class_name_changed");
 	class_name->set_h_size_flags(SIZE_EXPAND_FILL);
-	l = memnew(Label);
-	l->set_text(TTR("Class Name"));
+	l = memnew(Label(TTR("Class Name")));
 	l->set_align(Label::ALIGN_RIGHT);
 	gc->add_child(l);
 	gc->add_child(class_name);
@@ -764,8 +743,7 @@ ScriptCreateDialog::ScriptCreateDialog() {
 	/* Templates */
 
 	template_menu = memnew(OptionButton);
-	l = memnew(Label);
-	l->set_text(TTR("Template"));
+	l = memnew(Label(TTR("Template")));
 	l->set_align(Label::ALIGN_RIGHT);
 	gc->add_child(l);
 	gc->add_child(template_menu);
@@ -774,14 +752,13 @@ ScriptCreateDialog::ScriptCreateDialog() {
 	/* Built-in Script */
 
 	internal = memnew(CheckButton);
+	internal->set_h_size_flags(0);
 	internal->connect("pressed", this, "_built_in_pressed");
-	hb = memnew(HBoxContainer);
-	hb->add_child(internal);
-	l = memnew(Label);
-	l->set_text(TTR("Built-in Script"));
-	l->set_align(Label::ALIGN_RIGHT);
-	gc->add_child(l);
-	gc->add_child(hb);
+	internal_label = memnew(Label(TTR("Built-in Script")));
+	internal_label->set_text(TTR("Built-in Script"));
+	internal_label->set_align(Label::ALIGN_RIGHT);
+	gc->add_child(internal_label);
+	gc->add_child(internal);
 
 	/* Path */
 
@@ -796,8 +773,7 @@ ScriptCreateDialog::ScriptCreateDialog() {
 	path_button->set_flat(true);
 	path_button->connect("pressed", this, "_browse_path", varray(false, true));
 	hb->add_child(path_button);
-	l = memnew(Label);
-	l->set_text(TTR("Path"));
+	l = memnew(Label(TTR("Path")));
 	l->set_align(Label::ALIGN_RIGHT);
 	gc->add_child(l);
 	gc->add_child(hb);
