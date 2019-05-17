@@ -1015,8 +1015,7 @@ void EditorNode::_save_scene_with_preview(String p_file, int p_idx) {
 			y = (img->get_height() - size) / 2;
 
 			img->crop_from_point(x, y, size, size);
-			// We could get better pictures with better filters
-			img->resize(preview_size, preview_size, Image::INTERPOLATE_CUBIC);
+			img->resize(preview_size, preview_size, Image::INTERPOLATE_LANCZOS);
 		}
 		img->convert(Image::FORMAT_RGB8);
 
@@ -5997,7 +5996,6 @@ EditorNode::EditorNode() {
 	node_dock = memnew(NodeDock);
 
 	filesystem_dock = memnew(FileSystemDock(this));
-	filesystem_dock->connect("open", this, "open_request");
 	filesystem_dock->connect("inherit", this, "_inherit_request");
 	filesystem_dock->connect("instance", this, "_instance_request");
 	filesystem_dock->connect("display_mode_changed", this, "_save_docks");
