@@ -63,8 +63,6 @@ public:
 		ClassDB::bind_method("_dont_undo_redo", &AnimationTrackKeyEdit::_dont_undo_redo);
 	}
 
-	//PopupDialog *ke_dialog;
-
 	void _fix_node_path(Variant &value) {
 
 		NodePath np = value;
@@ -3456,7 +3454,7 @@ void AnimationTrackEditor::_update_tracks() {
 				Ref<Texture> icon = get_icon("Node", "EditorIcons");
 				String name = base_path;
 				String tooltip;
-				if (root) {
+				if (root && root->has_node(base_path)) {
 					Node *n = root->get_node(base_path);
 					if (n) {
 						if (has_icon(n->get_class(), "EditorIcons")) {
@@ -3656,7 +3654,8 @@ void AnimationTrackEditor::_update_step(double p_new_step) {
 	step->set_block_signals(true);
 	undo_redo->commit_action();
 	step->set_block_signals(false);
-	emit_signal("animation_step_changed", step_value);
+	emit_signal("animation_step_changed", p_new_step);
+	animation->_change_notify("step");
 }
 
 void AnimationTrackEditor::_update_length(double p_new_len) {
@@ -4931,7 +4930,6 @@ void AnimationTrackEditor::_bind_methods() {
 	ClassDB::bind_method("_update_scroll", &AnimationTrackEditor::_update_scroll);
 	ClassDB::bind_method("_update_tracks", &AnimationTrackEditor::_update_tracks);
 	ClassDB::bind_method("_update_step", &AnimationTrackEditor::_update_step);
-	ClassDB::bind_method("_update_length", &AnimationTrackEditor::_update_length);
 	ClassDB::bind_method("_dropped_track", &AnimationTrackEditor::_dropped_track);
 	ClassDB::bind_method("_add_track", &AnimationTrackEditor::_add_track);
 	ClassDB::bind_method("_new_track_node_selected", &AnimationTrackEditor::_new_track_node_selected);
@@ -4992,7 +4990,6 @@ AnimationTrackEditor::AnimationTrackEditor() {
 	timeline->connect("name_limit_changed", this, "_name_limit_changed");
 	timeline->connect("track_added", this, "_add_track");
 	timeline->connect("value_changed", this, "_timeline_value_changed");
-	timeline->connect("length_changed", this, "_update_length");
 
 	scroll = memnew(ScrollContainer);
 	timeline_vbox->add_child(scroll);
