@@ -288,6 +288,7 @@ void EditorNode::_notification(int p_what) {
 
 		Engine::get_singleton()->set_editor_hint(true);
 
+		OS::get_singleton()->set_low_processor_usage_mode_sleep_usec(int(EDITOR_GET("interface/editor/low_processor_mode_sleep_usec")));
 		get_tree()->get_root()->set_usage(Viewport::USAGE_2D_NO_SAMPLING); //reduce memory usage
 		get_tree()->get_root()->set_disable_3d(true);
 		get_tree()->get_root()->set_as_audio_listener(false);
@@ -323,7 +324,16 @@ void EditorNode::_notification(int p_what) {
 
 	if (p_what == MainLoop::NOTIFICATION_WM_FOCUS_IN) {
 
+		// Restore the original FPS cap after focusing back on the editor
+		OS::get_singleton()->set_low_processor_usage_mode_sleep_usec(int(EDITOR_GET("interface/editor/low_processor_mode_sleep_usec")));
+
 		EditorFileSystem::get_singleton()->scan_changes();
+	}
+
+	if (p_what == MainLoop::NOTIFICATION_WM_FOCUS_OUT) {
+
+		// Set a low FPS cap to decrease CPU/GPU usage while the editor is unfocused
+		OS::get_singleton()->set_low_processor_usage_mode_sleep_usec(int(EDITOR_GET("interface/editor/unfocused_low_processor_mode_sleep_usec")));
 	}
 
 	if (p_what == MainLoop::NOTIFICATION_WM_QUIT_REQUEST) {
@@ -1273,7 +1283,7 @@ void EditorNode::_dialog_action(String p_file) {
 			Node *scene = editor_data.get_edited_scene_root();
 			// If the previous scene is rootless, just close it in favor of the new one.
 			if (!scene)
-				_menu_option_confirm(FILE_CLOSE, false);
+				_menu_option_confirm(FILE_CLOSE, true);
 
 			load_scene(p_file, false, true);
 		} break;
@@ -1286,7 +1296,12 @@ void EditorNode::_dialog_action(String p_file) {
 			ProjectSettings::get_singleton()->set("application/run/main_scene", p_file);
 			ProjectSettings::get_singleton()->save();
 			//would be nice to show the project manager opened with the highlighted field..
-			_run(false, ""); // automatically run the project
+
+			if (pick_main_scene->has_meta("from_native") && (bool)pick_main_scene->get_meta("from_native")) {
+				run_native->resume_run_native();
+			} else {
+				_run(false, ""); // automatically run the project
+			}
 		} break;
 		case FILE_CLOSE:
 		case FILE_CLOSE_ALL_AND_QUIT:
@@ -1799,28 +1814,7 @@ void EditorNode::_run(bool p_current, const String &p_custom) {
 	if (run_filename == "") {
 
 		//evidently, run the scene
-		main_scene = GLOBAL_DEF("application/run/main_scene", "");
-		if (main_scene == "") {
-
-			current_option = -1;
-			pick_main_scene->set_text(TTR("No main scene has ever been defined, select one?\nYou can change it later in \"Project Settings\" under the 'application' category."));
-			pick_main_scene->popup_centered_minsize();
-			return;
-		}
-
-		if (!FileAccess::exists(main_scene)) {
-
-			current_option = -1;
-			pick_main_scene->set_text(vformat(TTR("Selected scene '%s' does not exist, select a valid one?\nYou can change it later in \"Project Settings\" under the 'application' category."), main_scene));
-			pick_main_scene->popup_centered_minsize();
-			return;
-		}
-
-		if (ResourceLoader::get_resource_type(main_scene) != "PackedScene") {
-
-			current_option = -1;
-			pick_main_scene->set_text(vformat(TTR("Selected scene '%s' is not a scene file, select a valid one?\nYou can change it later in \"Project Settings\" under the 'application' category."), main_scene));
-			pick_main_scene->popup_centered_minsize();
+		if (!ensure_main_scene(false)) {
 			return;
 		}
 	}
@@ -4155,6 +4149,37 @@ bool EditorNode::has_scenes_in_session() {
 	}
 	Array scenes = config->get_value("EditorNode", "open_scenes");
 	return !scenes.empty();
+}
+
+bool EditorNode::ensure_main_scene(bool p_from_native) {
+	pick_main_scene->set_meta("from_native", p_from_native); //whether from play button or native run
+	String main_scene = GLOBAL_DEF("application/run/main_scene", "");
+
+	if (main_scene == "") {
+
+		current_option = -1;
+		pick_main_scene->set_text(TTR("No main scene has ever been defined, select one?\nYou can change it later in \"Project Settings\" under the 'application' category."));
+		pick_main_scene->popup_centered_minsize();
+		return false;
+	}
+
+	if (!FileAccess::exists(main_scene)) {
+
+		current_option = -1;
+		pick_main_scene->set_text(vformat(TTR("Selected scene '%s' does not exist, select a valid one?\nYou can change it later in \"Project Settings\" under the 'application' category."), main_scene));
+		pick_main_scene->popup_centered_minsize();
+		return false;
+	}
+
+	if (ResourceLoader::get_resource_type(main_scene) != "PackedScene") {
+
+		current_option = -1;
+		pick_main_scene->set_text(vformat(TTR("Selected scene '%s' is not a scene file, select a valid one?\nYou can change it later in \"Project Settings\" under the 'application' category."), main_scene));
+		pick_main_scene->popup_centered_minsize();
+		return false;
+	}
+
+	return true;
 }
 
 void EditorNode::_update_layouts_menu() {
