@@ -4025,7 +4025,7 @@ void GDScriptParser::_parse_class(ClassNode *p_class) {
 
 										if (tokenizer->get_token() == GDScriptTokenizer::TK_PARENTHESIS_CLOSE) {
 											ERR_EXPLAIN("Exporting bit flags hint requires string constants.");
-											WARN_DEPRECATED
+											WARN_DEPRECATED;
 											break;
 										}
 										if (tokenizer->get_token() != GDScriptTokenizer::TK_COMMA) {
@@ -4065,6 +4065,50 @@ void GDScriptParser::_parse_class(ClassNode *p_class) {
 											tokenizer->advance();
 										}
 
+										break;
+									}
+
+									if (tokenizer->get_token() == GDScriptTokenizer::TK_IDENTIFIER && tokenizer->get_token_identifier() == "LAYERS_2D_RENDER") {
+
+										tokenizer->advance();
+										if (tokenizer->get_token() != GDScriptTokenizer::TK_PARENTHESIS_CLOSE) {
+											_set_error("Expected ')' in layers 2D render hint.");
+											return;
+										}
+										current_export.hint = PROPERTY_HINT_LAYERS_2D_RENDER;
+										break;
+									}
+
+									if (tokenizer->get_token() == GDScriptTokenizer::TK_IDENTIFIER && tokenizer->get_token_identifier() == "LAYERS_2D_PHYSICS") {
+
+										tokenizer->advance();
+										if (tokenizer->get_token() != GDScriptTokenizer::TK_PARENTHESIS_CLOSE) {
+											_set_error("Expected ')' in layers 2D physics hint.");
+											return;
+										}
+										current_export.hint = PROPERTY_HINT_LAYERS_2D_PHYSICS;
+										break;
+									}
+
+									if (tokenizer->get_token() == GDScriptTokenizer::TK_IDENTIFIER && tokenizer->get_token_identifier() == "LAYERS_3D_RENDER") {
+
+										tokenizer->advance();
+										if (tokenizer->get_token() != GDScriptTokenizer::TK_PARENTHESIS_CLOSE) {
+											_set_error("Expected ')' in layers 3D render hint.");
+											return;
+										}
+										current_export.hint = PROPERTY_HINT_LAYERS_3D_RENDER;
+										break;
+									}
+
+									if (tokenizer->get_token() == GDScriptTokenizer::TK_IDENTIFIER && tokenizer->get_token_identifier() == "LAYERS_3D_PHYSICS") {
+
+										tokenizer->advance();
+										if (tokenizer->get_token() != GDScriptTokenizer::TK_PARENTHESIS_CLOSE) {
+											_set_error("Expected ')' in layers 3D physics hint.");
+											return;
+										}
+										current_export.hint = PROPERTY_HINT_LAYERS_3D_PHYSICS;
 										break;
 									}
 
