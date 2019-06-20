@@ -173,7 +173,7 @@ enum MidiMessageList {
  */
 
 class InputEvent : public Resource {
-	GDCLASS(InputEvent, Resource)
+	GDCLASS(InputEvent, Resource);
 
 	int device;
 
@@ -211,7 +211,7 @@ public:
 };
 
 class InputEventWithModifiers : public InputEvent {
-	GDCLASS(InputEventWithModifiers, InputEvent)
+	GDCLASS(InputEventWithModifiers, InputEvent);
 
 	bool shift;
 	bool alt;
@@ -257,7 +257,7 @@ public:
 
 class InputEventKey : public InputEventWithModifiers {
 
-	GDCLASS(InputEventKey, InputEventWithModifiers)
+	GDCLASS(InputEventKey, InputEventWithModifiers);
 
 	bool pressed; /// otherwise release
 
@@ -296,7 +296,7 @@ public:
 
 class InputEventMouse : public InputEventWithModifiers {
 
-	GDCLASS(InputEventMouse, InputEventWithModifiers)
+	GDCLASS(InputEventMouse, InputEventWithModifiers);
 
 	int button_mask;
 
@@ -321,7 +321,7 @@ public:
 
 class InputEventMouseButton : public InputEventMouse {
 
-	GDCLASS(InputEventMouseButton, InputEventMouse)
+	GDCLASS(InputEventMouseButton, InputEventMouse);
 
 	float factor;
 	int button_index;
@@ -355,7 +355,7 @@ public:
 
 class InputEventMouseMotion : public InputEventMouse {
 
-	GDCLASS(InputEventMouseMotion, InputEventMouse)
+	GDCLASS(InputEventMouseMotion, InputEventMouse);
 	Vector2 relative;
 	Vector2 speed;
 
@@ -379,7 +379,7 @@ public:
 
 class InputEventJoypadMotion : public InputEvent {
 
-	GDCLASS(InputEventJoypadMotion, InputEvent)
+	GDCLASS(InputEventJoypadMotion, InputEvent);
 	int axis; ///< Joypad axis
 	float axis_value; ///< -1 to 1
 
@@ -404,7 +404,7 @@ public:
 };
 
 class InputEventJoypadButton : public InputEvent {
-	GDCLASS(InputEventJoypadButton, InputEvent)
+	GDCLASS(InputEventJoypadButton, InputEvent);
 
 	int button_index;
 	bool pressed;
@@ -432,7 +432,7 @@ public:
 };
 
 class InputEventScreenTouch : public InputEvent {
-	GDCLASS(InputEventScreenTouch, InputEvent)
+	GDCLASS(InputEventScreenTouch, InputEvent);
 	int index;
 	Vector2 pos;
 	bool pressed;
@@ -458,7 +458,7 @@ public:
 
 class InputEventScreenDrag : public InputEvent {
 
-	GDCLASS(InputEventScreenDrag, InputEvent)
+	GDCLASS(InputEventScreenDrag, InputEvent);
 	int index;
 	Vector2 pos;
 	Vector2 relative;
@@ -488,7 +488,7 @@ public:
 
 class InputEventAction : public InputEvent {
 
-	GDCLASS(InputEventAction, InputEvent)
+	GDCLASS(InputEventAction, InputEvent);
 
 	StringName action;
 	bool pressed;
@@ -520,7 +520,7 @@ public:
 
 class InputEventGesture : public InputEventWithModifiers {
 
-	GDCLASS(InputEventGesture, InputEventWithModifiers)
+	GDCLASS(InputEventGesture, InputEventWithModifiers);
 
 	Vector2 pos;
 
@@ -534,7 +534,7 @@ public:
 
 class InputEventMagnifyGesture : public InputEventGesture {
 
-	GDCLASS(InputEventMagnifyGesture, InputEventGesture)
+	GDCLASS(InputEventMagnifyGesture, InputEventGesture);
 	real_t factor;
 
 protected:
@@ -552,7 +552,7 @@ public:
 
 class InputEventPanGesture : public InputEventGesture {
 
-	GDCLASS(InputEventPanGesture, InputEventGesture)
+	GDCLASS(InputEventPanGesture, InputEventGesture);
 	Vector2 delta;
 
 protected:
@@ -569,7 +569,7 @@ public:
 };
 
 class InputEventMIDI : public InputEvent {
-	GDCLASS(InputEventMIDI, InputEvent)
+	GDCLASS(InputEventMIDI, InputEvent);
 
 	int channel;
 	int message;
