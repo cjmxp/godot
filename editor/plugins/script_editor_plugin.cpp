@@ -306,8 +306,11 @@ void ScriptEditor::_goto_script_line(REF p_script, int p_line) {
 			editor->push_item(p_script.ptr());
 
 			ScriptEditorBase *current = _get_current_editor();
-			if (current)
+			if (ScriptTextEditor *script_text_editor = Object::cast_to<ScriptTextEditor>(current)) {
+				script_text_editor->goto_line_centered(p_line);
+			} else if (current) {
 				current->goto_line(p_line, true);
+			}
 		}
 	}
 }
@@ -1915,9 +1918,7 @@ Ref<TextFile> ScriptEditor::_load_text_file(const String &p_path, Error *r_error
 	Ref<TextFile> text_res(text_file);
 	Error err = text_file->load_text(path);
 
-	if (err != OK) {
-		ERR_FAIL_COND_V(err != OK, RES());
-	}
+	ERR_FAIL_COND_V(err != OK, RES());
 
 	text_file->set_file_path(local_path);
 	text_file->set_path(local_path, true);
