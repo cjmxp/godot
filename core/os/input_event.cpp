@@ -319,7 +319,7 @@ bool InputEventKey::action_match(const Ref<InputEvent> &p_event, bool *p_pressed
 		if (p_pressed != NULL)
 			*p_pressed = key->is_pressed();
 		if (p_strength != NULL)
-			*p_strength = (*p_pressed) ? 1.0f : 0.0f;
+			*p_strength = (p_pressed != NULL && *p_pressed) ? 1.0f : 0.0f;
 	}
 	return match;
 }
@@ -488,7 +488,7 @@ bool InputEventMouseButton::action_match(const Ref<InputEvent> &p_event, bool *p
 		if (p_pressed != NULL)
 			*p_pressed = mb->is_pressed();
 		if (p_strength != NULL)
-			*p_strength = (*p_pressed) ? 1.0f : 0.0f;
+			*p_strength = (p_pressed != NULL && *p_pressed) ? 1.0f : 0.0f;
 	}
 
 	return match;
@@ -800,7 +800,7 @@ bool InputEventJoypadButton::action_match(const Ref<InputEvent> &p_event, bool *
 		if (p_pressed != NULL)
 			*p_pressed = jb->is_pressed();
 		if (p_strength != NULL)
-			*p_strength = (*p_pressed) ? 1.0f : 0.0f;
+			*p_strength = (p_pressed != NULL && *p_pressed) ? 1.0f : 0.0f;
 	}
 
 	return match;
@@ -1046,7 +1046,7 @@ bool InputEventAction::action_match(const Ref<InputEvent> &p_event, bool *p_pres
 		if (p_pressed != NULL)
 			*p_pressed = act->pressed;
 		if (p_strength != NULL)
-			*p_strength = (*p_pressed) ? 1.0f : 0.0f;
+			*p_strength = (p_pressed != NULL && *p_pressed) ? 1.0f : 0.0f;
 	}
 	return match;
 }
