@@ -149,8 +149,10 @@ _ResourceLoader::_ResourceLoader() {
 }
 
 Error _ResourceSaver::save(const String &p_path, const RES &p_resource, SaverFlags p_flags) {
-
-	ERR_FAIL_COND_V(p_resource.is_null(), ERR_INVALID_PARAMETER);
+	if (p_resource.is_null()) {
+		ERR_EXPLAIN("Can't save empty resource to path: " + String(p_path))
+		ERR_FAIL_V(ERR_INVALID_PARAMETER);
+	}
 	return ResourceSaver::save(p_path, p_resource, p_flags);
 }
 
@@ -246,11 +248,11 @@ PoolStringArray _OS::get_connected_midi_inputs() {
 }
 
 void _OS::open_midi_inputs() {
-	return OS::get_singleton()->open_midi_inputs();
+	OS::get_singleton()->open_midi_inputs();
 }
 
 void _OS::close_midi_inputs() {
-	return OS::get_singleton()->close_midi_inputs();
+	OS::get_singleton()->close_midi_inputs();
 }
 
 void _OS::set_video_mode(const Size2 &p_size, bool p_fullscreen, bool p_resizeable, int p_screen) {
@@ -1317,6 +1319,26 @@ void _OS::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "window_position"), "set_window_position", "get_window_position");
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "window_size"), "set_window_size", "get_window_size");
 
+	// Those default values need to be specified for the docs generator,
+	// to avoid using values from the documentation writer's own OS instance.
+	ADD_PROPERTY_DEFAULT("clipboard", "");
+	ADD_PROPERTY_DEFAULT("current_screen", 0);
+	ADD_PROPERTY_DEFAULT("exit_code", 0);
+	ADD_PROPERTY_DEFAULT("vsync_enabled", true);
+	ADD_PROPERTY_DEFAULT("low_processor_usage_mode", false);
+	ADD_PROPERTY_DEFAULT("keep_screen_on", true);
+	ADD_PROPERTY_DEFAULT("min_window_size", Vector2());
+	ADD_PROPERTY_DEFAULT("max_window_size", Vector2());
+	ADD_PROPERTY_DEFAULT("screen_orientation", 0);
+	ADD_PROPERTY_DEFAULT("window_borderless", false);
+	ADD_PROPERTY_DEFAULT("window_per_pixel_transparency_enabled", false);
+	ADD_PROPERTY_DEFAULT("window_fullscreen", false);
+	ADD_PROPERTY_DEFAULT("window_maximized", false);
+	ADD_PROPERTY_DEFAULT("window_minimized", false);
+	ADD_PROPERTY_DEFAULT("window_resizable", true);
+	ADD_PROPERTY_DEFAULT("window_position", Vector2());
+	ADD_PROPERTY_DEFAULT("window_size", Vector2());
+
 	BIND_ENUM_CONSTANT(VIDEO_DRIVER_GLES2);
 	BIND_ENUM_CONSTANT(VIDEO_DRIVER_GLES3);
 
@@ -2246,7 +2268,7 @@ bool _Directory::current_is_dir() const {
 void _Directory::list_dir_end() {
 
 	ERR_FAIL_COND(!d);
-	return d->list_dir_end();
+	d->list_dir_end();
 }
 
 int _Directory::get_drive_count() {
