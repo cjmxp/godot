@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  stream_peer_mbed_tls.h                                               */
+/*  RegularFallbackConfigChooser.java                                    */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,67 +28,34 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#ifndef STREAM_PEER_OPEN_SSL_H
-#define STREAM_PEER_OPEN_SSL_H
+package org.godotengine.godot.xr.regular;
 
-#include "core/io/stream_peer_ssl.h"
+import android.util.Log;
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.egl.EGLDisplay;
+import org.godotengine.godot.utils.GLUtils;
 
-#include <mbedtls/config.h>
-#include <mbedtls/ctr_drbg.h>
-#include <mbedtls/debug.h>
-#include <mbedtls/entropy.h>
-#include <mbedtls/ssl.h>
+/* Fallback if 32bit View is not supported*/
+public class RegularFallbackConfigChooser extends RegularConfigChooser {
 
-#include <stdio.h>
-#include <stdlib.h>
+	private static final String TAG = RegularFallbackConfigChooser.class.getSimpleName();
 
-class StreamPeerMbedTLS : public StreamPeerSSL {
-private:
-	Status status;
-	String hostname;
+	private RegularConfigChooser fallback;
 
-	Ref<StreamPeer> base;
+	public RegularFallbackConfigChooser(int r, int g, int b, int a, int depth, int stencil, RegularConfigChooser fallback) {
+		super(r, g, b, a, depth, stencil);
+		this.fallback = fallback;
+	}
 
-	static StreamPeerSSL *_create_func();
-	static void _load_certs(const PoolByteArray &p_array);
-
-	static int bio_recv(void *ctx, unsigned char *buf, size_t len);
-	static int bio_send(void *ctx, const unsigned char *buf, size_t len);
-	void _cleanup();
-
-protected:
-	static mbedtls_x509_crt cacert;
-
-	mbedtls_entropy_context entropy;
-	mbedtls_ctr_drbg_context ctr_drbg;
-	mbedtls_ssl_context ssl;
-	mbedtls_ssl_config conf;
-
-	static void _bind_methods();
-
-	Error _do_handshake();
-
-public:
-	virtual void poll();
-	virtual Error accept_stream(Ref<StreamPeer> p_base);
-	virtual Error connect_to_stream(Ref<StreamPeer> p_base, bool p_validate_certs = false, const String &p_for_hostname = String());
-	virtual Status get_status() const;
-
-	virtual void disconnect_from_stream();
-
-	virtual Error put_data(const uint8_t *p_data, int p_bytes);
-	virtual Error put_partial_data(const uint8_t *p_data, int p_bytes, int &r_sent);
-
-	virtual Error get_data(uint8_t *p_buffer, int p_bytes);
-	virtual Error get_partial_data(uint8_t *p_buffer, int p_bytes, int &r_received);
-
-	virtual int get_available_bytes() const;
-
-	static void initialize_ssl();
-	static void finalize_ssl();
-
-	StreamPeerMbedTLS();
-	~StreamPeerMbedTLS();
-};
-
-#endif // STREAM_PEER_SSL_H
+	@Override
+	public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display, EGLConfig[] configs) {
+		EGLConfig ec = super.chooseConfig(egl, display, configs);
+		if (ec == null) {
+			Log.w(TAG, "Trying ConfigChooser fallback");
+			ec = fallback.chooseConfig(egl, display, configs);
+			GLUtils.use_32 = false;
+		}
+		return ec;
+	}
+}

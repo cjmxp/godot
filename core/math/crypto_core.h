@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  PancakeFallbackConfigChooser.java                                    */
+/*  crypto_core.h                                                        */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,34 +28,62 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-package org.godotengine.godot.xr.pancake;
+#ifndef CRYPTO_CORE_H
+#define CRYPTO_CORE_H
 
-import android.util.Log;
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLDisplay;
-import org.godotengine.godot.utils.GLUtils;
+#include "core/reference.h"
 
-/* Fallback if 32bit View is not supported*/
-public class PancakeFallbackConfigChooser extends PancakeConfigChooser {
+class CryptoCore {
 
-	private static final String TAG = PancakeFallbackConfigChooser.class.getSimpleName();
+public:
+	class MD5Context {
 
-	private PancakeConfigChooser fallback;
+	private:
+		void *ctx; // To include, or not to include...
 
-	public PancakeFallbackConfigChooser(int r, int g, int b, int a, int depth, int stencil, PancakeConfigChooser fallback) {
-		super(r, g, b, a, depth, stencil);
-		this.fallback = fallback;
-	}
+	public:
+		MD5Context();
+		~MD5Context();
 
-	@Override
-	public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display, EGLConfig[] configs) {
-		EGLConfig ec = super.chooseConfig(egl, display, configs);
-		if (ec == null) {
-			Log.w(TAG, "Trying ConfigChooser fallback");
-			ec = fallback.chooseConfig(egl, display, configs);
-			GLUtils.use_32 = false;
-		}
-		return ec;
-	}
-}
+		Error start();
+		Error update(uint8_t *p_src, size_t p_len);
+		Error finish(unsigned char r_hash[16]);
+	};
+
+	class SHA256Context {
+
+	private:
+		void *ctx; // To include, or not to include...
+
+	public:
+		SHA256Context();
+		~SHA256Context();
+
+		Error start();
+		Error update(uint8_t *p_src, size_t p_len);
+		Error finish(unsigned char r_hash[16]);
+	};
+
+	class AESContext {
+
+	private:
+		void *ctx; // To include, or not to include...
+
+	public:
+		AESContext();
+		~AESContext();
+
+		Error set_encode_key(const uint8_t *p_key, size_t p_bits);
+		Error set_decode_key(const uint8_t *p_key, size_t p_bits);
+		Error encrypt_ecb(const uint8_t p_src[16], uint8_t r_dst[16]);
+		Error decrypt_ecb(const uint8_t p_src[16], uint8_t r_dst[16]);
+	};
+
+	static Error b64_encode(uint8_t *r_dst, int p_dst_len, size_t *r_len, const uint8_t *p_src, int p_src_len);
+	static Error b64_decode(uint8_t *r_dst, int p_dst_len, size_t *r_len, const uint8_t *p_src, int p_src_len);
+
+	static Error md5(const uint8_t *p_src, int p_src_len, unsigned char r_hash[16]);
+	static Error sha1(const uint8_t *p_src, int p_src_len, unsigned char r_hash[20]);
+	static Error sha256(const uint8_t *p_src, int p_src_len, unsigned char r_hash[32]);
+};
+#endif // CRYPTO_CORE_H
