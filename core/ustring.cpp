@@ -778,7 +778,7 @@ Vector<String> String::split(const String &p_splitter, bool p_allow_empty, int p
 		if (p_allow_empty || (end > from)) {
 			if (p_maxsplit <= 0)
 				ret.push_back(substr(from, end - from));
-			else if (p_maxsplit > 0) {
+			else {
 
 				// Put rest of the string and leave cycle.
 				if (p_maxsplit == ret.size()) {
@@ -3338,7 +3338,7 @@ String String::http_unescape() const {
 			if ((ord1 >= '0' && ord1 <= '9') || (ord1 >= 'A' && ord1 <= 'Z')) {
 				CharType ord2 = ord_at(i + 2);
 				if ((ord2 >= '0' && ord2 <= '9') || (ord2 >= 'A' && ord2 <= 'Z')) {
-					char bytes[2] = { (char)ord1, (char)ord2 };
+					char bytes[3] = { (char)ord1, (char)ord2, 0 };
 					res += (char)strtol(bytes, NULL, 16);
 					i += 2;
 				}
