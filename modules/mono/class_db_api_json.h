@@ -1,12 +1,12 @@
 /*************************************************************************/
-/*  remote_transform.h                                                   */
+/*  class_db_api_json.h                                                  */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2019 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2019 Godot Engine contributors (cf. AUTHORS.md)    */
+/* Copyright (c) 2007-2018 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2018 Godot Engine contributors (cf. AUTHORS.md)    */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -28,51 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#ifndef REMOTETRANSFORM_H
-#define REMOTETRANSFORM_H
+#ifndef CLASS_DB_API_JSON_H
+#define CLASS_DB_API_JSON_H
 
-#include "scene/3d/spatial.h"
+#include "core/class_db.h"
+#include "core/ustring.h"
 
-class RemoteTransform : public Spatial {
-	GDCLASS(RemoteTransform, Spatial);
+void class_db_api_to_json(const String &p_output_file, ClassDB::APIType p_api);
 
-	NodePath remote_node;
-
-	ObjectID cache;
-
-	bool use_global_coordinates;
-	bool update_remote_position;
-	bool update_remote_rotation;
-	bool update_remote_scale;
-
-	void _update_remote();
-	void _update_cache();
-
-protected:
-	static void _bind_methods();
-	void _notification(int p_what);
-
-public:
-	void set_remote_node(const NodePath &p_remote_node);
-	NodePath get_remote_node() const;
-
-	void set_use_global_coordinates(const bool p_enable);
-	bool get_use_global_coordinates() const;
-
-	void set_update_position(const bool p_update);
-	bool get_update_position() const;
-
-	void set_update_rotation(const bool p_update);
-	bool get_update_rotation() const;
-
-	void set_update_scale(const bool p_update);
-	bool get_update_scale() const;
-
-	void force_update_cache();
-
-	virtual String get_configuration_warning() const;
-
-	RemoteTransform();
-};
-
-#endif // REMOTETRANSFORM_H
+#endif // CLASS_DB_API_JSON_H
