@@ -11,11 +11,11 @@ namespace GodotTools
 {
     public static class CSharpProject
     {
-        public static string GenerateGameProject(string dir, string name, IEnumerable<string> files = null)
+        public static string GenerateGameProject(string dir, string name)
         {
             try
             {
-                return ProjectGenerator.GenGameProject(dir, name, files);
+                return ProjectGenerator.GenGameProject(dir, name, compileItems: new string[] { });
             }
             catch (Exception e)
             {
@@ -30,6 +30,18 @@ namespace GodotTools
                 return;
 
             ProjectUtils.AddItemToProjectChecked(projectPath, itemType, include);
+        }
+
+        public static void FixApiHintPath(string projectPath)
+        {
+            try
+            {
+                ProjectUtils.FixApiHintPath(projectPath);
+            }
+            catch (Exception e)
+            {
+                GD.PushError(e.ToString());
+            }
         }
 
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
