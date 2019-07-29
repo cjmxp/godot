@@ -2615,7 +2615,7 @@ void EditorNode::_exit_editor() {
 
 	// Dim the editor window while it's quitting to make it clearer that it's busy.
 	// No transition is applied, as the effect needs to be visible immediately
-	float c = 1.0f - float(EDITOR_GET("interface/editor/dim_amount"));
+	float c = 0.4f;
 	Color dim_color = Color(c, c, c);
 	gui_base->set_modulate(dim_color);
 
@@ -5051,9 +5051,8 @@ void EditorNode::_start_dimming(bool p_dimming) {
 void EditorNode::_dim_timeout() {
 
 	_dim_time += _dim_timer->get_wait_time();
-	float wait_time = EditorSettings::get_singleton()->get("interface/editor/dim_transition_time");
-
-	float c = 1.0f - (float)EditorSettings::get_singleton()->get("interface/editor/dim_amount");
+	float wait_time = 0.08f;
+	float c = 0.4f;
 
 	Color base = _dimming ? Color(1, 1, 1) : Color(c, c, c);
 	Color final = _dimming ? Color(c, c, c) : Color(1, 1, 1);
@@ -6255,6 +6254,13 @@ EditorNode::EditorNode() {
 	bottom_panel_hb_editors = memnew(HBoxContainer);
 	bottom_panel_hb_editors->set_h_size_flags(Control::SIZE_EXPAND_FILL);
 	bottom_panel_hb->add_child(bottom_panel_hb_editors);
+
+	version_label = memnew(Label);
+	version_label->set_text(VERSION_FULL_CONFIG);
+	// Fade out the version label to be less prominent, but still readable
+	version_label->set_self_modulate(Color(1, 1, 1, 0.6));
+	bottom_panel_hb->add_child(version_label);
+
 	bottom_panel_raise = memnew(ToolButton);
 	bottom_panel_raise->set_icon(gui_base->get_icon("ExpandBottomDock", "EditorIcons"));
 
