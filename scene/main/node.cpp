@@ -408,7 +408,6 @@ void Node::set_physics_process(bool p_process) {
 	else
 		remove_from_group("physics_process");
 
-	data.physics_process = p_process;
 	_change_notify("physics_process");
 }
 
@@ -429,7 +428,6 @@ void Node::set_physics_process_internal(bool p_process_internal) {
 	else
 		remove_from_group("physics_process_internal");
 
-	data.physics_process_internal = p_process_internal;
 	_change_notify("physics_process_internal");
 }
 
@@ -811,7 +809,6 @@ void Node::set_process(bool p_idle_process) {
 	else
 		remove_from_group("idle_process");
 
-	data.idle_process = p_idle_process;
 	_change_notify("idle_process");
 }
 
@@ -832,7 +829,6 @@ void Node::set_process_internal(bool p_idle_process_internal) {
 	else
 		remove_from_group("idle_process_internal");
 
-	data.idle_process_internal = p_idle_process_internal;
 	_change_notify("idle_process_internal");
 }
 
@@ -1021,7 +1017,7 @@ void Node::_validate_child_name(Node *p_child, bool p_force_human_readable) {
 
 		if (!unique) {
 
-			node_hrcr_count.ref();
+			ERR_FAIL_COND(!node_hrcr_count.ref());
 			String name = "@" + String(p_child->get_name()) + "@" + itos(node_hrcr_count.get());
 			p_child->data.name = name;
 		}
@@ -2198,8 +2194,11 @@ void Node::_duplicate_and_reown(Node *p_new_parent, const Map<Node *, Node *> &p
 		ERR_EXPLAIN("Node: Could not duplicate: " + String(get_class()));
 		ERR_FAIL_COND(!obj);
 		node = Object::cast_to<Node>(obj);
-		if (!node)
+		if (!node) {
 			memdelete(obj);
+			ERR_EXPLAIN("Node: Could not duplicate: " + String(get_class()));
+			ERR_FAIL();
+		}
 	}
 
 	List<PropertyInfo> plist;
@@ -2295,16 +2294,16 @@ Node *Node::duplicate_and_reown(const Map<Node *, Node *> &p_reown_map) const {
 
 	ERR_FAIL_COND_V(get_filename() != "", NULL);
 
-	Node *node = NULL;
-
 	Object *obj = ClassDB::instance(get_class());
 	ERR_EXPLAIN("Node: Could not duplicate: " + String(get_class()));
 	ERR_FAIL_COND_V(!obj, NULL);
-	node = Object::cast_to<Node>(obj);
-	if (!node)
-		memdelete(obj);
-	ERR_FAIL_COND_V(!node, NULL);
 
+	Node *node = Object::cast_to<Node>(obj);
+	if (!node) {
+		memdelete(obj);
+		ERR_EXPLAIN("Node: Could not duplicate: " + String(get_class()));
+		ERR_FAIL_V(NULL);
+	}
 	node->set_name(get_name());
 
 	List<PropertyInfo> plist;
