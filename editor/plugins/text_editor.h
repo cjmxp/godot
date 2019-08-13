@@ -46,7 +46,7 @@ private:
 	MenuButton *edit_menu;
 	PopupMenu *highlighter_menu;
 	MenuButton *search_menu;
-	MenuButton *bookmarks_menu;
+	PopupMenu *bookmarks_menu;
 	PopupMenu *context_menu;
 
 	GotoLineDialog *goto_line_dialog;
@@ -87,6 +87,7 @@ private:
 		SEARCH_FIND_NEXT,
 		SEARCH_FIND_PREV,
 		SEARCH_REPLACE,
+		SEARCH_IN_FILES,
 		SEARCH_GOTO_LINE,
 		BOOKMARK_TOGGLE,
 		BOOKMARK_GOTO_NEXT,
