@@ -32,8 +32,8 @@
 
 #include "core/color_names.inc"
 #include "core/core_string_names.h"
+#include "core/crypto/crypto_core.h"
 #include "core/io/compression.h"
-#include "core/math/crypto_core.h"
 #include "core/object.h"
 #include "core/os/os.h"
 #include "core/script_language.h"
@@ -596,13 +596,10 @@ struct _VariantCall {
 		r_ret = decompressed;
 	}
 
-	static void _call_PoolByteArray_sha256_string(Variant &r_ret, Variant &p_self, const Variant **p_args) {
+	static void _call_PoolByteArray_hex_encode(Variant &r_ret, Variant &p_self, const Variant **p_args) {
 		PoolByteArray *ba = reinterpret_cast<PoolByteArray *>(p_self._data._mem);
 		PoolByteArray::Read r = ba->read();
-		String s;
-		unsigned char hash[32];
-		CryptoCore::sha256((unsigned char *)r.ptr(), ba->size(), hash);
-		s = String::hex_encode_buffer(hash, 32);
+		String s = String::hex_encode_buffer(&r[0], ba->size());
 		r_ret = s;
 	}
 
@@ -1762,7 +1759,7 @@ void register_variant_methods() {
 
 	ADDFUNC0R(POOL_BYTE_ARRAY, STRING, PoolByteArray, get_string_from_ascii, varray());
 	ADDFUNC0R(POOL_BYTE_ARRAY, STRING, PoolByteArray, get_string_from_utf8, varray());
-	ADDFUNC0R(POOL_BYTE_ARRAY, STRING, PoolByteArray, sha256_string, varray());
+	ADDFUNC0R(POOL_BYTE_ARRAY, STRING, PoolByteArray, hex_encode, varray());
 	ADDFUNC1R(POOL_BYTE_ARRAY, POOL_BYTE_ARRAY, PoolByteArray, compress, INT, "compression_mode", varray(0));
 	ADDFUNC2R(POOL_BYTE_ARRAY, POOL_BYTE_ARRAY, PoolByteArray, decompress, INT, "buffer_size", INT, "compression_mode", varray(0));
 
