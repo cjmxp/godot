@@ -946,6 +946,11 @@ public:
 	static const char *SIGNAL_SELECTION_CHANGED;
 	static const char *SIGNAL_PROJECT_ASK_OPEN;
 
+	enum MenuOptions {
+		GLOBAL_NEW_WINDOW,
+		GLOBAL_OPEN_PROJECT
+	};
+
 	// Can often be passed by copy
 	struct Item {
 		String project_key;
@@ -1181,6 +1186,7 @@ void ProjectList::load_projects() {
 	_projects.clear();
 	_last_clicked = "";
 	_selected_project_keys.clear();
+	OS::get_singleton()->global_menu_clear("_dock");
 
 	// Load data
 	// TODO Would be nice to change how projects and favourites are stored... it complicates things a bit.
@@ -1217,6 +1223,9 @@ void ProjectList::load_projects() {
 	for (int i = 0; i < _projects.size(); ++i) {
 		create_project_item_control(i);
 	}
+
+	OS::get_singleton()->global_menu_add_separator("_dock");
+	OS::get_singleton()->global_menu_add_item("_dock", TTR("New Window"), GLOBAL_NEW_WINDOW, Variant());
 
 	sort_projects();
 
@@ -1255,19 +1264,22 @@ void ProjectList::create_project_item_control(int p_index) {
 
 	TextureRect *tf = memnew(TextureRect);
 	tf->set_texture(get_icon("DefaultProjectIcon", "EditorIcons"));
+	if (item.missing) {
+		tf->set_modulate(Color(1, 1, 1, 0.5));
+	}
 	hb->add_child(tf);
 	hb->icon = tf;
 
 	VBoxContainer *vb = memnew(VBoxContainer);
 	if (item.grayed)
-		vb->set_modulate(Color(0.5, 0.5, 0.5));
+		vb->set_modulate(Color(1, 1, 1, 0.5));
 	vb->set_h_size_flags(SIZE_EXPAND_FILL);
 	hb->add_child(vb);
 	Control *ec = memnew(Control);
 	ec->set_custom_minimum_size(Size2(0, 1));
 	ec->set_mouse_filter(MOUSE_FILTER_PASS);
 	vb->add_child(ec);
-	Label *title = memnew(Label(item.project_name));
+	Label *title = memnew(Label(!item.missing ? item.project_name : TTR("Missing Project")));
 	title->add_font_override("font", get_font("title", "EditorFonts"));
 	title->add_color_override("font_color", font_color);
 	title->set_clip_text(true);
@@ -1278,12 +1290,21 @@ void ProjectList::create_project_item_control(int p_index) {
 	vb->add_child(path_hb);
 
 	Button *show = memnew(Button);
-	show->set_icon(get_icon("Load", "EditorIcons")); // Folder icon
+	// Display a folder icon if the project directory can be opened, or a "broken file" icon if it can't
+	show->set_icon(get_icon(!item.missing ? "Load" : "FileBroken", "EditorIcons"));
 	show->set_flat(true);
-	show->set_modulate(Color(1, 1, 1, 0.5));
+	if (!item.grayed) {
+		// Don't make the icon less prominent if the parent is already grayed out
+		show->set_modulate(Color(1, 1, 1, 0.5));
+	}
 	path_hb->add_child(show);
-	show->connect("pressed", this, "_show_project", varray(item.path));
-	show->set_tooltip(TTR("Show in File Manager"));
+
+	if (!item.missing) {
+		show->connect("pressed", this, "_show_project", varray(item.path));
+		show->set_tooltip(TTR("Show in File Manager"));
+	} else {
+		show->set_tooltip(TTR("Error: Project is missing on the filesystem."));
+	}
 
 	Label *fpath = memnew(Label(item.path));
 	path_hb->add_child(fpath);
@@ -1293,6 +1314,7 @@ void ProjectList::create_project_item_control(int p_index) {
 	fpath->set_clip_text(true);
 
 	_scroll_children->add_child(hb);
+	OS::get_singleton()->global_menu_add_item("_dock", item.project_name + " ( " + item.path + " )", GLOBAL_OPEN_PROJECT, Variant(item.path.plus_file("project.godot")));
 	item.control = hb;
 }
 
@@ -1737,10 +1759,18 @@ void ProjectManager::_update_project_buttons() {
 	Vector<ProjectList::Item> selected_projects = _project_list->get_selected_projects();
 	bool empty_selection = selected_projects.empty();
 
+	bool is_missing_project_selected = false;
+	for (int i = 0; i < selected_projects.size(); ++i) {
+		if (selected_projects[i].missing) {
+			is_missing_project_selected = true;
+			break;
+		}
+	}
+
 	erase_btn->set_disabled(empty_selection);
-	open_btn->set_disabled(empty_selection);
-	rename_btn->set_disabled(empty_selection);
-	run_btn->set_disabled(empty_selection);
+	open_btn->set_disabled(empty_selection || is_missing_project_selected);
+	rename_btn->set_disabled(empty_selection || is_missing_project_selected);
+	run_btn->set_disabled(empty_selection || is_missing_project_selected);
 
 	erase_missing_btn->set_visible(_project_list->is_any_project_missing());
 }
@@ -1802,7 +1832,7 @@ void ProjectManager::_unhandled_input(const Ref<InputEvent> &p_ev) {
 					break;
 
 				int index = _project_list->get_single_selected_index();
-				if (index - 1 > 0) {
+				if (index > 0) {
 					_project_list->select_project(index - 1);
 					_project_list->ensure_project_visible(index - 1);
 					_update_project_buttons();
@@ -1874,6 +1904,29 @@ void ProjectManager::_confirm_update_settings() {
 	_open_selected_projects();
 }
 
+void ProjectManager::_global_menu_action(const Variant &p_id, const Variant &p_meta) {
+
+	int id = (int)p_id;
+	if (id == ProjectList::GLOBAL_NEW_WINDOW) {
+		List<String> args;
+		String exec = OS::get_singleton()->get_executable_path();
+
+		OS::ProcessID pid = 0;
+		OS::get_singleton()->execute(exec, args, false, &pid);
+	} else if (id == ProjectList::GLOBAL_OPEN_PROJECT) {
+		String conf = (String)p_meta;
+
+		if (conf != String()) {
+			List<String> args;
+			args.push_back(conf);
+			String exec = OS::get_singleton()->get_executable_path();
+
+			OS::ProcessID pid = 0;
+			OS::get_singleton()->execute(exec, args, false, &pid);
+		}
+	}
+}
+
 void ProjectManager::_open_selected_projects() {
 
 	const Set<String> &selected_list = _project_list->get_selected_project_keys();
@@ -1928,6 +1981,9 @@ void ProjectManager::_open_selected_projects_ask() {
 	}
 
 	ProjectList::Item project = _project_list->get_selected_projects()[0];
+	if (project.missing) {
+		return;
+	}
 
 	// Update the project settings or don't open
 	String conf = project.path.plus_file("project.godot");
@@ -2110,7 +2166,7 @@ void ProjectManager::_erase_project() {
 
 void ProjectManager::_erase_missing_projects() {
 
-	erase_missing_ask->set_text(TTR("Remove all missing projects from the list? The project folders' contents won't be modified."));
+	erase_missing_ask->set_text(TTR("Remove all missing projects from the list?\nThe project folders' contents won't be modified."));
 	erase_missing_ask->popup_centered_minsize();
 }
 
@@ -2213,6 +2269,7 @@ void ProjectManager::_bind_methods() {
 
 	ClassDB::bind_method("_open_selected_projects_ask", &ProjectManager::_open_selected_projects_ask);
 	ClassDB::bind_method("_open_selected_projects", &ProjectManager::_open_selected_projects);
+	ClassDB::bind_method(D_METHOD("_global_menu_action"), &ProjectManager::_global_menu_action, DEFVAL(Variant()));
 	ClassDB::bind_method("_run_project", &ProjectManager::_run_project);
 	ClassDB::bind_method("_run_project_confirm", &ProjectManager::_run_project_confirm);
 	ClassDB::bind_method("_scan_projects", &ProjectManager::_scan_projects);
@@ -2538,6 +2595,7 @@ ProjectManager::ProjectManager() {
 	}
 
 	SceneTree::get_singleton()->connect("files_dropped", this, "_files_dropped");
+	SceneTree::get_singleton()->connect("global_menu_action", this, "_global_menu_action");
 
 	run_error_diag = memnew(AcceptDialog);
 	gui_base->add_child(run_error_diag);
