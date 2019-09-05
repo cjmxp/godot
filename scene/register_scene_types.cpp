@@ -343,6 +343,7 @@ void register_scene_types() {
 	ClassDB::register_class<ColorPicker>();
 	ClassDB::register_class<ColorPickerButton>();
 	ClassDB::register_class<RichTextLabel>();
+	ClassDB::register_class<RichTextEffect>();
 	ClassDB::register_class<PopupDialog>();
 	ClassDB::register_class<WindowDialog>();
 	ClassDB::register_class<AcceptDialog>();
@@ -528,6 +529,7 @@ void register_scene_types() {
 	ClassDB::register_class<VisualShaderNodeCubeMapUniform>();
 	ClassDB::register_class<VisualShaderNodeIf>();
 	ClassDB::register_class<VisualShaderNodeSwitch>();
+	ClassDB::register_class<VisualShaderNodeScalarSwitch>();
 	ClassDB::register_class<VisualShaderNodeFresnel>();
 	ClassDB::register_class<VisualShaderNodeExpression>();
 	ClassDB::register_class<VisualShaderNodeGlobalExpression>();
