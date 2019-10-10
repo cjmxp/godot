@@ -1067,7 +1067,16 @@ Error VisualShader::_write_node(Type type, StringBuilder &global_code, StringBui
 
 				VisualShaderNodeUniform *uniform = (VisualShaderNodeUniform *)graph[type].nodes[from_node].node.ptr();
 				if (uniform) {
-					inputs[i] = uniform->get_uniform_name();
+					inputs[i] = "";
+					switch (uniform->get_uniform_type()) {
+						case VisualShaderNodeUniform::UTYPE_CUBEMAP:
+							inputs[i] += "cube_";
+							break;
+						case VisualShaderNodeUniform::UTYPE_SAMPLER2D:
+							inputs[i] += "s2d_";
+							break;
+					}
+					inputs[i] += uniform->get_uniform_name();
 				} else {
 					inputs[i] = "";
 				}
@@ -1349,7 +1358,6 @@ void VisualShader::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_valid_node_id", "type"), &VisualShader::get_valid_node_id);
 
 	ClassDB::bind_method(D_METHOD("remove_node", "type", "id"), &VisualShader::remove_node);
-	ClassDB::bind_method(D_METHOD("rebuild"), &VisualShader::rebuild);
 
 	ClassDB::bind_method(D_METHOD("is_node_connection", "type", "from_node", "from_port", "to_node", "to_port"), &VisualShader::is_node_connection);
 	ClassDB::bind_method(D_METHOD("can_connect_nodes", "type", "from_node", "from_port", "to_node", "to_port"), &VisualShader::is_node_connection);
@@ -1973,7 +1981,16 @@ void VisualShaderNodeUniform::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "uniform_name"), "set_uniform_name", "get_uniform_name");
 }
 
+int VisualShaderNodeUniform::get_uniform_type() const {
+	return (int)uniform_type;
+}
+
+void VisualShaderNodeUniform::set_uniform_type(int p_type) {
+	uniform_type = (UniformType)p_type;
+}
+
 VisualShaderNodeUniform::VisualShaderNodeUniform() {
+	uniform_type = UTYPE_NONE;
 }
 
 ////////////// GroupBase
