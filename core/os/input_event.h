@@ -352,6 +352,9 @@ public:
 class InputEventMouseMotion : public InputEventMouse {
 
 	GDCLASS(InputEventMouseMotion, InputEventMouse);
+
+	Vector2 tilt;
+	float pressure;
 	Vector2 relative;
 	Vector2 speed;
 
@@ -359,6 +362,12 @@ protected:
 	static void _bind_methods();
 
 public:
+	void set_tilt(const Vector2 &p_tilt);
+	Vector2 get_tilt() const;
+
+	void set_pressure(float p_pressure);
+	float get_pressure() const;
+
 	void set_relative(const Vector2 &p_relative);
 	Vector2 get_relative() const;
 
