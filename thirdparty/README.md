@@ -376,7 +376,7 @@ Collection of single-file libraries used in Godot components.
   * License: zlib
 - `stb_vorbis.c`
   * Upstream: https://github.com/nothings/stb
-  * Version: 1.16
+  * Version: 1.17
   * License: Public Domain (Unlicense) or MIT
 
 
@@ -534,7 +534,7 @@ Files extracted from upstream source:
 ## zstd
 
 - Upstream: https://github.com/facebook/zstd
-- Version: 1.4.3
+- Version: 1.4.4
 - License: BSD-3-Clause
 
 Files extracted from upstream source:
