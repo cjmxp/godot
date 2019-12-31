@@ -32,8 +32,10 @@
 
 #include "core/io/resource_loader.h"
 #include "core/project_settings.h"
+#include "editor/editor_scale.h"
 #include "editor/editor_settings.h"
 #include "scene/3d/sprite_3d.h"
+#include "scene/gui/center_container.h"
 
 void SpriteFramesEditor::_gui_input(Ref<InputEvent> p_event) {
 }
@@ -202,7 +204,7 @@ void SpriteFramesEditor::_prepare_sprite_sheet(const String &p_file) {
 
 	Ref<Resource> texture = ResourceLoader::load(p_file);
 	if (!texture.is_valid()) {
-		EditorNode::get_singleton()->show_warning("Unable to load images");
+		EditorNode::get_singleton()->show_warning(TTR("Unable to load images"));
 		ERR_FAIL_COND(!texture.is_valid());
 	}
 	if (texture != split_sheet_preview->get_texture()) {

@@ -32,6 +32,8 @@
 
 #include "core/os/file_access.h"
 #include "core/version.h"
+#include "editor/editor_scale.h"
+#include "scene/gui/progress_bar.h"
 
 void ThemeEditor::edit(const Ref<Theme> &p_theme) {
 
@@ -908,7 +910,7 @@ ThemeEditorPlugin::ThemeEditorPlugin(EditorNode *p_node) {
 
 	editor = p_node;
 	theme_editor = memnew(ThemeEditor);
-	theme_editor->set_custom_minimum_size(Size2(0, 200));
+	theme_editor->set_custom_minimum_size(Size2(0, 200) * EDSCALE);
 
 	button = editor->add_bottom_panel_item(TTR("Theme"), theme_editor);
 	button->hide();

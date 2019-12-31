@@ -32,6 +32,7 @@
 
 #include "core/os/input.h"
 #include "core/os/keyboard.h"
+#include "editor/editor_scale.h"
 #include "editor/plugins/canvas_item_editor_plugin.h"
 #include "scene/2d/physics_body_2d.h"
 #include "scene/2d/sprite.h"
@@ -2036,10 +2037,10 @@ void TileSetEditor::_update_toggle_shape_button() {
 		tools[SHAPE_TOGGLE_TYPE]->hide();
 	} else if (concave.is_valid()) {
 		tools[SHAPE_TOGGLE_TYPE]->set_icon(get_icon("ConvexPolygonShape2D", "EditorIcons"));
-		tools[SHAPE_TOGGLE_TYPE]->set_text("Make Convex");
+		tools[SHAPE_TOGGLE_TYPE]->set_text(TTR("Make Convex"));
 	} else if (convex.is_valid()) {
 		tools[SHAPE_TOGGLE_TYPE]->set_icon(get_icon("ConcavePolygonShape2D", "EditorIcons"));
-		tools[SHAPE_TOGGLE_TYPE]->set_text("Make Concave");
+		tools[SHAPE_TOGGLE_TYPE]->set_text(TTR("Make Concave"));
 	} else {
 		// Shouldn't happen
 		separator_shape_toggle->hide();

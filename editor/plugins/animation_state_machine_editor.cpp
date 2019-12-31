@@ -35,6 +35,7 @@
 #include "core/os/input.h"
 #include "core/os/keyboard.h"
 #include "core/project_settings.h"
+#include "editor/editor_scale.h"
 #include "scene/animation/animation_blend_tree.h"
 #include "scene/animation/animation_player.h"
 #include "scene/gui/menu_button.h"
@@ -262,7 +263,7 @@ void AnimationNodeStateMachineEditor::_state_machine_gui_input(const Ref<InputEv
 		if (connecting_to_node != StringName()) {
 
 			if (state_machine->has_transition(connecting_from, connecting_to_node)) {
-				EditorNode::get_singleton()->show_warning("Transition exists!");
+				EditorNode::get_singleton()->show_warning(TTR("Transition exists!"));
 
 			} else {
 
