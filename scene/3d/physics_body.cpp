@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2019 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2019 Godot Engine contributors (cf. AUTHORS.md)    */
+/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -1151,17 +1151,8 @@ Vector3 KinematicBody::move_and_slide(const Vector3 &p_linear_velocity, const Ve
 		}
 	}
 
-	Vector3 current_floor_velocity = floor_velocity;
-	if (on_floor && on_floor_body.is_valid()) {
-		//this approach makes sure there is less delay between the actual body velocity and the one we saved
-		PhysicsDirectBodyState *bs = PhysicsServer::get_singleton()->body_get_direct_state(on_floor_body);
-		if (bs) {
-			current_floor_velocity = bs->get_linear_velocity();
-		}
-	}
-
 	// Hack in order to work with calling from _process as well as from _physics_process; calling from thread is risky
-	Vector3 motion = (current_floor_velocity + body_velocity) * (Engine::get_singleton()->is_in_physics_frame() ? get_physics_process_delta_time() : get_process_delta_time());
+	Vector3 motion = (floor_velocity + body_velocity) * (Engine::get_singleton()->is_in_physics_frame() ? get_physics_process_delta_time() : get_process_delta_time());
 
 	on_floor = false;
 	on_floor_body = RID();

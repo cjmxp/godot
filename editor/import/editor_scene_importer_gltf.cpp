@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2019 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2019 Godot Engine contributors (cf. AUTHORS.md)    */
+/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -1479,9 +1479,16 @@ Error EditorSceneImporterGLTF::_parse_materials(GLTFState &state) {
 
 		if (d.has("alphaMode")) {
 			const String &am = d["alphaMode"];
-			if (am != "OPAQUE") {
+			if (am == "BLEND") {
 				material->set_feature(SpatialMaterial::FEATURE_TRANSPARENT, true);
 				material->set_depth_draw_mode(SpatialMaterial::DEPTH_DRAW_ALPHA_OPAQUE_PREPASS);
+			} else if (am == "MASK") {
+				material->set_flag(SpatialMaterial::FLAG_USE_ALPHA_SCISSOR, true);
+				if (d.has("alphaCutoff")) {
+					material->set_alpha_scissor_threshold(d["alphaCutoff"]);
+				} else {
+					material->set_alpha_scissor_threshold(0.5f);
+				}
 			}
 		}
 

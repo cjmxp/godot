@@ -45,6 +45,7 @@
 			</return>
 			<description>
 				Creates a camera and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]camera_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="camera_set_cull_mask">
@@ -142,7 +143,8 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates a canvas and returns the assigned [RID].
+				Creates a canvas and returns the assigned [RID]. It can be accessed with the RID that is returned. This RID will be used in all [code]canvas_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="canvas_item_add_circle">
@@ -422,6 +424,8 @@
 			</argument>
 			<argument index="10" name="antialiased" type="bool" default="false">
 			</argument>
+			<argument index="11" name="antialiasing_use_indices" type="bool" default="false">
+			</argument>
 			<description>
 				Adds a triangle array to the [CanvasItem]'s draw commands.
 			</description>
@@ -439,7 +443,8 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates a new [CanvasItem] and returns its [RID].
+				Creates a new [CanvasItem] and returns its [RID]. It can be accessed with the RID that is returned. This RID will be used in all [code]canvas_item_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="canvas_item_set_clip">
@@ -648,7 +653,8 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates a canvas light.
+				Creates a canvas light and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]canvas_light_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="canvas_light_occluder_attach_to_canvas">
@@ -666,7 +672,8 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates a light occluder.
+				Creates a light occluder and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]canvas_light_ocluder_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="canvas_light_occluder_set_enabled">
@@ -930,7 +937,8 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates a new light occluder polygon.
+				Creates a new light occluder polygon and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]canvas_occluder_polygon_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="canvas_occluder_polygon_set_cull_mode">
@@ -997,6 +1005,8 @@
 			</return>
 			<description>
 				Creates a directional light and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID can be used in most [code]light_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach this directional light to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="draw">
@@ -1015,6 +1025,7 @@
 			</return>
 			<description>
 				Creates an environment and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]environment_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="environment_set_adjustment">
@@ -1397,6 +1408,9 @@
 			<return type="RID">
 			</return>
 			<description>
+				Creates a GI probe and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]gi_probe_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach this GI probe to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="gi_probe_get_bias" qualifiers="const">
@@ -1405,6 +1419,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns the bias value for the GI probe. Bias is used to avoid self occlusion. Equivalent to [member GIProbeData.bias].
 			</description>
 		</method>
 		<method name="gi_probe_get_bounds" qualifiers="const">
@@ -1413,6 +1428,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns the axis-aligned bounding box that covers the full extent of the GI probe.
 			</description>
 		</method>
 		<method name="gi_probe_get_cell_size" qualifiers="const">
@@ -1421,6 +1437,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns the cell size set by [method gi_probe_set_cell_size].
 			</description>
 		</method>
 		<method name="gi_probe_get_dynamic_data" qualifiers="const">
@@ -1429,6 +1446,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns the data used by the GI probe.
 			</description>
 		</method>
 		<method name="gi_probe_get_dynamic_range" qualifiers="const">
@@ -1437,6 +1455,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns the dynamic range set for this GI probe. Equivalent to [member GIProbe.dynamic_range].
 			</description>
 		</method>
 		<method name="gi_probe_get_energy" qualifiers="const">
@@ -1445,6 +1464,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns the energy multiplier for this GI probe. Equivalent to [member GIProbe.energy].
 			</description>
 		</method>
 		<method name="gi_probe_get_normal_bias" qualifiers="const">
@@ -1453,6 +1473,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns the normal bias for this GI probe. Equivalent to [member GIProbe.normal_bias].
 			</description>
 		</method>
 		<method name="gi_probe_get_propagation" qualifiers="const">
@@ -1461,6 +1482,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns the propagation value for this GI probe. Equivalent to [member GIProbe.propagation].
 			</description>
 		</method>
 		<method name="gi_probe_get_to_cell_xform" qualifiers="const">
@@ -1469,6 +1491,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns the Transform set by [method gi_probe_set_to_cell_xform].
 			</description>
 		</method>
 		<method name="gi_probe_is_compressed" qualifiers="const">
@@ -1477,6 +1500,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns [code]true[/code] if the GI probe data associated with this GI probe is compressed. Equivalent to [member GIProbe.compress].
 			</description>
 		</method>
 		<method name="gi_probe_is_interior" qualifiers="const">
@@ -1485,6 +1509,7 @@
 			<argument index="0" name="probe" type="RID">
 			</argument>
 			<description>
+				Returns [code]true[/code] if the GI probe is set to interior, meaning it does not account for sky light. Equivalent to [member GIProbe.interior].
 			</description>
 		</method>
 		<method name="gi_probe_set_bias">
@@ -1495,6 +1520,7 @@
 			<argument index="1" name="bias" type="float">
 			</argument>
 			<description>
+				Sets the bias value to avoid self-occlusion. Equivalent to [member GIProbe.bias].
 			</description>
 		</method>
 		<method name="gi_probe_set_bounds">
@@ -1505,6 +1531,7 @@
 			<argument index="1" name="bounds" type="AABB">
 			</argument>
 			<description>
+				Sets the axis-aligned bounding box that covers the extent of the GI probe.
 			</description>
 		</method>
 		<method name="gi_probe_set_cell_size">
@@ -1515,6 +1542,7 @@
 			<argument index="1" name="range" type="float">
 			</argument>
 			<description>
+				Sets the size of individual cells within the GI probe.
 			</description>
 		</method>
 		<method name="gi_probe_set_compress">
@@ -1525,6 +1553,7 @@
 			<argument index="1" name="enable" type="bool">
 			</argument>
 			<description>
+				Sets the compression setting for the GI probe data. Compressed data will take up less space but may look worse. Equivalent to [member GIProbe.compress].
 			</description>
 		</method>
 		<method name="gi_probe_set_dynamic_data">
@@ -1535,6 +1564,7 @@
 			<argument index="1" name="data" type="PoolIntArray">
 			</argument>
 			<description>
+				Sets the data to be used in the GI probe for lighting calculations. Normally this is created and called internally within the [GIProbe] node. You should not try to set this yourself.
 			</description>
 		</method>
 		<method name="gi_probe_set_dynamic_range">
@@ -1545,6 +1575,7 @@
 			<argument index="1" name="range" type="int">
 			</argument>
 			<description>
+				Sets the dynamic range of the GI probe. Dynamic range sets the limit for how bright lights can be. A smaller range captures greater detail but limits how bright lights can be. Equivalent to [member GIProbe.dynamic_range].
 			</description>
 		</method>
 		<method name="gi_probe_set_energy">
@@ -1555,6 +1586,7 @@
 			<argument index="1" name="energy" type="float">
 			</argument>
 			<description>
+				Sets the energy multiplier for this GI probe. A higher energy makes the indirect light from the GI probe brighter. Equivalent to [member GIProbe.energy].
 			</description>
 		</method>
 		<method name="gi_probe_set_interior">
@@ -1565,6 +1597,7 @@
 			<argument index="1" name="enable" type="bool">
 			</argument>
 			<description>
+				Sets the interior value of this GI probe. A GI probe set to interior does not include the sky when calculating lighting. Equivalent to [member GIProbe.interior].
 			</description>
 		</method>
 		<method name="gi_probe_set_normal_bias">
@@ -1575,6 +1608,7 @@
 			<argument index="1" name="bias" type="float">
 			</argument>
 			<description>
+				Sets the normal bias for this GI probe. Normal bias behaves similar to the other form of bias and may help reduce self-occlusion. Equivalent to [member GIProbe.normal_bias].
 			</description>
 		</method>
 		<method name="gi_probe_set_propagation">
@@ -1585,6 +1619,7 @@
 			<argument index="1" name="propagation" type="float">
 			</argument>
 			<description>
+				Sets the propagation of light within this GI probe. Equivalent to [member GIProbe.propagation].
 			</description>
 		</method>
 		<method name="gi_probe_set_to_cell_xform">
@@ -1595,6 +1630,7 @@
 			<argument index="1" name="xform" type="Transform">
 			</argument>
 			<description>
+				Sets the to cell [Transform] for this GI probe.
 			</description>
 		</method>
 		<method name="has_changed" qualifiers="const">
@@ -1610,6 +1646,7 @@
 			<argument index="0" name="feature" type="int" enum="VisualServer.Features">
 			</argument>
 			<description>
+				Not yet implemented. Always returns [code]false[/code].
 			</description>
 		</method>
 		<method name="has_os_feature" qualifiers="const">
@@ -1658,7 +1695,9 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates an [ImmediateGeometry] and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]immediate_*[/code] VisualServer functions.
+				Creates an immediate geometry and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]immediate_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach this immediate geometry to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="immediate_end">
@@ -1753,13 +1792,14 @@
 			<argument index="1" name="vertex" type="Vector2">
 			</argument>
 			<description>
+				Adds the next vertex using the information provided in advance. This is a helper class that calls [method immediate_vertex] under the hood. Equivalent to [method ImmediateGeometry.add_vertex].
 			</description>
 		</method>
 		<method name="init">
 			<return type="void">
 			</return>
 			<description>
-				Initializes the visual server.
+				Initializes the visual server. This function is called internally by platform-dependent code during engine initialization. If called from a running game, it will not do anything.
 			</description>
 		</method>
 		<method name="instance_attach_object_instance_id">
@@ -1770,6 +1810,7 @@
 			<argument index="1" name="id" type="int">
 			</argument>
 			<description>
+				Attaches a unique Object ID to instance. Object ID must be attached to instance for proper culling with [method instances_cull_aabb], [method instances_cull_convex], and [method instances_cull_ray].
 			</description>
 		</method>
 		<method name="instance_attach_skeleton">
@@ -1780,12 +1821,16 @@
 			<argument index="1" name="skeleton" type="RID">
 			</argument>
 			<description>
+				Attaches a skeleton to an instance. Removes the previous skeleton from the instance.
 			</description>
 		</method>
 		<method name="instance_create">
 			<return type="RID">
 			</return>
 			<description>
+				Creates a visual instance and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]instance_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				An instance is a way of placing a 3D object in the scenario. Objects like particles, meshes, and reflection probes need to be associated with an instance to be visible in the scenario using [method instance_set_base].
 			</description>
 		</method>
 		<method name="instance_create2">
@@ -1796,6 +1841,8 @@
 			<argument index="1" name="scenario" type="RID">
 			</argument>
 			<description>
+				Creates a visual instance, adds it to the VisualServer, and sets both base and scenario. It can be accessed with the RID that is returned. This RID will be used in all [code]instance_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="instance_geometry_set_as_instance_lod">
@@ -1806,6 +1853,7 @@
 			<argument index="1" name="as_lod_of_instance" type="RID">
 			</argument>
 			<description>
+				Not implemented in Godot 3.x.
 			</description>
 		</method>
 		<method name="instance_geometry_set_cast_shadows_setting">
@@ -1816,6 +1864,7 @@
 			<argument index="1" name="shadow_casting_setting" type="int" enum="VisualServer.ShadowCastingSetting">
 			</argument>
 			<description>
+				Sets the shadow casting setting to one of [enum ShadowCastingSetting]. Equivalent to [member GeometryInstance.cast_shadow].
 			</description>
 		</method>
 		<method name="instance_geometry_set_draw_range">
@@ -1832,6 +1881,7 @@
 			<argument index="4" name="max_margin" type="float">
 			</argument>
 			<description>
+				Not implemented in Godot 3.x.
 			</description>
 		</method>
 		<method name="instance_geometry_set_flag">
@@ -1844,6 +1894,7 @@
 			<argument index="2" name="enabled" type="bool">
 			</argument>
 			<description>
+				Sets the flag for a given [enum InstanceFlags]. See [enum InstanceFlags] for more details.
 			</description>
 		</method>
 		<method name="instance_geometry_set_material_override">
@@ -1854,6 +1905,7 @@
 			<argument index="1" name="material" type="RID">
 			</argument>
 			<description>
+				Sets a material that will override the material for all surfaces on the mesh associated with this instance. Equivalent to [member GeometryInstance.material_override].
 			</description>
 		</method>
 		<method name="instance_set_base">
@@ -1864,6 +1916,7 @@
 			<argument index="1" name="base" type="RID">
 			</argument>
 			<description>
+				Sets the base of the instance. A base can be any of the 3D objects that are created in the VisualServer that can be displayed. For example, any of the light types, mesh, multimesh, immediate geometry, particle system, reflection probe, lightmap capture, and the GI probe are all types that can be set as the base of an instance in order to be displayed in the scenario.
 			</description>
 		</method>
 		<method name="instance_set_blend_shape_weight">
@@ -1876,6 +1929,7 @@
 			<argument index="2" name="weight" type="float">
 			</argument>
 			<description>
+				Sets the weight for a given blend shape associated with this instance.
 			</description>
 		</method>
 		<method name="instance_set_custom_aabb">
@@ -1886,6 +1940,7 @@
 			<argument index="1" name="aabb" type="AABB">
 			</argument>
 			<description>
+				Sets a custom AABB to use when culling objects from the view frustum. Equivalent to [method GeometryInstance.set_custom_aabb].
 			</description>
 		</method>
 		<method name="instance_set_exterior">
@@ -1896,6 +1951,7 @@
 			<argument index="1" name="enabled" type="bool">
 			</argument>
 			<description>
+				Function not implemented in Godot 3.x.
 			</description>
 		</method>
 		<method name="instance_set_extra_visibility_margin">
@@ -1906,6 +1962,7 @@
 			<argument index="1" name="margin" type="float">
 			</argument>
 			<description>
+				Sets a margin to increase the size of the AABB when culling objects from the view frustum. This allows you avoid culling objects that fall outside the view frustum. Equivalent to [member GeometryInstance.extra_cull_margin].
 			</description>
 		</method>
 		<method name="instance_set_layer_mask">
@@ -1916,6 +1973,7 @@
 			<argument index="1" name="mask" type="int">
 			</argument>
 			<description>
+				Sets the render layers that this instance will be drawn to. Equivalent to [member VisualInstance.layers].
 			</description>
 		</method>
 		<method name="instance_set_scenario">
@@ -1926,6 +1984,7 @@
 			<argument index="1" name="scenario" type="RID">
 			</argument>
 			<description>
+				Sets the scenario that the instance is in. The scenario is the 3D world that the objects will be displayed in.
 			</description>
 		</method>
 		<method name="instance_set_surface_material">
@@ -1938,6 +1997,7 @@
 			<argument index="2" name="material" type="RID">
 			</argument>
 			<description>
+				Sets the material of a specific surface. Equivalent to [method MeshInstance.set_surface_material].
 			</description>
 		</method>
 		<method name="instance_set_transform">
@@ -1948,6 +2008,7 @@
 			<argument index="1" name="transform" type="Transform">
 			</argument>
 			<description>
+				Sets the world space transform of the instance. Equivalent to [member Spatial.transform].
 			</description>
 		</method>
 		<method name="instance_set_use_lightmap">
@@ -1960,6 +2021,7 @@
 			<argument index="2" name="lightmap" type="RID">
 			</argument>
 			<description>
+				Sets the lightmap to use with this instance. 
 			</description>
 		</method>
 		<method name="instance_set_visible">
@@ -1970,6 +2032,7 @@
 			<argument index="1" name="visible" type="bool">
 			</argument>
 			<description>
+				Sets whether an instance is drawn or not. Equivalent to [member Spatial.visible].
 			</description>
 		</method>
 		<method name="instances_cull_aabb" qualifiers="const">
@@ -1980,6 +2043,8 @@
 			<argument index="1" name="scenario" type="RID">
 			</argument>
 			<description>
+				Returns an array of object IDs intersecting with the provided AABB. Only visual 3D nodes are considered, such as [MeshInstance] or [DirectionalLight]. Use [method @GDScript.instance_from_id] to obtain the actual nodes. A scenario RID must be provided, which is available in the [World] you want to query. This forces an update for all resources queued to update.
+				[b]Warning:[/b] This function is primarily intended for editor usage. For in-game use cases, prefer physics collision.
 			</description>
 		</method>
 		<method name="instances_cull_convex" qualifiers="const">
@@ -1990,6 +2055,8 @@
 			<argument index="1" name="scenario" type="RID">
 			</argument>
 			<description>
+				Returns an array of object IDs intersecting with the provided convex shape. Only visual 3D nodes are considered, such as [MeshInstance] or [DirectionalLight]. Use [method @GDScript.instance_from_id] to obtain the actual nodes. A scenario RID must be provided, which is available in the [World] you want to query. This forces an update for all resources queued to update.
+				[b]Warning:[/b] This function is primarily intended for editor usage. For in-game use cases, prefer physics collision.
 			</description>
 		</method>
 		<method name="instances_cull_ray" qualifiers="const">
@@ -2002,7 +2069,7 @@
 			<argument index="2" name="scenario" type="RID">
 			</argument>
 			<description>
-				Returns an array of object IDs intersecting with the provided 3D ray. Only visual 3D nodes are considered, such as [MeshInstance] or [DirectionalLight]. Use [method @GDScript.instance_from_id] to obtain the actual nodes. A scenario RID must be provided, which is available in the [World] you want to query.
+				Returns an array of object IDs intersecting with the provided 3D ray. Only visual 3D nodes are considered, such as [MeshInstance] or [DirectionalLight]. Use [method @GDScript.instance_from_id] to obtain the actual nodes. A scenario RID must be provided, which is available in the [World] you want to query. This forces an update for all resources queued to update.
 				[b]Warning:[/b] This function is primarily intended for editor usage. For in-game use cases, prefer physics collision.
 			</description>
 		</method>
@@ -2014,6 +2081,7 @@
 			<argument index="1" name="enable" type="bool">
 			</argument>
 			<description>
+				If [code]true[/code], this directional light will blend between shadow map splits resulting in a smoother transition between them. Equivalent to [member DirectionalLight.directional_shadow_blend_splits].
 			</description>
 		</method>
 		<method name="light_directional_set_shadow_depth_range_mode">
@@ -2024,6 +2092,7 @@
 			<argument index="1" name="range_mode" type="int" enum="VisualServer.LightDirectionalShadowDepthRangeMode">
 			</argument>
 			<description>
+				Sets the shadow depth range mode for this directional light. Equivalent to [member DirectionalLight.directional_shadow_depth_range]. See [enum LightDirectionalShadowDepthRangeMode] for options.
 			</description>
 		</method>
 		<method name="light_directional_set_shadow_mode">
@@ -2034,6 +2103,7 @@
 			<argument index="1" name="mode" type="int" enum="VisualServer.LightDirectionalShadowMode">
 			</argument>
 			<description>
+				Sets the shadow mode for this directional light. Equivalent to [member DirectionalLight.directional_shadow_mode]. See [enum LightDirectionalShadowMode] for options.
 			</description>
 		</method>
 		<method name="light_omni_set_shadow_detail">
@@ -2044,6 +2114,7 @@
 			<argument index="1" name="detail" type="int" enum="VisualServer.LightOmniShadowDetail">
 			</argument>
 			<description>
+				Sets whether to use vertical or horizontal detail for this omni light. This can be used to alleviate artifacts in the shadow map. Equivalent to [member OmniLight.omni_shadow_detail].
 			</description>
 		</method>
 		<method name="light_omni_set_shadow_mode">
@@ -2054,6 +2125,7 @@
 			<argument index="1" name="mode" type="int" enum="VisualServer.LightOmniShadowMode">
 			</argument>
 			<description>
+				Sets whether to use a dual paraboloid or a cubemap for the shadow map. Dual paraboloid is faster but may suffer from artifacts. Equivalent to [member OmniLight.omni_shadow_mode].
 			</description>
 		</method>
 		<method name="light_set_color">
@@ -2064,6 +2136,7 @@
 			<argument index="1" name="color" type="Color">
 			</argument>
 			<description>
+				Sets the color of the light. Equivalent to [member Light.light_color].
 			</description>
 		</method>
 		<method name="light_set_cull_mask">
@@ -2074,6 +2147,7 @@
 			<argument index="1" name="mask" type="int">
 			</argument>
 			<description>
+				Sets the cull mask for this Light. Lights only affect objects in the selected layers. Equivalent to [member Light.light_cull_mask].
 			</description>
 		</method>
 		<method name="light_set_negative">
@@ -2084,6 +2158,7 @@
 			<argument index="1" name="enable" type="bool">
 			</argument>
 			<description>
+				If [code]true[/code], light will subtract light instead of adding light. Equivalent to [member Light.light_negative].
 			</description>
 		</method>
 		<method name="light_set_param">
@@ -2096,6 +2171,7 @@
 			<argument index="2" name="value" type="float">
 			</argument>
 			<description>
+				Sets the specified light parameter. See [enum LightParam] for options. Equivalent to [method Light.set_param].
 			</description>
 		</method>
 		<method name="light_set_projector">
@@ -2106,6 +2182,7 @@
 			<argument index="1" name="texture" type="RID">
 			</argument>
 			<description>
+				Not implemented in Godot 3.x.
 			</description>
 		</method>
 		<method name="light_set_reverse_cull_face_mode">
@@ -2116,6 +2193,7 @@
 			<argument index="1" name="enabled" type="bool">
 			</argument>
 			<description>
+				If [code]true[/code], reverses the backface culling of the mesh. This can be useful when you have a flat mesh that has a light behind it. If you need to cast a shadow on both sides of the mesh, set the mesh to use double sided shadows with [method instance_geometry_set_cast_shadows_setting]. Equivalent to [member Light.shadow_reverse_cull_face].
 			</description>
 		</method>
 		<method name="light_set_shadow">
@@ -2126,6 +2204,7 @@
 			<argument index="1" name="enabled" type="bool">
 			</argument>
 			<description>
+				If [code]true[/code], light will cast shadows. Equivalent to [member Light.shadow_enabled].
 			</description>
 		</method>
 		<method name="light_set_shadow_color">
@@ -2136,6 +2215,7 @@
 			<argument index="1" name="color" type="Color">
 			</argument>
 			<description>
+				Sets the color of the shadow cast by the light. Equivalent to [member Light.shadow_color].
 			</description>
 		</method>
 		<method name="light_set_use_gi">
@@ -2153,6 +2233,9 @@
 			<return type="RID">
 			</return>
 			<description>
+				Creates a lightmap capture and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]lightmap_capture_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach this lightmap capture to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="lightmap_capture_get_bounds" qualifiers="const">
@@ -2262,7 +2345,8 @@
 			<return type="RID">
 			</return>
 			<description>
-				Returns an empty material.
+				Creates an empty material and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]material_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="material_get_param" qualifiers="const">
@@ -2284,6 +2368,7 @@
 			<argument index="1" name="parameter" type="String">
 			</argument>
 			<description>
+				Returns the default value for the param if available. Otherwise returns an empty [Variant].
 			</description>
 		</method>
 		<method name="material_get_shader" qualifiers="const">
@@ -2382,7 +2467,9 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates a new mesh.
+				Creates a new mesh and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]mesh_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach this mesh to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="mesh_get_blend_shape_count" qualifiers="const">
@@ -2554,6 +2641,7 @@
 			<argument index="3" name="array_index" type="int">
 			</argument>
 			<description>
+				Function is unused in Godot 3.x.
 			</description>
 		</method>
 		<method name="mesh_surface_get_format_stride" qualifiers="const">
@@ -2566,6 +2654,7 @@
 			<argument index="2" name="index_len" type="int">
 			</argument>
 			<description>
+				Function is unused in Godot 3.x.
 			</description>
 		</method>
 		<method name="mesh_surface_get_index_array" qualifiers="const">
@@ -2637,6 +2726,7 @@
 			<argument index="3" name="data" type="PoolByteArray">
 			</argument>
 			<description>
+				Updates a specific region of a vertex buffer for the specified surface. Warning: this function alters the vertex buffer directly with no safety mechanisms, you can easily corrupt your mesh.
 			</description>
 		</method>
 		<method name="multimesh_allocate">
@@ -2653,14 +2743,16 @@
 			<argument index="4" name="custom_data_format" type="int" enum="VisualServer.MultimeshCustomDataFormat" default="0">
 			</argument>
 			<description>
+				Allocates space for the multimesh data. Format parameters determine how the data will be stored by OpenGL. See [enum MultimeshTransformFormat], [enum MultimeshColorFormat], and [enum MultimeshCustomDataFormat] for usage. Equivalent to [member MultiMesh.instance_count].
 			</description>
 		</method>
 		<method name="multimesh_create">
 			<return type="RID">
 			</return>
 			<description>
-				Creates a new multimesh on the VisualServer and returns an [RID] handle.
+				Creates a new multimesh on the VisualServer and returns an [RID] handle. This RID will be used in all [code]multimesh_*[/code] VisualServer functions.
 				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach this multimesh to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="multimesh_get_aabb" qualifiers="const">
@@ -2669,6 +2761,7 @@
 			<argument index="0" name="multimesh" type="RID">
 			</argument>
 			<description>
+				Calculates and returns the axis-aligned bounding box that encloses all instances within the multimesh.
 			</description>
 		</method>
 		<method name="multimesh_get_instance_count" qualifiers="const">
@@ -2677,6 +2770,7 @@
 			<argument index="0" name="multimesh" type="RID">
 			</argument>
 			<description>
+				Returns the number of instances allocated for this multimesh.
 			</description>
 		</method>
 		<method name="multimesh_get_mesh" qualifiers="const">
@@ -2685,6 +2779,7 @@
 			<argument index="0" name="multimesh" type="RID">
 			</argument>
 			<description>
+				Returns the RID of the mesh that will be used in drawing this multimesh.
 			</description>
 		</method>
 		<method name="multimesh_get_visible_instances" qualifiers="const">
@@ -2693,6 +2788,7 @@
 			<argument index="0" name="multimesh" type="RID">
 			</argument>
 			<description>
+				Returns the number of visible instances for this multimesh.
 			</description>
 		</method>
 		<method name="multimesh_instance_get_color" qualifiers="const">
@@ -2703,6 +2799,7 @@
 			<argument index="1" name="index" type="int">
 			</argument>
 			<description>
+				Returns the color by which the specified instance will be modulated.
 			</description>
 		</method>
 		<method name="multimesh_instance_get_custom_data" qualifiers="const">
@@ -2713,6 +2810,7 @@
 			<argument index="1" name="index" type="int">
 			</argument>
 			<description>
+				Returns the custom data associated with the specified instance.
 			</description>
 		</method>
 		<method name="multimesh_instance_get_transform" qualifiers="const">
@@ -2723,6 +2821,7 @@
 			<argument index="1" name="index" type="int">
 			</argument>
 			<description>
+				Returns the [Transform] of the specified instance.
 			</description>
 		</method>
 		<method name="multimesh_instance_get_transform_2d" qualifiers="const">
@@ -2733,6 +2832,7 @@
 			<argument index="1" name="index" type="int">
 			</argument>
 			<description>
+				Returns the [Transform2D] of the specified instance. For use when the multimesh is set to use 2D transforms.
 			</description>
 		</method>
 		<method name="multimesh_instance_set_color">
@@ -2745,6 +2845,7 @@
 			<argument index="2" name="color" type="Color">
 			</argument>
 			<description>
+				Sets the color by which this instance will be modulated. Equivalent to [method MultiMesh.set_instance_color].
 			</description>
 		</method>
 		<method name="multimesh_instance_set_custom_data">
@@ -2757,6 +2858,7 @@
 			<argument index="2" name="custom_data" type="Color">
 			</argument>
 			<description>
+				Sets the custom data for this instance. Custom data is passed as a [Color], but is interpreted as a [code]vec4[/code] in the shader. Equivalent to [method MultiMesh.set_instance_custom_data].
 			</description>
 		</method>
 		<method name="multimesh_instance_set_transform">
@@ -2769,6 +2871,7 @@
 			<argument index="2" name="transform" type="Transform">
 			</argument>
 			<description>
+				Sets the [Transform] for this instance. Equivalent to [method MultiMesh.set_instance_transform].
 			</description>
 		</method>
 		<method name="multimesh_instance_set_transform_2d">
@@ -2781,6 +2884,7 @@
 			<argument index="2" name="transform" type="Transform2D">
 			</argument>
 			<description>
+				Sets the [Transform2D] for this instance. For use when multimesh is used in 2D. Equivalent to [method MultiMesh.set_instance_transform_2d].
 			</description>
 		</method>
 		<method name="multimesh_set_as_bulk_array">
@@ -2791,6 +2895,11 @@
 			<argument index="1" name="array" type="PoolRealArray">
 			</argument>
 			<description>
+				Sets all data related to the instances in one go. This is especially useful when loading the data from disk or preparing the data from GDNative.
+
+				All data is packed in one large float array. An array may look like this: Transform for instance 1, color data for instance 1, custom data for instance 1, transform for instance 2, color data for instance 2, etc.
+
+				[Transform] is stored as 12 floats, [Transform2D] is stored as 8 floats, [code]COLOR_8BIT[/code] / [code]CUSTOM_DATA_8BIT[/code] is stored as 1 float (4 bytes as is) and [code]COLOR_FLOAT[/code] / [code]CUSTOM_DATA_FLOAT[/code] is stored as 4 floats.
 			</description>
 		</method>
 		<method name="multimesh_set_mesh">
@@ -2801,6 +2910,7 @@
 			<argument index="1" name="mesh" type="RID">
 			</argument>
 			<description>
+				Sets the mesh to be drawn by the multimesh. Equivalent to [member MultiMesh.mesh].
 			</description>
 		</method>
 		<method name="multimesh_set_visible_instances">
@@ -2811,18 +2921,25 @@
 			<argument index="1" name="visible" type="int">
 			</argument>
 			<description>
+				Sets the number of instances visible at a given time. If -1, all instances that have been allocated are drawn. Equivalent to [member MultiMesh.visible_instance_count].
 			</description>
 		</method>
 		<method name="omni_light_create">
 			<return type="RID">
 			</return>
 			<description>
+				Creates a new omni light and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID can be used in most [code]light_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach this omni light to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="particles_create">
 			<return type="RID">
 			</return>
 			<description>
+				Creates a particle system and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]particles_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach these particles to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="particles_get_current_aabb">
@@ -2831,6 +2948,7 @@
 			<argument index="0" name="particles" type="RID">
 			</argument>
 			<description>
+				Calculates and returns the axis-aligned bounding box that contains all the particles. Equivalent to [method Particles.capture_aabb].
 			</description>
 		</method>
 		<method name="particles_get_emitting">
@@ -2839,6 +2957,7 @@
 			<argument index="0" name="particles" type="RID">
 			</argument>
 			<description>
+				Returns [code]true[/code] if particles are currently set to emitting.
 			</description>
 		</method>
 		<method name="particles_is_inactive">
@@ -2847,6 +2966,7 @@
 			<argument index="0" name="particles" type="RID">
 			</argument>
 			<description>
+				Returns [code]true[/code] if particles are not emitting and particles are set to inactive.
 			</description>
 		</method>
 		<method name="particles_request_process">
@@ -2855,6 +2975,7 @@
 			<argument index="0" name="particles" type="RID">
 			</argument>
 			<description>
+				Add particle system to list of particle systems that need to be updated. Update will take place on the next frame, or on the next call to [method instances_cull_aabb], [method instances_cull_convex], or [method instances_cull_ray].
 			</description>
 		</method>
 		<method name="particles_restart">
@@ -2863,6 +2984,7 @@
 			<argument index="0" name="particles" type="RID">
 			</argument>
 			<description>
+				Reset the particles on the next update. Equivalent to [method Particles.restart]
 			</description>
 		</method>
 		<method name="particles_set_amount">
@@ -2873,6 +2995,7 @@
 			<argument index="1" name="amount" type="int">
 			</argument>
 			<description>
+				Sets the number of particles to be drawn and allocates the memory for them. Equivalent to [member Particles.amount].
 			</description>
 		</method>
 		<method name="particles_set_custom_aabb">
@@ -2883,6 +3006,7 @@
 			<argument index="1" name="aabb" type="AABB">
 			</argument>
 			<description>
+				Sets a custom axis-aligned bounding box for the particle system. Equivalent to [member Particles.visibility_aabb].
 			</description>
 		</method>
 		<method name="particles_set_draw_order">
@@ -2893,6 +3017,7 @@
 			<argument index="1" name="order" type="int" enum="VisualServer.ParticlesDrawOrder">
 			</argument>
 			<description>
+				Sets the draw order of the particles to one of the named enums from [enum ParticlesDrawOrder]. See [enum ParticlesDrawOrder] for options. Equivalent to [member Particles.draw_order].
 			</description>
 		</method>
 		<method name="particles_set_draw_pass_mesh">
@@ -2905,6 +3030,7 @@
 			<argument index="2" name="mesh" type="RID">
 			</argument>
 			<description>
+				Sets the mesh to be used for the specified draw pass. Equivalent to [member Particles.draw_pass_1], [member Particles.draw_pass_2], [member Particles.draw_pass_3], and [member Particles.draw_pass_4].
 			</description>
 		</method>
 		<method name="particles_set_draw_passes">
@@ -2915,6 +3041,7 @@
 			<argument index="1" name="count" type="int">
 			</argument>
 			<description>
+				Sets the number of draw passes to use. Equivalent to [member Particles.draw_passes].
 			</description>
 		</method>
 		<method name="particles_set_emission_transform">
@@ -2925,6 +3052,7 @@
 			<argument index="1" name="transform" type="Transform">
 			</argument>
 			<description>
+				Sets the [Transform] that will be used by the particles when they first emit.
 			</description>
 		</method>
 		<method name="particles_set_emitting">
@@ -2935,6 +3063,7 @@
 			<argument index="1" name="emitting" type="bool">
 			</argument>
 			<description>
+				If [code]true[/code], particles will emit over time. Setting to false does not reset the particles, but only stops their emission. Equivalent to [member Particles.emitting].
 			</description>
 		</method>
 		<method name="particles_set_explosiveness_ratio">
@@ -2945,6 +3074,7 @@
 			<argument index="1" name="ratio" type="float">
 			</argument>
 			<description>
+				Sets the explosiveness ratio. Equivalent to [member Particles.explosiveness].
 			</description>
 		</method>
 		<method name="particles_set_fixed_fps">
@@ -2955,6 +3085,7 @@
 			<argument index="1" name="fps" type="int">
 			</argument>
 			<description>
+				Sets the frame rate that the particle system rendering will be fixed to. Equivalent to [member Particles.fixed_fps].
 			</description>
 		</method>
 		<method name="particles_set_fractional_delta">
@@ -2965,6 +3096,7 @@
 			<argument index="1" name="enable" type="bool">
 			</argument>
 			<description>
+				If [code]true[/code], uses fractional delta which smooths the movement of the particles. Equivalent to [member Particles.fract_delta].
 			</description>
 		</method>
 		<method name="particles_set_lifetime">
@@ -2975,6 +3107,7 @@
 			<argument index="1" name="lifetime" type="float">
 			</argument>
 			<description>
+				Sets the lifetime of each particle in the system. Equivalent to [member Particles.lifetime].
 			</description>
 		</method>
 		<method name="particles_set_one_shot">
@@ -2985,6 +3118,7 @@
 			<argument index="1" name="one_shot" type="bool">
 			</argument>
 			<description>
+				If [code]true[/code], particles will emit once and then stop. Equivalent to [member Particles.one_shot].
 			</description>
 		</method>
 		<method name="particles_set_pre_process_time">
@@ -2995,6 +3129,7 @@
 			<argument index="1" name="time" type="float">
 			</argument>
 			<description>
+				Sets the preprocess time for the particles animation. This lets you delay starting an animation until after the particles have begun emitting. Equivalent to [member Particles.preprocess].
 			</description>
 		</method>
 		<method name="particles_set_process_material">
@@ -3005,6 +3140,7 @@
 			<argument index="1" name="material" type="RID">
 			</argument>
 			<description>
+				Sets the material for processing the particles. Note: this is not the material used to draw the materials. Equivalent to [member Particles.process_material].
 			</description>
 		</method>
 		<method name="particles_set_randomness_ratio">
@@ -3015,6 +3151,7 @@
 			<argument index="1" name="ratio" type="float">
 			</argument>
 			<description>
+				Sets the emission randomness ratio. This randomizes the emission of particles within their phase. Equivalent to [member Particles.randomness].
 			</description>
 		</method>
 		<method name="particles_set_speed_scale">
@@ -3025,6 +3162,7 @@
 			<argument index="1" name="scale" type="float">
 			</argument>
 			<description>
+				Sets the speed scale of the particle system. Equivalent to [member Particles.speed_scale].
 			</description>
 		</method>
 		<method name="particles_set_use_local_coordinates">
@@ -3035,12 +3173,16 @@
 			<argument index="1" name="enable" type="bool">
 			</argument>
 			<description>
+				If [code]true[/code], particles use local coordinates. If [code]false[/code] they use global coordinates. Equivalent to [member Particles.local_coords].
 			</description>
 		</method>
 		<method name="reflection_probe_create">
 			<return type="RID">
 			</return>
 			<description>
+				Creates a reflection probe and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]reflection_probe_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach this reflection probe to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="reflection_probe_set_as_interior">
@@ -3181,6 +3323,9 @@
 			<return type="RID">
 			</return>
 			<description>
+				Creates a scenario and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]scenario_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				The scenario is the 3D world that all the visual instances exist in. 
 			</description>
 		</method>
 		<method name="scenario_set_debug">
@@ -3191,6 +3336,7 @@
 			<argument index="1" name="debug_mode" type="int" enum="VisualServer.ScenarioDebugMode">
 			</argument>
 			<description>
+				Sets the [enum ScenarioDebugMode] for this scenario. See [enum ScenarioDebugMode] for options.
 			</description>
 		</method>
 		<method name="scenario_set_environment">
@@ -3201,6 +3347,7 @@
 			<argument index="1" name="environment" type="RID">
 			</argument>
 			<description>
+				Sets the environment that will be used with this scenario.
 			</description>
 		</method>
 		<method name="scenario_set_fallback_environment">
@@ -3211,6 +3358,7 @@
 			<argument index="1" name="environment" type="RID">
 			</argument>
 			<description>
+				Sets the fallback environment to be used by this scenario. The fallback environment is used if no environment is set. Internally, this is used by the editor to provide a default environment.
 			</description>
 		</method>
 		<method name="scenario_set_reflection_atlas_size">
@@ -3223,6 +3371,7 @@
 			<argument index="2" name="subdiv" type="int">
 			</argument>
 			<description>
+				Sets the size of the reflection atlas shared by all reflection probes in this scenario.
 			</description>
 		</method>
 		<method name="set_boot_image">
@@ -3246,6 +3395,7 @@
 			<argument index="0" name="generate" type="bool">
 			</argument>
 			<description>
+				If [code]true[/code], the engine will generate wireframes for use with the wireframe debug mode.
 			</description>
 		</method>
 		<method name="set_default_clear_color">
@@ -3254,13 +3404,15 @@
 			<argument index="0" name="color" type="Color">
 			</argument>
 			<description>
+				Sets the default clear color which is used when a specific clear color has not been selected.
 			</description>
 		</method>
 		<method name="shader_create">
 			<return type="RID">
 			</return>
 			<description>
-				Creates an empty shader.
+				Creates an empty shader and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]shader_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="shader_get_code" qualifiers="const">
@@ -3376,6 +3528,8 @@
 			<return type="RID">
 			</return>
 			<description>
+				Creates a skeleton and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]skeleton_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="skeleton_get_bone_count" qualifiers="const">
@@ -3390,7 +3544,8 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates an empty sky.
+				Creates an empty sky and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]sky_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="sky_set_texture">
@@ -3410,12 +3565,16 @@
 			<return type="RID">
 			</return>
 			<description>
+				Creates a spot light and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID can be used in most [code]light_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
+				To place in a scene, attach this spot light to an instance using [method instance_set_base] using the returned RID.
 			</description>
 		</method>
 		<method name="sync">
 			<return type="void">
 			</return>
 			<description>
+				Not implemented in Godot 3.x.
 			</description>
 		</method>
 		<method name="texture_allocate">
@@ -3436,6 +3595,7 @@
 			<argument index="6" name="flags" type="int" default="7">
 			</argument>
 			<description>
+				Allocates the GPU memory for the texture.
 			</description>
 		</method>
 		<method name="texture_bind">
@@ -3453,7 +3613,8 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates an empty texture.
+				Creates an empty texture and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]texture_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="texture_create_from_image">
@@ -3491,6 +3652,7 @@
 			<argument index="0" name="texture" type="RID">
 			</argument>
 			<description>
+				Returns the depth of the texture.
 			</description>
 		</method>
 		<method name="texture_get_flags" qualifiers="const">
@@ -3544,6 +3706,7 @@
 			<argument index="0" name="texture" type="RID">
 			</argument>
 			<description>
+				Returns the type of the texture, can be any of the [enum TextureType].
 			</description>
 		</method>
 		<method name="texture_get_width" qualifiers="const">
@@ -3592,6 +3755,7 @@
 			<argument index="9" name="layer" type="int" default="0">
 			</argument>
 			<description>
+				Sets a part of the data for a texture. Warning: this function calls the underlying graphics API directly and may corrupt your texture if used improperly.
 			</description>
 		</method>
 		<method name="texture_set_flags">
@@ -3637,6 +3801,7 @@
 			<argument index="3" name="depth" type="int">
 			</argument>
 			<description>
+				Resizes the texture to the specified dimensions.
 			</description>
 		</method>
 		<method name="textures_keep_original">
@@ -3694,7 +3859,8 @@
 			<return type="RID">
 			</return>
 			<description>
-				Creates an empty viewport.
+				Creates an empty viewport and adds it to the VisualServer. It can be accessed with the RID that is returned. This RID will be used in all [code]viewport_*[/code] VisualServer functions.
+				Once finished with your RID, you will want to free the RID using the VisualServer's [method free_rid] static method.
 			</description>
 		</method>
 		<method name="viewport_detach">
@@ -3862,6 +4028,7 @@
 			<argument index="1" name="hidden" type="bool">
 			</argument>
 			<description>
+				Currently unimplemented in Godot 3.x.
 			</description>
 		</method>
 		<method name="viewport_set_msaa">
@@ -4387,10 +4554,13 @@
 			The instance is a light.
 		</constant>
 		<constant name="INSTANCE_REFLECTION_PROBE" value="6" enum="InstanceType">
+			The instance is a reflection probe.
 		</constant>
 		<constant name="INSTANCE_GI_PROBE" value="7" enum="InstanceType">
+			The instance is a GI probe.
 		</constant>
 		<constant name="INSTANCE_LIGHTMAP_CAPTURE" value="8" enum="InstanceType">
+			The instance is a lightmap capture.
 		</constant>
 		<constant name="INSTANCE_MAX" value="9" enum="InstanceType">
 			Represents the size of the [enum InstanceType] enum.
@@ -4399,19 +4569,25 @@
 			A combination of the flags of geometry instances (mesh, multimesh, immediate and particles).
 		</constant>
 		<constant name="INSTANCE_FLAG_USE_BAKED_LIGHT" value="0" enum="InstanceFlags">
+			Allows the instance to be used in baked lighting.
 		</constant>
 		<constant name="INSTANCE_FLAG_DRAW_NEXT_FRAME_IF_VISIBLE" value="1" enum="InstanceFlags">
+			When set, manually requests to draw geometry on next frame.
 		</constant>
 		<constant name="INSTANCE_FLAG_MAX" value="2" enum="InstanceFlags">
 			Represents the size of the [enum InstanceFlags] enum.
 		</constant>
 		<constant name="SHADOW_CASTING_SETTING_OFF" value="0" enum="ShadowCastingSetting">
+			Disable shadows from this instance.
 		</constant>
 		<constant name="SHADOW_CASTING_SETTING_ON" value="1" enum="ShadowCastingSetting">
+			Cast shadows from this instance.
 		</constant>
 		<constant name="SHADOW_CASTING_SETTING_DOUBLE_SIDED" value="2" enum="ShadowCastingSetting">
+			Disable backface culling when rendering the shadow of the object. This is slightly slower but may result in more correct shadows.
 		</constant>
 		<constant name="SHADOW_CASTING_SETTING_SHADOWS_ONLY" value="3" enum="ShadowCastingSetting">
+			Only render the shadows from the object. The object itself will not be drawn.
 		</constant>
 		<constant name="NINE_PATCH_STRETCH" value="0" enum="NinePatchAxisMode">
 			The nine patch gets stretched where needed.
@@ -4490,20 +4666,28 @@
 		<constant name="FEATURE_MULTITHREADED" value="1" enum="Features">
 		</constant>
 		<constant name="MULTIMESH_TRANSFORM_2D" value="0" enum="MultimeshTransformFormat">
+			Use [Transform2D] to store MultiMesh transform.
 		</constant>
 		<constant name="MULTIMESH_TRANSFORM_3D" value="1" enum="MultimeshTransformFormat">
+			Use [Transform] to store MultiMesh transform.
 		</constant>
 		<constant name="MULTIMESH_COLOR_NONE" value="0" enum="MultimeshColorFormat">
+			MultiMesh does not use per-instance color.
 		</constant>
 		<constant name="MULTIMESH_COLOR_8BIT" value="1" enum="MultimeshColorFormat">
+			MultiMesh color uses 8 bits per component. This packs the color into a single float.
 		</constant>
 		<constant name="MULTIMESH_COLOR_FLOAT" value="2" enum="MultimeshColorFormat">
+			MultiMesh color uses a float per channel.
 		</constant>
 		<constant name="MULTIMESH_CUSTOM_DATA_NONE" value="0" enum="MultimeshCustomDataFormat">
+			MultiMesh does not use custom data.
 		</constant>
 		<constant name="MULTIMESH_CUSTOM_DATA_8BIT" value="1" enum="MultimeshCustomDataFormat">
+			MultiMesh custom data uses 8 bits per component. This packs the 4-component custom data into a single float.
 		</constant>
 		<constant name="MULTIMESH_CUSTOM_DATA_FLOAT" value="2" enum="MultimeshCustomDataFormat">
+			MultiMesh custom data uses a float per component.
 		</constant>
 		<constant name="REFLECTION_PROBE_UPDATE_ONCE" value="0" enum="ReflectionProbeUpdateMode">
 		</constant>
