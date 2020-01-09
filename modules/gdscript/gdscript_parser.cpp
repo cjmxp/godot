@@ -2689,6 +2689,7 @@ void GDScriptParser::_transform_match_statment(MatchNode *p_match_statement) {
 			op->op = OperatorNode::OP_ASSIGN;
 			op->arguments.push_back(id2);
 			op->arguments.push_back(local_var->assign);
+			local_var->assign_op = op;
 
 			branch->body->statements.push_front(op);
 			branch->body->statements.push_front(local_var);
@@ -2866,7 +2867,6 @@ void GDScriptParser::_parse_block(BlockNode *p_block, bool p_static) {
 
 					assigned = _get_default_value_for_type(lv->datatype, var_line);
 				}
-				lv->assign = assigned;
 				//must be added later, to avoid self-referencing.
 				p_block->variables.insert(n, lv);
 
@@ -6965,6 +6965,17 @@ GDScriptParser::DataType GDScriptParser::_reduce_function_call_type(const Operat
 
 			if (error_set) return DataType();
 
+			// Special case: check copy constructor. Those are defined implicitly in Variant.
+			if (par_types.size() == 1) {
+				if (!par_types[0].has_type || (par_types[0].kind == DataType::BUILTIN && par_types[0].builtin_type == tn->vtype)) {
+					DataType result;
+					result.has_type = true;
+					result.kind = DataType::BUILTIN;
+					result.builtin_type = tn->vtype;
+					return result;
+				}
+			}
+
 			bool match = false;
 			List<MethodInfo> constructors;
 			Variant::get_constructor_list(tn->vtype, &constructors);
@@ -8047,6 +8058,7 @@ void GDScriptParser::_check_block_types(BlockNode *p_block) {
 
 				last_var_assign = lv->assign;
 				if (lv->assign) {
+					lv->assign_op->arguments[0]->set_datatype(lv->datatype);
 					DataType assign_type = _reduce_node_type(lv->assign);
 #ifdef DEBUG_ENABLED
 					if (assign_type.has_type && assign_type.kind == DataType::BUILTIN && assign_type.builtin_type == Variant::NIL) {
@@ -8191,11 +8203,14 @@ void GDScriptParser::_check_block_types(BlockNode *p_block) {
 						if (lh_type.has_type && rh_type.may_yield && op->arguments[1]->type == Node::TYPE_OPERATOR) {
 							_add_warning(GDScriptWarning::FUNCTION_MAY_YIELD, op->line, _find_function_name(static_cast<OperatorNode *>(op->arguments[1])));
 						}
-#endif // DEBUG_ENABLED
 
 						bool type_match = check_types;
+#endif // DEBUG_ENABLED
 						if (check_types && !_is_type_compatible(lh_type, rh_type)) {
+#ifdef DEBUG_ENABLED
 							type_match = false;
+#endif // DEBUG_ENABLED
+
 							// Try supertype test
 							if (_is_type_compatible(rh_type, lh_type)) {
 								_mark_line_as_unsafe(op->line);
@@ -8226,7 +8241,9 @@ void GDScriptParser::_check_block_types(BlockNode *p_block) {
 
 									op->arguments.write[1] = convert_call;
 
+#ifdef DEBUG_ENABLED
 									type_match = true; // Since we are converting, the type is matching
+#endif // DEBUG_ENABLED
 								}
 #ifdef DEBUG_ENABLED
 								if (lh_type.builtin_type == Variant::INT && rh_type.builtin_type == Variant::REAL) {
@@ -8239,8 +8256,10 @@ void GDScriptParser::_check_block_types(BlockNode *p_block) {
 						if (!rh_type.has_type && (op->op != OperatorNode::OP_ASSIGN || lh_type.has_type || op->arguments[0]->type == Node::TYPE_OPERATOR)) {
 							_mark_line_as_unsafe(op->line);
 						}
-#endif // DEBUG_ENABLED
 						op->datatype.has_type = type_match;
+#else
+						op->datatype.has_type = false;
+#endif // DEBUG_ENABLED
 					} break;
 					case OperatorNode::OP_CALL:
 					case OperatorNode::OP_PARENT_CALL: {
@@ -8266,7 +8285,11 @@ void GDScriptParser::_check_block_types(BlockNode *p_block) {
 						_mark_line_as_safe(op->line);
 						_reduce_node_type(op); // Test for safety anyway
 #ifdef DEBUG_ENABLED
-						_add_warning(GDScriptWarning::STANDALONE_EXPRESSION, statement->line);
+						if (op->op == OperatorNode::OP_TERNARY_IF) {
+							_add_warning(GDScriptWarning::STANDALONE_TERNARY, statement->line);
+						} else {
+							_add_warning(GDScriptWarning::STANDALONE_EXPRESSION, statement->line);
+						}
 #endif // DEBUG_ENABLED
 					}
 				}
@@ -8483,11 +8506,8 @@ Error GDScriptParser::_parse(const String &p_base_path) {
 	current_class = main_class;
 	current_function = NULL;
 	current_block = NULL;
-#ifdef DEBUG_ENABLED
+
 	if (for_completion) check_types = false;
-#else
-	check_types = false;
-#endif
 
 	// Resolve all class-level stuff before getting into function blocks
 	_check_class_level_types(main_class);
