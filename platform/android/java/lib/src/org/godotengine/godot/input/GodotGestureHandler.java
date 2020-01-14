@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  spin_box.h                                                           */
+/*  GodotGestureHandler.java                                             */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,69 +28,79 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#ifndef SPIN_BOX_H
-#define SPIN_BOX_H
+package org.godotengine.godot.input;
 
-#include "scene/gui/line_edit.h"
-#include "scene/gui/range.h"
-#include "scene/main/timer.h"
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import org.godotengine.godot.GodotLib;
+import org.godotengine.godot.GodotView;
 
-class SpinBox : public Range {
+/**
+ * Handles gesture input related events for the {@link GodotView} view.
+ * https://developer.android.com/reference/android/view/GestureDetector.SimpleOnGestureListener
+ */
+public class GodotGestureHandler extends GestureDetector.SimpleOnGestureListener {
 
-	GDCLASS(SpinBox, Range);
+	private final GodotView godotView;
 
-	LineEdit *line_edit;
-	int last_w;
+	public GodotGestureHandler(GodotView godotView) {
+		this.godotView = godotView;
+	}
 
-	Timer *range_click_timer;
-	void _range_click_timeout();
+	private void queueEvent(Runnable task) {
+		godotView.queueEvent(task);
+	}
 
-	void _text_entered(const String &p_string);
-	virtual void _value_changed(double);
-	String prefix;
-	String suffix;
+	@Override
+	public boolean onDown(MotionEvent event) {
+		super.onDown(event);
+		//Log.i("GodotGesture", "onDown");
+		return true;
+	}
 
-	void _line_edit_input(const Ref<InputEvent> &p_event);
+	@Override
+	public boolean onSingleTapConfirmed(MotionEvent event) {
+		super.onSingleTapConfirmed(event);
+		return true;
+	}
 
-	struct Drag {
-		float base_val;
-		bool allowed;
-		bool enabled;
-		Vector2 capture_pos;
-		float diff_y;
-	} drag;
+	@Override
+	public void onLongPress(MotionEvent event) {
+		//Log.i("GodotGesture", "onLongPress");
+	}
 
-	void _line_edit_focus_exit();
+	@Override
+	public boolean onDoubleTap(MotionEvent event) {
+		//Log.i("GodotGesture", "onDoubleTap");
+		final int x = Math.round(event.getX());
+		final int y = Math.round(event.getY());
+		queueEvent(new Runnable() {
+			@Override
+			public void run() {
+				GodotLib.doubletap(x, y);
+			}
+		});
+		return true;
+	}
 
-	inline void _adjust_width_for_icon(const Ref<Texture> &icon);
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		//Log.i("GodotGesture", "onScroll");
+		final int x = Math.round(distanceX);
+		final int y = Math.round(distanceY);
+		queueEvent(new Runnable() {
+			@Override
+			public void run() {
+				GodotLib.scroll(x, y);
+			}
+		});
+		return true;
+	}
 
-protected:
-	void _gui_input(const Ref<InputEvent> &p_event);
-
-	void _notification(int p_what);
-
-	static void _bind_methods();
-
-public:
-	LineEdit *get_line_edit();
-
-	virtual Size2 get_minimum_size() const;
-
-	void set_align(LineEdit::Align p_align);
-	LineEdit::Align get_align() const;
-
-	void set_editable(bool p_editable);
-	bool is_editable() const;
-
-	void set_suffix(const String &p_suffix);
-	String get_suffix() const;
-
-	void set_prefix(const String &p_prefix);
-	String get_prefix() const;
-
-	void apply();
-
-	SpinBox();
-};
-
-#endif // SPIN_BOX_H
+	@Override
+	public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
+		//Log.i("GodotGesture", "onFling");
+		return true;
+	}
+}

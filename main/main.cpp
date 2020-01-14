@@ -292,7 +292,7 @@ void Main::print_help(const char *p_binary) {
 	OS::get_singleton()->print("  --export-pack <preset> <path>    Same as --export, but only export the game pack for the given preset. The <path> extension determines whether it will be in PCK or ZIP format.\n");
 	OS::get_singleton()->print("  --doctool <path>                 Dump the engine API reference to the given <path> in XML format, merging if existing files are found.\n");
 	OS::get_singleton()->print("  --no-docbase                     Disallow dumping the base types (used with --doctool).\n");
-	OS::get_singleton()->print("  --build-solutions                Build the scripting solutions (e.g. for C# projects).\n");
+	OS::get_singleton()->print("  --build-solutions                Build the scripting solutions (e.g. for C# projects). Implies --editor and requires a valid project to edit.\n");
 #ifdef DEBUG_METHODS_ENABLED
 	OS::get_singleton()->print("  --gdnative-generate-json-api     Generate JSON dump of the Godot API for GDNative bindings.\n");
 #endif
@@ -815,6 +815,13 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		I = N;
 	}
 
+#ifdef TOOLS_ENABLED
+	if (editor && project_manager) {
+		OS::get_singleton()->print("Error: Command line arguments implied opening both editor and project manager, which is not possible. Aborting.\n");
+		goto error;
+	}
+#endif
+
 	// Network file system needs to be configured before globals, since globals are based on the
 	// 'project.godot' file which will only be available through the network if this is enabled
 	FileAccessNetwork::configure();
@@ -930,7 +937,7 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		}
 	}
 
-	if (!project_manager) {
+	if (!project_manager && !editor) {
 		// Determine if the project manager should be requested
 		project_manager = main_args.size() == 0 && !found_project;
 	}
@@ -1395,6 +1402,7 @@ bool Main::start() {
 	bool hasicon = false;
 	String doc_tool;
 	List<String> removal_docs;
+	String positional_arg;
 	String game_path;
 	String script;
 	String test;
@@ -1422,8 +1430,18 @@ bool Main::start() {
 		} else if (args[i] == "-p" || args[i] == "--project-manager") {
 			project_manager = true;
 #endif
-		} else if (args[i].length() && args[i][0] != '-' && game_path == "") {
-			game_path = args[i];
+		} else if (args[i].length() && args[i][0] != '-' && positional_arg == "") {
+			positional_arg = args[i];
+
+			if (args[i].ends_with(".scn") || args[i].ends_with(".tscn") || args[i].ends_with(".escn")) {
+				// Only consider the positional argument to be a scene path if it ends with
+				// a file extension associated with Godot scenes. This makes it possible
+				// for projects to parse command-line arguments for custom CLI arguments
+				// or other file extensions without trouble. This can be used to implement
+				// "drag-and-drop onto executable" logic, which can prove helpful
+				// for non-game applications.
+				game_path = args[i];
+			}
 		}
 		//parameters that have an argument to the right
 		else if (i < (args.size() - 1)) {
@@ -1518,7 +1536,7 @@ bool Main::start() {
 	}
 
 	if (_export_preset != "") {
-		if (game_path == "") {
+		if (positional_arg == "") {
 			String err = "Command line includes export parameter option, but no destination path was given.\n";
 			err += "Please specify the binary's file path to export to. Aborting export.";
 			ERR_PRINT(err);
@@ -1709,7 +1727,7 @@ bool Main::start() {
 			sml->get_root()->add_child(editor_node);
 
 			if (_export_preset != "") {
-				editor_node->export_preset(_export_preset, game_path, export_debug, export_pack_only);
+				editor_node->export_preset(_export_preset, positional_arg, export_debug, export_pack_only);
 				game_path = ""; // Do not load anything.
 			}
 		}
@@ -2094,8 +2112,12 @@ bool Main::iteration() {
 #ifdef TOOLS_ENABLED
 	if (auto_build_solutions) {
 		auto_build_solutions = false;
+		// Only relevant when running the editor.
+		if (!editor) {
+			ERR_FAIL_V_MSG(true, "Command line option --build-solutions was passed, but no project is being edited. Aborting.");
+		}
 		if (!EditorNode::get_singleton()->call_build()) {
-			ERR_FAIL_V(true);
+			ERR_FAIL_V_MSG(true, "Command line option --build-solutions was passed, but the build callback failed. Aborting.");
 		}
 	}
 #endif
@@ -2146,6 +2168,9 @@ void Main::cleanup() {
 	ResourceLoader::clear_path_remaps();
 
 	ScriptServer::finish_languages();
+
+	// Sync pending commands that may have been queued from a different thread during ScriptServer finalization
+	VisualServer::get_singleton()->sync();
 
 #ifdef TOOLS_ENABLED
 	EditorNode::unregister_editor_types();
