@@ -1969,14 +1969,14 @@ const ShaderLanguage::BuiltinFuncDef ShaderLanguage::builtin_func_defs[] = {
 	{ "texture", TYPE_UVEC4, { TYPE_USAMPLER2D, TYPE_VEC2, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "texture", TYPE_IVEC4, { TYPE_ISAMPLER2D, TYPE_VEC2, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "texture", TYPE_IVEC4, { TYPE_ISAMPLER2D, TYPE_VEC2, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
-	{ "texture", TYPE_VEC4, { TYPE_SAMPLER2DARRAY, TYPE_VEC3, TYPE_VOID }, TAG_GLOBAL, true },
-	{ "texture", TYPE_VEC4, { TYPE_SAMPLER2DARRAY, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
+	{ "texture", TYPE_VEC4, { TYPE_SAMPLER2DARRAY, TYPE_VEC3, TYPE_VOID }, TAG_GLOBAL, false },
+	{ "texture", TYPE_VEC4, { TYPE_SAMPLER2DARRAY, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, false },
 	{ "texture", TYPE_UVEC4, { TYPE_USAMPLER2DARRAY, TYPE_VEC3, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "texture", TYPE_UVEC4, { TYPE_USAMPLER2DARRAY, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "texture", TYPE_IVEC4, { TYPE_ISAMPLER2DARRAY, TYPE_VEC3, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "texture", TYPE_IVEC4, { TYPE_ISAMPLER2DARRAY, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
-	{ "texture", TYPE_VEC4, { TYPE_SAMPLER3D, TYPE_VEC3, TYPE_VOID }, TAG_GLOBAL, true },
-	{ "texture", TYPE_VEC4, { TYPE_SAMPLER3D, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
+	{ "texture", TYPE_VEC4, { TYPE_SAMPLER3D, TYPE_VEC3, TYPE_VOID }, TAG_GLOBAL, false },
+	{ "texture", TYPE_VEC4, { TYPE_SAMPLER3D, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, false },
 	{ "texture", TYPE_UVEC4, { TYPE_USAMPLER3D, TYPE_VEC3, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "texture", TYPE_UVEC4, { TYPE_USAMPLER3D, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "texture", TYPE_IVEC4, { TYPE_ISAMPLER3D, TYPE_VEC3, TYPE_VOID }, TAG_GLOBAL, true },
@@ -2006,10 +2006,10 @@ const ShaderLanguage::BuiltinFuncDef ShaderLanguage::builtin_func_defs[] = {
 	{ "textureLod", TYPE_VEC4, { TYPE_SAMPLER2D, TYPE_VEC2, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, false },
 	{ "textureLod", TYPE_IVEC4, { TYPE_ISAMPLER2D, TYPE_VEC2, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "textureLod", TYPE_UVEC4, { TYPE_USAMPLER2D, TYPE_VEC2, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
-	{ "textureLod", TYPE_VEC4, { TYPE_SAMPLER2DARRAY, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
+	{ "textureLod", TYPE_VEC4, { TYPE_SAMPLER2DARRAY, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, false },
 	{ "textureLod", TYPE_IVEC4, { TYPE_ISAMPLER2DARRAY, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "textureLod", TYPE_UVEC4, { TYPE_USAMPLER2DARRAY, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
-	{ "textureLod", TYPE_VEC4, { TYPE_SAMPLER3D, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
+	{ "textureLod", TYPE_VEC4, { TYPE_SAMPLER3D, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, false },
 	{ "textureLod", TYPE_IVEC4, { TYPE_ISAMPLER3D, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "textureLod", TYPE_UVEC4, { TYPE_USAMPLER3D, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, true },
 	{ "textureLod", TYPE_VEC4, { TYPE_SAMPLERCUBE, TYPE_VEC3, TYPE_FLOAT, TYPE_VOID }, TAG_GLOBAL, false },
@@ -2986,14 +2986,32 @@ ShaderLanguage::Node *ShaderLanguage::_parse_expression(BlockNode *p_block, cons
 				bool is_const = false;
 				int array_size = 0;
 
-				if (!_find_identifier(p_block, p_builtin_types, identifier, &data_type, &ident_type, &is_const, &array_size)) {
-					_set_error("Unknown identifier in expression: " + String(identifier));
-					return NULL;
-				}
+				if (p_block && p_block->block_tag != SubClassTag::TAG_GLOBAL) {
+					int idx = 0;
+					bool found = false;
 
-				if (ident_type == IDENTIFIER_FUNCTION) {
-					_set_error("Can't use function as identifier: " + String(identifier));
-					return NULL;
+					while (builtin_func_defs[idx].name) {
+						if (builtin_func_defs[idx].tag == p_block->block_tag && builtin_func_defs[idx].name == identifier) {
+							found = true;
+							break;
+						}
+						idx++;
+					}
+					if (!found) {
+						_set_error("Unknown identifier in expression: " + String(identifier));
+						return NULL;
+					}
+				} else {
+
+					if (!_find_identifier(p_block, p_builtin_types, identifier, &data_type, &ident_type, &is_const, &array_size)) {
+						_set_error("Unknown identifier in expression: " + String(identifier));
+						return NULL;
+					}
+
+					if (ident_type == IDENTIFIER_FUNCTION) {
+						_set_error("Can't use function as identifier: " + String(identifier));
+						return NULL;
+					}
 				}
 
 				Node *index_expression = NULL;
@@ -3009,7 +3027,9 @@ ShaderLanguage::Node *ShaderLanguage::_parse_expression(BlockNode *p_block, cons
 
 					if (tk.type == TK_PERIOD) {
 						completion_class = TAG_ARRAY;
+						p_block->block_tag = SubClassTag::TAG_ARRAY;
 						call_expression = _parse_and_reduce_expression(p_block, p_builtin_types);
+						p_block->block_tag = SubClassTag::TAG_GLOBAL;
 						if (!call_expression)
 							return NULL;
 						data_type = call_expression->get_datatype();
@@ -3281,9 +3301,6 @@ ShaderLanguage::Node *ShaderLanguage::_parse_expression(BlockNode *p_block, cons
 								_set_error("Index out of range (0-1)");
 								return NULL;
 							}
-						} else {
-							_set_error("Only integer constants are allowed as index at the moment");
-							return NULL;
 						}
 
 						switch (expr->get_datatype()) {
@@ -3307,9 +3324,6 @@ ShaderLanguage::Node *ShaderLanguage::_parse_expression(BlockNode *p_block, cons
 								_set_error("Index out of range (0-2)");
 								return NULL;
 							}
-						} else {
-							_set_error("Only integer constants are allowed as index at the moment");
-							return NULL;
 						}
 
 						switch (expr->get_datatype()) {
@@ -3332,9 +3346,6 @@ ShaderLanguage::Node *ShaderLanguage::_parse_expression(BlockNode *p_block, cons
 								_set_error("Index out of range (0-3)");
 								return NULL;
 							}
-						} else {
-							_set_error("Only integer constants are allowed as index at the moment");
-							return NULL;
 						}
 
 						switch (expr->get_datatype()) {
@@ -4700,10 +4711,8 @@ Error ShaderLanguage::_validate_datatype(DataType p_type) {
 			case TYPE_UVEC4:
 			case TYPE_ISAMPLER2D:
 			case TYPE_USAMPLER2D:
-			case TYPE_SAMPLER3D:
 			case TYPE_ISAMPLER3D:
 			case TYPE_USAMPLER3D:
-			case TYPE_SAMPLER2DARRAY:
 			case TYPE_USAMPLER2DARRAY:
 			case TYPE_ISAMPLER2DARRAY:
 				invalid_type = true;

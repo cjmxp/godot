@@ -78,7 +78,6 @@ env_base.__class__.add_module_version_string = methods.add_module_version_string
 
 env_base.__class__.add_source_files = methods.add_source_files
 env_base.__class__.use_windows_spawn_fix = methods.use_windows_spawn_fix
-env_base.__class__.split_lib = methods.split_lib
 
 env_base.__class__.add_shared_library = methods.add_shared_library
 env_base.__class__.add_library = methods.add_library
@@ -118,7 +117,6 @@ opts.Add(BoolVariable('use_precise_math_checks', 'Math checks use very precise e
 
 # Components
 opts.Add(BoolVariable('deprecated', "Enable deprecated features", True))
-opts.Add(BoolVariable('gdscript', "Enable GDScript support", True))
 opts.Add(BoolVariable('minizip', "Enable ZIP archive support using minizip", True))
 opts.Add(BoolVariable('xaudio2', "Enable the XAudio2 audio driver", False))
 
@@ -131,7 +129,6 @@ opts.Add(BoolVariable('dev', "If yes, alias for verbose=yes warnings=extra werro
 opts.Add('extra_suffix', "Custom extra suffix added to the base filename of all generated binary files", '')
 opts.Add(BoolVariable('vsproj', "Generate a Visual Studio solution", False))
 opts.Add(EnumVariable('macports_clang', "Build using Clang from MacPorts", 'no', ('no', '5.0', 'devel')))
-opts.Add(BoolVariable('split_libmodules', "Split intermediate libmodules.a in smaller chunks to prevent exceeding linker command line size (forced to True when using MinGW)", False))
 opts.Add(BoolVariable('disable_3d', "Disable 3D nodes for a smaller executable", False))
 opts.Add(BoolVariable('disable_advanced_gui', "Disable advanced GUI nodes and behaviors", False))
 opts.Add(BoolVariable('no_editor_splash', "Don't use the custom splash screen for the editor", False))
@@ -410,7 +407,7 @@ if selected_platform in platform_list:
     env.module_icons_paths = []
     env.doc_class_path = {}
 
-    for x in module_list:
+    for x in sorted(module_list):
         if not env['module_' + x + '_enabled']:
             continue
         tmppath = "./modules/" + x
@@ -427,7 +424,7 @@ if selected_platform in platform_list:
                   "signature in its config.py file, it should be "
                   "`can_build(env, platform)`." % x)
             can_build = config.can_build(selected_platform)
-        if (can_build):
+        if can_build:
             config.configure(env)
             env.module_list.append(x)
 
@@ -477,8 +474,6 @@ if selected_platform in platform_list:
             sys.exit(255)
         else:
             env.Append(CPPDEFINES=['_3D_DISABLED'])
-    if env['gdscript']:
-        env.Append(CPPDEFINES=['GDSCRIPT_ENABLED'])
     if env['disable_advanced_gui']:
         if env['tools']:
             print("Build option 'disable_advanced_gui=yes' cannot be used with 'tools=yes' (editor), only with 'tools=no' (export template).")
