@@ -885,7 +885,8 @@ public:
 		rs_button->set_pressed(true);
 		rvb->add_child(rs_button);
 		l = memnew(Label);
-		l->set_text(TTR("Higher visual quality\nAll features available\nIncompatible with older hardware\nNot recommended for web games"));
+		l->set_text(TTR("- Higher visual quality\n- All features available\n- Incompatible with older hardware\n- Not recommended for web games"));
+		l->set_modulate(Color(1, 1, 1, 0.7));
 		rvb->add_child(l);
 
 		rshb->add_child(memnew(VSeparator));
@@ -899,12 +900,17 @@ public:
 		rs_button->set_meta("driver_name", "GLES2");
 		rvb->add_child(rs_button);
 		l = memnew(Label);
-		l->set_text(TTR("Lower visual quality\nSome features not available\nWorks on most hardware\nRecommended for web games"));
+		l->set_text(TTR("- Lower visual quality\n- Some features not available\n- Works on most hardware\n- Recommended for web games"));
+		l->set_modulate(Color(1, 1, 1, 0.7));
 		rvb->add_child(l);
 
 		l = memnew(Label);
-		l->set_text(TTR("Renderer can be changed later, but scenes may need to be adjusted."));
+		l->set_text(TTR("The renderer can be changed later, but scenes may need to be adjusted."));
+		// Add some extra spacing to separate it from the list above and the buttons below.
+		l->set_custom_minimum_size(Size2(0, 40) * EDSCALE);
 		l->set_align(Label::ALIGN_CENTER);
+		l->set_valign(Label::VALIGN_CENTER);
+		l->set_modulate(Color(1, 1, 1, 0.7));
 		rasterizer_container->add_child(l);
 
 		fdialog = memnew(FileDialog);
@@ -1037,6 +1043,7 @@ public:
 	void sort_projects();
 	int get_project_count() const;
 	void select_project(int p_index);
+	void select_first_visible_project();
 	void erase_selected_projects();
 	Vector<Item> get_selected_projects() const;
 	const Set<String> &get_selected_project_keys() const;
@@ -1627,6 +1634,23 @@ void ProjectList::select_project(int p_index) {
 	}
 
 	toggle_select(p_index);
+}
+
+void ProjectList::select_first_visible_project() {
+	bool found = false;
+
+	for (int i = 0; i < _projects.size(); i++) {
+		if (_projects[i].control->is_visible()) {
+			select_project(i);
+			found = true;
+			break;
+		}
+	}
+
+	if (!found) {
+		// Deselect all projects if there are no visible projects in the list.
+		_selected_project_keys.clear();
+	}
 }
 
 inline void sort(int &a, int &b) {
@@ -2347,6 +2371,12 @@ void ProjectManager::_on_order_option_changed() {
 void ProjectManager::_on_filter_option_changed() {
 	_project_list->set_search_term(project_filter->get_search_term());
 	_project_list->sort_projects();
+
+	// Select the first visible project in the list.
+	// This makes it possible to open a project without ever touching the mouse,
+	// as the search field is automatically focused on startup.
+	_project_list->select_first_visible_project();
+	_update_project_buttons();
 }
 
 void ProjectManager::_bind_methods() {
