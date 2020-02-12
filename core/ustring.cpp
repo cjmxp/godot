@@ -146,9 +146,11 @@ void CharString::copy_from(const char *p_cstr) {
 		return;
 	}
 
-	resize(len + 1); // include terminating null char
+	Error err = resize(++len); // include terminating null char
 
-	strcpy(ptrw(), p_cstr);
+	ERR_FAIL_COND_MSG(err != OK, "Failed to copy C-string.");
+
+	memcpy(ptrw(), p_cstr, len);
 }
 
 void String::copy_from(const char *p_cstr) {
@@ -644,6 +646,17 @@ String String::camelcase_to_underscore(bool lowercase) const {
 	return lowercase ? new_string.to_lower() : new_string;
 }
 
+String String::get_with_code_lines() const {
+	Vector<String> lines = split("\n");
+	String ret;
+	for (int i = 0; i < lines.size(); i++) {
+		if (i > 0) {
+			ret += "\n";
+		}
+		ret += itos(i + 1) + " " + lines[i];
+	}
+	return ret;
+}
 int String::get_slice_count(String p_splitter) const {
 
 	if (empty())
