@@ -484,8 +484,8 @@ private:
 				if (mode == MODE_NEW) {
 
 					ProjectSettings::CustomMap initial_settings;
-					if (rasterizer_button_group->get_pressed_button()->get_meta("driver_name") == "GLES3") {
-						initial_settings["rendering/quality/driver/driver_name"] = "GLES3";
+					if (rasterizer_button_group->get_pressed_button()->get_meta("driver_name") == "Vulkan") {
+						initial_settings["rendering/quality/driver/driver_name"] = "Vulkan";
 					} else {
 						initial_settings["rendering/quality/driver/driver_name"] = "GLES2";
 						initial_settings["rendering/vram_compression/import_etc2"] = false;
@@ -880,28 +880,37 @@ public:
 		rshb->add_child(rvb);
 		Button *rs_button = memnew(CheckBox);
 		rs_button->set_button_group(rasterizer_button_group);
-		rs_button->set_text(TTR("OpenGL ES 3.0"));
-		rs_button->set_meta("driver_name", "GLES3");
+		rs_button->set_text(TTR("Vulkan"));
+		rs_button->set_meta("driver_name", "Vulkan");
 		rs_button->set_pressed(true);
 		rvb->add_child(rs_button);
 		l = memnew(Label);
-		l->set_text(TTR("- Higher visual quality\n- All features available\n- Incompatible with older hardware\n- Not recommended for web games"));
+		l->set_text(TTR("- Higher visual quality\n- More accurate API, which produces very fast code\n- Some features not implemented yet - work in progress\n- Incompatible with older hardware\n- Not recommended for web and mobile games"));
 		l->set_modulate(Color(1, 1, 1, 0.7));
 		rvb->add_child(l);
 
 		rshb->add_child(memnew(VSeparator));
+
+		const String gles2_unsupported_tooltip =
+				TTR("The GLES2 renderer is currently unavailable, as it needs to be reworked for Godot 4.0.\nUse Godot 3.2 if you need GLES2 support.");
 
 		rvb = memnew(VBoxContainer);
 		rvb->set_h_size_flags(SIZE_EXPAND_FILL);
 		rshb->add_child(rvb);
 		rs_button = memnew(CheckBox);
 		rs_button->set_button_group(rasterizer_button_group);
-		rs_button->set_text(TTR("OpenGL ES 2.0"));
+		rs_button->set_text(TTR("OpenGL ES 2.0 (currently unavailable)"));
 		rs_button->set_meta("driver_name", "GLES2");
+		rs_button->set_disabled(true);
+		rs_button->set_tooltip(gles2_unsupported_tooltip);
 		rvb->add_child(rs_button);
 		l = memnew(Label);
-		l->set_text(TTR("- Lower visual quality\n- Some features not available\n- Works on most hardware\n- Recommended for web games"));
+		l->set_text(TTR("- Lower visual quality\n- Some features not available\n- Works on most hardware\n- Recommended for web and mobile games"));
 		l->set_modulate(Color(1, 1, 1, 0.7));
+		// Also set the tooltip on the label so it appears when hovering either the checkbox or label.
+		l->set_tooltip(gles2_unsupported_tooltip);
+		// Required for the tooltip to show.
+		l->set_mouse_filter(MOUSE_FILTER_STOP);
 		rvb->add_child(l);
 
 		l = memnew(Label);
@@ -992,7 +1001,7 @@ public:
 		String path;
 		String icon;
 		String main_scene;
-		uint64_t last_modified;
+		uint64_t last_edited;
 		bool favorite;
 		bool grayed;
 		bool missing;
@@ -1008,7 +1017,7 @@ public:
 				const String &p_path,
 				const String &p_icon,
 				const String &p_main_scene,
-				uint64_t p_last_modified,
+				uint64_t p_last_edited,
 				bool p_favorite,
 				bool p_grayed,
 				bool p_missing,
@@ -1020,7 +1029,7 @@ public:
 			path = p_path;
 			icon = p_icon;
 			main_scene = p_main_scene;
-			last_modified = p_last_modified;
+			last_edited = p_last_edited;
 			favorite = p_favorite;
 			grayed = p_grayed;
 			missing = p_missing;
@@ -1095,8 +1104,8 @@ struct ProjectListComparator {
 		switch (order_option) {
 			case ProjectListFilter::FILTER_PATH:
 				return a.project_key < b.project_key;
-			case ProjectListFilter::FILTER_MODIFIED:
-				return a.last_modified > b.last_modified;
+			case ProjectListFilter::FILTER_EDIT_DATE:
+				return a.last_edited > b.last_edited;
 			default:
 				return a.project_name < b.project_name;
 		}
@@ -1104,7 +1113,7 @@ struct ProjectListComparator {
 };
 
 ProjectList::ProjectList() {
-	_order_option = ProjectListFilter::FILTER_MODIFIED;
+	_order_option = ProjectListFilter::FILTER_EDIT_DATE;
 
 	_scroll_children = memnew(VBoxContainer);
 	_scroll_children->set_h_size_flags(SIZE_EXPAND_FILL);
@@ -1191,15 +1200,18 @@ void ProjectList::load_project_data(const String &p_property_key, Item &p_item, 
 	String icon = cf->get_value("application", "config/icon", "");
 	String main_scene = cf->get_value("application", "run/main_scene", "");
 
-	uint64_t last_modified = 0;
+	uint64_t last_edited = 0;
 	if (FileAccess::exists(conf)) {
-		last_modified = FileAccess::get_modified_time(conf);
+		// The modification date marks the date the project was last edited.
+		// This is because the `project.godot` file will always be modified
+		// when editing a project (but not when running it).
+		last_edited = FileAccess::get_modified_time(conf);
 
 		String fscache = path.plus_file(".fscache");
 		if (FileAccess::exists(fscache)) {
 			uint64_t cache_modified = FileAccess::get_modified_time(fscache);
-			if (cache_modified > last_modified)
-				last_modified = cache_modified;
+			if (cache_modified > last_edited)
+				last_edited = cache_modified;
 		}
 	} else {
 		grayed = true;
@@ -1209,7 +1221,7 @@ void ProjectList::load_project_data(const String &p_property_key, Item &p_item, 
 
 	String project_key = p_property_key.get_slice("/", 1);
 
-	p_item = Item(project_key, project_name, description, path, icon, main_scene, last_modified, p_favorite, grayed, missing, config_version);
+	p_item = Item(project_key, project_name, description, path, icon, main_scene, last_edited, p_favorite, grayed, missing, config_version);
 }
 
 void ProjectList::load_projects() {
@@ -2506,7 +2518,7 @@ ProjectManager::ProjectManager() {
 	Vector<String> sort_filter_titles;
 	sort_filter_titles.push_back(TTR("Name"));
 	sort_filter_titles.push_back(TTR("Path"));
-	sort_filter_titles.push_back(TTR("Last Modified"));
+	sort_filter_titles.push_back(TTR("Last Edited"));
 	project_order_filter = memnew(ProjectListFilter);
 	project_order_filter->add_filter_option();
 	project_order_filter->_setup_filters(sort_filter_titles);

@@ -423,6 +423,7 @@ void BaseMaterial3D::_update_shader() {
 		case TEXTURE_FILTER_LINEAR_WITH_MIPMAPS: texfilter_str = "filter_linear_mipmap"; break;
 		case TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS_ANISOTROPIC: texfilter_str = "filter_nearest_mipmap_aniso"; break;
 		case TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC: texfilter_str = "filter_linear_mipmap_aniso"; break;
+		case TEXTURE_FILTER_MAX: break; // Internal value, skip.
 	}
 
 	if (flags[FLAG_USE_TEXTURE_REPEAT]) {
@@ -2225,7 +2226,7 @@ void BaseMaterial3D::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "alpha_scissor_threshold", PROPERTY_HINT_RANGE, "0,1,0.01"), "set_alpha_scissor_threshold", "get_alpha_scissor_threshold");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "blend_mode", PROPERTY_HINT_ENUM, "Mix,Add,Sub,Mul"), "set_blend_mode", "get_blend_mode");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "cull_mode", PROPERTY_HINT_ENUM, "Back,Front,Disabled"), "set_cull_mode", "get_cull_mode");
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "depth_draw", PROPERTY_HINT_ENUM, "Opaque Only,Always,Never"), "set_depth_draw_mode", "get_depth_draw_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "depth_draw_mode", PROPERTY_HINT_ENUM, "Opaque Only,Always,Never"), "set_depth_draw_mode", "get_depth_draw_mode");
 	ADD_PROPERTYI(PropertyInfo(Variant::BOOL, "no_depth_test"), "set_flag", "get_flag", FLAG_DISABLE_DEPTH_TEST);
 
 	ADD_GROUP("Shading", "");
@@ -2375,11 +2376,6 @@ void BaseMaterial3D::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "distance_fade_min_distance", PROPERTY_HINT_RANGE, "0,4096,0.01"), "set_distance_fade_min_distance", "get_distance_fade_min_distance");
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "distance_fade_max_distance", PROPERTY_HINT_RANGE, "0,4096,0.01"), "set_distance_fade_max_distance", "get_distance_fade_max_distance");
 
-	BIND_ENUM_CONSTANT(TRANSPARENCY_DISABLED);
-	BIND_ENUM_CONSTANT(TRANSPARENCY_ALPHA);
-	BIND_ENUM_CONSTANT(TRANSPARENCY_ALPHA_SCISSOR);
-	BIND_ENUM_CONSTANT(TRANSPARENCY_ALPHA_DEPTH_PRE_PASS);
-
 	BIND_ENUM_CONSTANT(TEXTURE_ALBEDO);
 	BIND_ENUM_CONSTANT(TEXTURE_METALLIC);
 	BIND_ENUM_CONSTANT(TEXTURE_ROUGHNESS);
@@ -2396,10 +2392,30 @@ void BaseMaterial3D::_bind_methods() {
 	BIND_ENUM_CONSTANT(TEXTURE_DETAIL_MASK);
 	BIND_ENUM_CONSTANT(TEXTURE_DETAIL_ALBEDO);
 	BIND_ENUM_CONSTANT(TEXTURE_DETAIL_NORMAL);
+	BIND_ENUM_CONSTANT(TEXTURE_ORM);
 	BIND_ENUM_CONSTANT(TEXTURE_MAX);
+
+	BIND_ENUM_CONSTANT(TEXTURE_FILTER_NEAREST);
+	BIND_ENUM_CONSTANT(TEXTURE_FILTER_LINEAR);
+	BIND_ENUM_CONSTANT(TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS);
+	BIND_ENUM_CONSTANT(TEXTURE_FILTER_LINEAR_WITH_MIPMAPS);
+	BIND_ENUM_CONSTANT(TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS_ANISOTROPIC);
+	BIND_ENUM_CONSTANT(TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC);
+	BIND_ENUM_CONSTANT(TEXTURE_FILTER_MAX);
 
 	BIND_ENUM_CONSTANT(DETAIL_UV_1);
 	BIND_ENUM_CONSTANT(DETAIL_UV_2);
+
+	BIND_ENUM_CONSTANT(TRANSPARENCY_DISABLED);
+	BIND_ENUM_CONSTANT(TRANSPARENCY_ALPHA);
+	BIND_ENUM_CONSTANT(TRANSPARENCY_ALPHA_SCISSOR);
+	BIND_ENUM_CONSTANT(TRANSPARENCY_ALPHA_DEPTH_PRE_PASS);
+	BIND_ENUM_CONSTANT(TRANSPARENCY_MAX);
+
+	BIND_ENUM_CONSTANT(SHADING_MODE_UNSHADED);
+	BIND_ENUM_CONSTANT(SHADING_MODE_PER_PIXEL);
+	BIND_ENUM_CONSTANT(SHADING_MODE_PER_VERTEX);
+	BIND_ENUM_CONSTANT(SHADING_MODE_MAX);
 
 	BIND_ENUM_CONSTANT(FEATURE_EMISSION);
 	BIND_ENUM_CONSTANT(FEATURE_NORMAL_MAPPING);
@@ -2444,6 +2460,7 @@ void BaseMaterial3D::_bind_methods() {
 	BIND_ENUM_CONSTANT(FLAG_DISABLE_AMBIENT_LIGHT);
 	BIND_ENUM_CONSTANT(FLAG_USE_SHADOW_TO_OPACITY);
 	BIND_ENUM_CONSTANT(FLAG_USE_TEXTURE_REPEAT);
+	BIND_ENUM_CONSTANT(FLAG_INVERT_HEIGHTMAP);
 	BIND_ENUM_CONSTANT(FLAG_MAX);
 
 	BIND_ENUM_CONSTANT(DIFFUSE_BURLEY);
@@ -2582,8 +2599,9 @@ BaseMaterial3D::~BaseMaterial3D() {
 }
 
 //////////////////////
-#ifndef DISABLE_DEPRECATED
 
+#ifndef DISABLE_DEPRECATED
+// Kept for compatibility from 3.x to 4.0.
 bool StandardMaterial3D::_set(const StringName &p_name, const Variant &p_value) {
 	if (p_name == "flags_transparent") {
 		bool transparent = p_value;
@@ -2670,5 +2688,4 @@ bool StandardMaterial3D::_set(const StringName &p_name, const Variant &p_value) 
 
 	return false;
 }
-
-#endif
+#endif // DISABLE_DEPRECATED

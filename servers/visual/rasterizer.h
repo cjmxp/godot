@@ -113,7 +113,7 @@ public:
 		~InstanceDependency();
 
 	private:
-		friend class InstanceBase;
+		friend struct InstanceBase;
 		Map<InstanceBase *, uint32_t> instances;
 	};
 
@@ -1080,8 +1080,8 @@ public:
 						const Item::CommandTransform *transform = static_cast<const Item::CommandTransform *>(c);
 						xf = transform->xform;
 						found_xform = true;
-
-					} //passthrough
+						FALLTHROUGH;
+					}
 					default: {
 						c = c->next;
 						continue;
