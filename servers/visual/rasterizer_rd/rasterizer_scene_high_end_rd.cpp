@@ -2690,13 +2690,27 @@ RasterizerSceneHighEndRD::RasterizerSceneHighEndRD(RasterizerStorageRD *p_storag
 }
 
 RasterizerSceneHighEndRD::~RasterizerSceneHighEndRD() {
+	directional_shadow_atlas_set_size(0);
+
 	//clear base uniform set if still valid
 	if (view_dependant_uniform_set.is_valid() && RD::get_singleton()->uniform_set_is_valid(view_dependant_uniform_set)) {
 		RD::get_singleton()->free(view_dependant_uniform_set);
 	}
 
+	storage->free(wireframe_material_shader);
+	storage->free(overdraw_material_shader);
+	storage->free(default_shader);
+
+	storage->free(wireframe_material);
+	storage->free(overdraw_material);
+	storage->free(default_material);
+
 	{
 		RD::get_singleton()->free(scene_state.reflection_buffer);
+		memdelete_arr(scene_state.instances);
+		memdelete_arr(scene_state.gi_probes);
+		memdelete_arr(scene_state.directional_lights);
+		memdelete_arr(scene_state.lights);
 		memdelete_arr(scene_state.reflections);
 	}
 }

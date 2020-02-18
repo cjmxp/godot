@@ -972,7 +972,7 @@ void SceneTreeDock::_tool_selected(int p_tool, bool p_confirm_override) {
 					new_node = Object::cast_to<Node>(ClassDB::instance(ScriptServer::get_global_class_native_base(name)));
 					Ref<Script> script = ResourceLoader::load(ScriptServer::get_global_class_path(name), "Script");
 					if (new_node && script.is_valid()) {
-						new_node->set_script(script.get_ref_ptr());
+						new_node->set_script(script);
 						new_node->set_name(name);
 					}
 				} else {
@@ -1725,7 +1725,7 @@ void SceneTreeDock::_script_created(Ref<Script> p_script) {
 	for (List<Node *>::Element *E = selected.front(); E; E = E->next()) {
 
 		Ref<Script> existing = E->get()->get_script();
-		editor_data->get_undo_redo().add_do_method(E->get(), "set_script", p_script.get_ref_ptr());
+		editor_data->get_undo_redo().add_do_method(E->get(), "set_script", p_script);
 		editor_data->get_undo_redo().add_undo_method(E->get(), "set_script", existing);
 		editor_data->get_undo_redo().add_do_method(this, "_update_script_button");
 		editor_data->get_undo_redo().add_undo_method(this, "_update_script_button");
@@ -2410,7 +2410,7 @@ void SceneTreeDock::_tree_rmb(const Vector2 &p_menu_pos) {
 	menu->clear();
 
 	Ref<Script> existing_script;
-	bool exisiting_script_removable = true;
+	bool existing_script_removable = true;
 	if (selection.size() == 1) {
 
 		Node *selected = selection[0];
@@ -2432,7 +2432,7 @@ void SceneTreeDock::_tree_rmb(const Vector2 &p_menu_pos) {
 		existing_script = selected->get_script();
 
 		if (EditorNode::get_singleton()->get_object_custom_type_base(selected) == existing_script) {
-			exisiting_script_removable = false;
+			existing_script_removable = false;
 		}
 	}
 
@@ -2446,7 +2446,7 @@ void SceneTreeDock::_tree_rmb(const Vector2 &p_menu_pos) {
 				menu->add_icon_shortcut(get_icon("ScriptExtend", "EditorIcons"), ED_GET_SHORTCUT("scene_tree/extend_script"), TOOL_EXTEND_SCRIPT);
 			}
 		}
-		if (existing_script.is_valid() && exisiting_script_removable) {
+		if (existing_script.is_valid() && existing_script_removable) {
 			add_separator = true;
 			menu->add_icon_shortcut(get_icon("ScriptRemove", "EditorIcons"), ED_GET_SHORTCUT("scene_tree/clear_script"), TOOL_CLEAR_SCRIPT);
 		} else if (full_selection.size() > 1) {

@@ -176,9 +176,9 @@ void CustomPropertyEditor::_menu_option(int p_which) {
 
 				case OBJ_MENU_EDIT: {
 
-					RefPtr RefPtr = v;
+					REF r = v;
 
-					if (!RefPtr.is_null()) {
+					if (!r.is_null()) {
 
 						emit_signal("resource_edit_request");
 						hide();
@@ -193,8 +193,7 @@ void CustomPropertyEditor::_menu_option(int p_which) {
 
 				case OBJ_MENU_MAKE_UNIQUE: {
 
-					RefPtr RefPtr = v;
-					Ref<Resource> res_orig = RefPtr;
+					Ref<Resource> res_orig = v;
 					if (res_orig.is_null())
 						return;
 
@@ -229,7 +228,7 @@ void CustomPropertyEditor::_menu_option(int p_which) {
 						res->set(p.first, p.second);
 					}
 
-					v = res.get_ref_ptr();
+					v = res;
 					emit_signal("variant_changed");
 					hide();
 				} break;
@@ -311,7 +310,7 @@ void CustomPropertyEditor::_menu_option(int p_which) {
 						res->call("set_instance_base_type", owner->get_class());
 					}
 
-					v = Ref<Resource>(res).get_ref_ptr();
+					v = res;
 					emit_signal("variant_changed");
 
 				} break;
@@ -1046,22 +1045,22 @@ bool CustomPropertyEditor::edit(Object *p_owner, const String &p_name, Variant::
 		case Variant::DICTIONARY: {
 
 		} break;
-		case Variant::POOL_BYTE_ARRAY: {
+		case Variant::PACKED_BYTE_ARRAY: {
 
 		} break;
-		case Variant::POOL_INT_ARRAY: {
+		case Variant::PACKED_INT_ARRAY: {
 
 		} break;
-		case Variant::POOL_REAL_ARRAY: {
+		case Variant::PACKED_REAL_ARRAY: {
 
 		} break;
-		case Variant::POOL_STRING_ARRAY: {
+		case Variant::PACKED_STRING_ARRAY: {
 
 		} break;
-		case Variant::POOL_VECTOR3_ARRAY: {
+		case Variant::PACKED_VECTOR3_ARRAY: {
 
 		} break;
-		case Variant::POOL_COLOR_ARRAY: {
+		case Variant::PACKED_COLOR_ARRAY: {
 
 		} break;
 		default: {
@@ -1103,7 +1102,7 @@ void CustomPropertyEditor::_file_selected(String p_file) {
 				error->popup_centered_minsize();
 				break;
 			}
-			v = res.get_ref_ptr();
+			v = res;
 			emit_signal("variant_changed");
 			hide();
 		} break;
@@ -1168,7 +1167,7 @@ void CustomPropertyEditor::_type_create_selected(int p_idx) {
 		Resource *res = Object::cast_to<Resource>(obj);
 		ERR_FAIL_COND(!res);
 
-		v = Ref<Resource>(res).get_ref_ptr();
+		v = res;
 		emit_signal("variant_changed");
 		hide();
 	}
@@ -1373,7 +1372,7 @@ void CustomPropertyEditor::_action_pressed(int p_which) {
 					Resource *res = Object::cast_to<Resource>(obj);
 					ERR_BREAK(!res);
 
-					v = Ref<Resource>(res).get_ref_ptr();
+					v = res;
 					emit_signal("variant_changed");
 					hide();
 				}
@@ -1395,9 +1394,9 @@ void CustomPropertyEditor::_action_pressed(int p_which) {
 
 			} else if (p_which == 2) {
 
-				RefPtr RefPtr = v;
+				RES r = v;
 
-				if (!RefPtr.is_null()) {
+				if (!r.is_null()) {
 
 					emit_signal("resource_edit_request");
 					hide();
@@ -1410,8 +1409,7 @@ void CustomPropertyEditor::_action_pressed(int p_which) {
 				hide();
 			} else if (p_which == 4) {
 
-				RefPtr RefPtr = v;
-				Ref<Resource> res_orig = RefPtr;
+				Ref<Resource> res_orig = v;
 				if (res_orig.is_null())
 					return;
 
@@ -1442,7 +1440,7 @@ void CustomPropertyEditor::_action_pressed(int p_which) {
 					res->set(p.first, p.second);
 				}
 
-				v = res.get_ref_ptr();
+				v = res;
 				emit_signal("variant_changed");
 				hide();
 			}
@@ -1699,22 +1697,22 @@ void CustomPropertyEditor::_modified(String p_string) {
 		case Variant::DICTIONARY: {
 
 		} break;
-		case Variant::POOL_BYTE_ARRAY: {
+		case Variant::PACKED_BYTE_ARRAY: {
 
 		} break;
-		case Variant::POOL_INT_ARRAY: {
+		case Variant::PACKED_INT_ARRAY: {
 
 		} break;
-		case Variant::POOL_REAL_ARRAY: {
+		case Variant::PACKED_REAL_ARRAY: {
 
 		} break;
-		case Variant::POOL_STRING_ARRAY: {
+		case Variant::PACKED_STRING_ARRAY: {
 
 		} break;
-		case Variant::POOL_VECTOR3_ARRAY: {
+		case Variant::PACKED_VECTOR3_ARRAY: {
 
 		} break;
-		case Variant::POOL_COLOR_ARRAY: {
+		case Variant::PACKED_COLOR_ARRAY: {
 
 		} break;
 		default: {

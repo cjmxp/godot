@@ -216,7 +216,7 @@ void VisualShaderEditor::update_custom_nodes() {
 
 			Ref<VisualShaderNodeCustom> ref;
 			ref.instance();
-			ref->set_script(script.get_ref_ptr());
+			ref->set_script(script);
 
 			String name;
 			if (ref->has_method("_get_name")) {
@@ -1415,7 +1415,7 @@ VisualShaderNode *VisualShaderEditor::_add_node(int p_idx, int p_op_idx) {
 		VisualShaderNode *vsn = Object::cast_to<VisualShaderNode>(ClassDB::instance(base_type));
 		ERR_FAIL_COND_V(!vsn, NULL);
 		vsnode = Ref<VisualShaderNode>(vsn);
-		vsnode->set_script(add_options[p_idx].script.get_ref_ptr());
+		vsnode->set_script(add_options[p_idx].script);
 	}
 
 	Point2 position = graph->get_scroll_ofs();
@@ -2164,10 +2164,10 @@ void VisualShaderEditor::drop_data_fw(const Point2 &p_point, const Variant &p_da
 			saved_node_pos_dirty = true;
 			_add_node(idx, add_options[idx].sub_func);
 		} else if (d.has("files")) {
-			if (d["files"].get_type() == Variant::POOL_STRING_ARRAY) {
+			if (d["files"].get_type() == Variant::PACKED_STRING_ARRAY) {
 
 				int j = 0;
-				PoolStringArray arr = d["files"];
+				PackedStringArray arr = d["files"];
 				for (int i = 0; i < arr.size(); i++) {
 
 					String type = ResourceLoader::get_resource_type(arr[i]);

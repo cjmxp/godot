@@ -2657,7 +2657,7 @@ PropertyInfo ShaderLanguage::uniform_to_property_info(const ShaderNode::Uniform 
 		case ShaderLanguage::TYPE_UVEC3:
 		case ShaderLanguage::TYPE_UVEC4: {
 
-			pi.type = Variant::POOL_INT_ARRAY;
+			pi.type = Variant::PACKED_INT_ARRAY;
 		} break;
 		case ShaderLanguage::TYPE_FLOAT: {
 			pi.type = Variant::REAL;
@@ -5675,7 +5675,7 @@ Error ShaderLanguage::_parse_shader(const Map<StringName, FunctionInfo> &p_funct
 				st.shader_struct = st_node;
 
 				int member_count = 0;
-
+				Set<String> member_names;
 				while (true) { // variables list
 					tk = _get_token();
 					if (tk.type == TK_CURLY_BRACKET_CLOSE) {
@@ -5731,6 +5731,12 @@ Error ShaderLanguage::_parse_shader(const Map<StringName, FunctionInfo> &p_funct
 						member->datatype = type;
 						member->struct_name = struct_name;
 						member->name = tk.text;
+
+						if (member_names.has(member->name)) {
+							_set_error("Redefinition of '" + String(member->name) + "'");
+							return ERR_PARSE_ERROR;
+						}
+						member_names.insert(member->name);
 
 						tk = _get_token();
 						if (tk.type == TK_BRACKET_OPEN) {
