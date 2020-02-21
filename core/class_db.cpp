@@ -1033,7 +1033,7 @@ bool ClassDB::set_property(Object *p_object, const StringName &p_property, const
 				return true; //return true but do nothing
 			}
 
-			Variant::CallError ce;
+			Callable::CallError ce;
 
 			if (psg->index >= 0) {
 				Variant index = psg->index;
@@ -1055,7 +1055,7 @@ bool ClassDB::set_property(Object *p_object, const StringName &p_property, const
 			}
 
 			if (r_valid)
-				*r_valid = ce.error == Variant::CallError::CALL_OK;
+				*r_valid = ce.error == Callable::CallError::CALL_OK;
 
 			return true;
 		}
@@ -1078,12 +1078,12 @@ bool ClassDB::get_property(Object *p_object, const StringName &p_property, Varia
 			if (psg->index >= 0) {
 				Variant index = psg->index;
 				const Variant *arg[1] = { &index };
-				Variant::CallError ce;
+				Callable::CallError ce;
 				r_value = p_object->call(psg->getter, arg, 1, ce);
 
 			} else {
 
-				Variant::CallError ce;
+				Callable::CallError ce;
 				if (psg->_getptr) {
 
 					r_value = psg->_getptr->call(p_object, NULL, 0, ce);
@@ -1094,10 +1094,20 @@ bool ClassDB::get_property(Object *p_object, const StringName &p_property, Varia
 			return true;
 		}
 
-		const int *c = check->constant_map.getptr(p_property);
+		const int *c = check->constant_map.getptr(p_property); //constants count
 		if (c) {
 
 			r_value = *c;
+			return true;
+		}
+
+		if (check->method_map.has(p_property)) { //methods count
+			r_value = Callable(p_object, p_property);
+			return true;
+		}
+
+		if (check->signal_map.has(p_property)) { //signals count
+			r_value = Signal(p_object, p_property);
 			return true;
 		}
 
@@ -1410,10 +1420,7 @@ Variant ClassDB::class_get_default_property_value(const StringName &p_class, con
 			cleanup_c = false;
 		} else if (ClassDB::can_instance(p_class)) {
 			c = ClassDB::instance(p_class);
-#ifndef _MSC_VER
-#warning FIXME: ObjectID refactoring broke GDScript handling of reference pointers, this needs a proper fix.
-#endif
-			cleanup_c = (p_class != StringName("GDScript"));
+			cleanup_c = true;
 		}
 
 		if (c) {

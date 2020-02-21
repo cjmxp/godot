@@ -292,6 +292,7 @@ if selected_platform in platform_list:
     if env["extra_suffix"] != '':
         env.extra_suffix += '.' + env["extra_suffix"]
 
+    # Environment flags
     CCFLAGS = env.get('CCFLAGS', '')
     env['CCFLAGS'] = ''
     env.Append(CCFLAGS=str(CCFLAGS).split())
@@ -308,17 +309,27 @@ if selected_platform in platform_list:
     env['LINKFLAGS'] = ''
     env.Append(LINKFLAGS=str(LINKFLAGS).split())
 
+    # Set our C and C++ standard requirements.
+    # Prepending to make it possible to override
+    if not env.msvc:
+        # Specifying GNU extensions support explicitly, which are supported by
+        # both GCC and Clang. This mirrors GCC and Clang's current default
+        # compile flags if no -std is specified.
+        env.Prepend(CFLAGS=['-std=gnu11'])
+        env.Prepend(CXXFLAGS=['-std=gnu++14'])
+    else:
+        # MSVC doesn't have clear C standard support, /std only covers C++.
+        # We apply it to CCFLAGS (both C and C++ code) in case it impacts C features.
+        env.Prepend(CCFLAGS=['/std:c++14', '/permissive-'])
+
+    # Platform specific flags
     flag_list = platform_flags[selected_platform]
     for f in flag_list:
         if not (f[0] in ARGUMENTS):  # allow command line to override platform flags
             env[f[0]] = f[1]
 
-    # must happen after the flags, so when flags are used by configure, stuff happens (ie, ssl on x11)
+    # Must happen after the flags definition, so that they can be used by platform detect
     detect.configure(env)
-
-    # Enable C++11 support
-    if not env.msvc:
-        env.Append(CXXFLAGS=['-std=c++11'])
 
     # Configure compiler warnings
     if env.msvc:
@@ -357,7 +368,8 @@ if selected_platform in platform_list:
                 env.Append(CCFLAGS=['-Walloc-zero',
                     '-Wduplicated-branches', '-Wduplicated-cond',
                     '-Wstringop-overflow=4', '-Wlogical-op'])
-                env.Append(CXXFLAGS=['-Wnoexcept', '-Wplacement-new=1'])
+                # -Wnoexcept was removed temporarily due to GH-36325.
+                env.Append(CXXFLAGS=['-Wplacement-new=1'])
                 version = methods.get_compiler_version(env)
                 if version != None and version[0] >= '9':
                     env.Append(CCFLAGS=['-Wattribute-alias=2'])
@@ -369,6 +381,11 @@ if selected_platform in platform_list:
             env.Append(CCFLAGS=['-w'])
         if (env["werror"]):
             env.Append(CCFLAGS=['-Werror'])
+            # FIXME: Temporary workaround after the Vulkan merge, remove once warnings are fixed.
+            if methods.using_gcc(env):
+                env.Append(CXXFLAGS=['-Wno-error=cpp'])
+            else:
+                env.Append(CXXFLAGS=['-Wno-error=#warnings'])
         else: # always enable those errors
             env.Append(CCFLAGS=['-Werror=return-type'])
 

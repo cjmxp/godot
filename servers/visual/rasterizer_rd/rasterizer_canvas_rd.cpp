@@ -991,6 +991,15 @@ void RasterizerCanvasRD::_render_item(RD::DrawListID p_draw_list, const Item *p_
 				}
 
 			} break;
+			case Item::Command::TYPE_MESH:
+			case Item::Command::TYPE_MULTIMESH:
+			case Item::Command::TYPE_PARTICLES: {
+				ERR_PRINT("FIXME: Mesh, MultiMesh and Particles render commands are unimplemented currently, they need to be ported to the 4.0 rendering architecture.");
+#ifndef _MSC_VER
+#warning Item::Command types for Mesh, MultiMesh and Particles need to be implemented.
+#endif
+				// See #if 0'ed code below to port from GLES3.
+			} break;
 
 #if 0
 			case Item::Command::TYPE_MESH: {
@@ -2131,15 +2140,15 @@ void RasterizerCanvasRD::MaterialData::update_parameters(const Map<StringName, V
 			RID *ids_ptr = u.ids.ptrw();
 			ids_ptr[0] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
 			ids_ptr[1] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
-			ids_ptr[2] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
+			ids_ptr[2] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIPMAPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
 			ids_ptr[3] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
-			ids_ptr[4] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
+			ids_ptr[4] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIPMAPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
 			ids_ptr[5] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
 			ids_ptr[6] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
 			ids_ptr[7] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
-			ids_ptr[8] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
+			ids_ptr[8] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIPMAPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
 			ids_ptr[9] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
-			ids_ptr[10] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
+			ids_ptr[10] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIPMAPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
 			ids_ptr[11] = canvas_singleton->storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
 			uniforms.push_back(u);
 		}

@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  audio_driver_dummy.h                                                 */
+/*  packet_peer_dtls.cpp                                                 */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,31 +28,35 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#ifndef AUDIO_DRIVER_DUMMY_H
-#define AUDIO_DRIVER_DUMMY_H
+#include "packet_peer_dtls.h"
+#include "core/os/file_access.h"
+#include "core/project_settings.h"
 
-#include "core/os/mutex.h"
-#include "core/os/thread.h"
-#include "servers/audio_server.h"
+PacketPeerDTLS *(*PacketPeerDTLS::_create)() = NULL;
+bool PacketPeerDTLS::available = false;
 
-class AudioDriverDummy : public AudioDriver {
-public:
-	const char *get_name() const {
-		return "Dummy";
-	};
+PacketPeerDTLS *PacketPeerDTLS::create() {
 
-	virtual Error init() { return OK; }
-	virtual void start(){};
-	virtual int get_mix_rate() const { return DEFAULT_MIX_RATE; };
-	virtual SpeakerMode get_speaker_mode() const { return SPEAKER_MODE_STEREO; };
-	virtual void lock(){};
-	virtual void unlock(){};
-	virtual void finish(){};
+	return _create();
+}
 
-	virtual float get_latency() { return 0; };
+bool PacketPeerDTLS::is_available() {
+	return available;
+}
 
-	AudioDriverDummy(){};
-	~AudioDriverDummy(){};
-};
+void PacketPeerDTLS::_bind_methods() {
 
-#endif // AUDIO_DRIVER_DUMMY_H
+	ClassDB::bind_method(D_METHOD("poll"), &PacketPeerDTLS::poll);
+	ClassDB::bind_method(D_METHOD("connect_to_peer", "packet_peer", "validate_certs", "for_hostname", "valid_certificate"), &PacketPeerDTLS::connect_to_peer, DEFVAL(true), DEFVAL(String()), DEFVAL(Ref<X509Certificate>()));
+	ClassDB::bind_method(D_METHOD("get_status"), &PacketPeerDTLS::get_status);
+	ClassDB::bind_method(D_METHOD("disconnect_from_peer"), &PacketPeerDTLS::disconnect_from_peer);
+
+	BIND_ENUM_CONSTANT(STATUS_DISCONNECTED);
+	BIND_ENUM_CONSTANT(STATUS_HANDSHAKING);
+	BIND_ENUM_CONSTANT(STATUS_CONNECTED);
+	BIND_ENUM_CONSTANT(STATUS_ERROR);
+	BIND_ENUM_CONSTANT(STATUS_ERROR_HOSTNAME_MISMATCH);
+}
+
+PacketPeerDTLS::PacketPeerDTLS() {
+}

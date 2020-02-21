@@ -67,18 +67,6 @@ static _FORCE_INLINE_ void store_transform_3x3(const Transform &p_mtx, float *p_
 	p_array[11] = 0;
 }
 
-static _FORCE_INLINE_ void store_transform_3x3_430(const Transform &p_mtx, float *p_array) {
-	p_array[0] = p_mtx.basis.elements[0][0];
-	p_array[1] = p_mtx.basis.elements[1][0];
-	p_array[2] = p_mtx.basis.elements[2][0];
-	p_array[3] = p_mtx.basis.elements[0][1];
-	p_array[4] = p_mtx.basis.elements[1][1];
-	p_array[5] = p_mtx.basis.elements[2][1];
-	p_array[6] = p_mtx.basis.elements[0][2];
-	p_array[7] = p_mtx.basis.elements[1][2];
-	p_array[8] = p_mtx.basis.elements[2][2];
-}
-
 static _FORCE_INLINE_ void store_camera(const CameraMatrix &p_mtx, float *p_array) {
 
 	for (int i = 0; i < 4; i++) {
@@ -2104,15 +2092,15 @@ void RasterizerSceneHighEndRD::_update_render_base_uniform_set() {
 			RID *ids_ptr = u.ids.ptrw();
 			ids_ptr[0] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
 			ids_ptr[1] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
-			ids_ptr[2] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
+			ids_ptr[2] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIPMAPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
 			ids_ptr[3] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
-			ids_ptr[4] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
+			ids_ptr[4] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIPMAPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
 			ids_ptr[5] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_DISABLED);
 			ids_ptr[6] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
 			ids_ptr[7] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
-			ids_ptr[8] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
+			ids_ptr[8] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIPMAPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
 			ids_ptr[9] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
-			ids_ptr[10] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIMPAMPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
+			ids_ptr[10] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_NEAREST_WITH_MIPMAPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
 			ids_ptr[11] = storage->sampler_rd_get_default(VS::CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC, VS::CANVAS_ITEM_TEXTURE_REPEAT_ENABLED);
 			uniforms.push_back(u);
 		}

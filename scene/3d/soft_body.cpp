@@ -464,12 +464,12 @@ void SoftBody::prepare_physics_server() {
 
 		become_mesh_owner();
 		PhysicsServer::get_singleton()->soft_body_set_mesh(physics_rid, get_mesh());
-		VS::get_singleton()->connect("frame_pre_draw", this, "_draw_soft_mesh");
+		VS::get_singleton()->connect_compat("frame_pre_draw", this, "_draw_soft_mesh");
 	} else {
 
 		PhysicsServer::get_singleton()->soft_body_set_mesh(physics_rid, NULL);
-		if (VS::get_singleton()->is_connected("frame_pre_draw", this, "_draw_soft_mesh")) {
-			VS::get_singleton()->disconnect("frame_pre_draw", this, "_draw_soft_mesh");
+		if (VS::get_singleton()->is_connected_compat("frame_pre_draw", this, "_draw_soft_mesh")) {
+			VS::get_singleton()->disconnect_compat("frame_pre_draw", this, "_draw_soft_mesh");
 		}
 	}
 }
@@ -561,7 +561,6 @@ const NodePath &SoftBody::get_parent_collision_ignore() const {
 
 void SoftBody::set_pinned_points_indices(Vector<SoftBody::PinnedPoint> p_pinned_points_indices) {
 	pinned_points = p_pinned_points_indices;
-	const PinnedPoint *w = pinned_points.ptr();
 	for (int i = pinned_points.size() - 1; 0 <= i; --i) {
 		pin_point(p_pinned_points_indices[i].point_index, true);
 	}
