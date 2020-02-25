@@ -1844,6 +1844,42 @@ void TextEdit::_consume_pair_symbol(CharType ch) {
 		}
 	}
 
+	String line = text[cursor.line];
+
+	bool in_single_quote = false;
+	bool in_double_quote = false;
+
+	int c = 0;
+	while (c < line.length()) {
+		if (line[c] == '\\') {
+			c++; // Skip quoted anything.
+
+			if (cursor.column == c) {
+				break;
+			}
+		} else {
+			if (line[c] == '\'' && !in_double_quote) {
+				in_single_quote = !in_single_quote;
+			} else if (line[c] == '"' && !in_single_quote) {
+				in_double_quote = !in_double_quote;
+			}
+		}
+
+		c++;
+
+		if (cursor.column == c) {
+			break;
+		}
+	}
+
+	//	Disallow inserting duplicated quotes while already in string
+	if ((in_single_quote || in_double_quote) && (ch == '"' || ch == '\'')) {
+		insert_text_at_cursor(ch_single);
+		cursor_set_column(cursor_position_to_move);
+
+		return;
+	}
+
 	insert_text_at_cursor(ch_pair);
 	cursor_set_column(cursor_position_to_move);
 }
@@ -3068,7 +3104,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 					scancode_handled = false;
 					break;
 				}
-				FALLTHROUGH;
+				[[fallthrough]];
 			}
 			case KEY_LEFT: {
 
@@ -3144,7 +3180,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 					scancode_handled = false;
 					break;
 				}
-				FALLTHROUGH;
+				[[fallthrough]];
 			}
 			case KEY_RIGHT: {
 
@@ -3205,7 +3241,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 					scancode_handled = false;
 					break;
 				}
-				FALLTHROUGH;
+				[[fallthrough]];
 			}
 			case KEY_UP: {
 
@@ -3258,7 +3294,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 					scancode_handled = false;
 					break;
 				}
-				FALLTHROUGH;
+				[[fallthrough]];
 			}
 			case KEY_DOWN: {
 
@@ -3381,7 +3417,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 					scancode_handled = false;
 					break;
 				}
-				FALLTHROUGH;
+				[[fallthrough]];
 			}
 			case KEY_HOME: {
 #ifdef APPLE_STYLE_KEYS
@@ -3442,7 +3478,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 					scancode_handled = false;
 					break;
 				}
-				FALLTHROUGH;
+				[[fallthrough]];
 			}
 			case KEY_END: {
 #ifdef APPLE_STYLE_KEYS
@@ -3489,7 +3525,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 					scancode_handled = false;
 					break;
 				}
-				FALLTHROUGH;
+				[[fallthrough]];
 			}
 			case KEY_PAGEUP: {
 
@@ -3512,7 +3548,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 					scancode_handled = false;
 					break;
 				}
-				FALLTHROUGH;
+				[[fallthrough]];
 			}
 			case KEY_PAGEDOWN: {
 

@@ -81,6 +81,7 @@ const char *VariantParser::tk_name[TK_MAX] = {
 	"')'",
 	"identifier",
 	"string",
+	"string_name",
 	"number",
 	"color",
 	"':'",
@@ -92,6 +93,8 @@ const char *VariantParser::tk_name[TK_MAX] = {
 };
 
 Error VariantParser::get_token(Stream *p_stream, Token &r_token, int &line, String &r_err_str) {
+
+	bool string_name = false;
 
 	while (true) {
 
@@ -204,6 +207,17 @@ Error VariantParser::get_token(Stream *p_stream, Token &r_token, int &line, Stri
 				r_token.type = TK_COLOR;
 				return OK;
 			};
+			case '@': {
+				cchar = p_stream->get_char();
+				if (cchar != '"') {
+					r_err_str = "Expected '\"' after '@'";
+					r_token.type = TK_ERROR;
+					return ERR_PARSE_ERROR;
+				}
+
+				string_name = true;
+				[[fallthrough]];
+			}
 			case '"': {
 
 				String str;
@@ -285,8 +299,14 @@ Error VariantParser::get_token(Stream *p_stream, Token &r_token, int &line, Stri
 				if (p_stream->is_utf8()) {
 					str.parse_utf8(str.ascii(true).get_data());
 				}
-				r_token.type = TK_STRING;
-				r_token.value = str;
+				if (string_name) {
+					r_token.type = TK_STRING_NAME;
+					r_token.value = StringName(str);
+					string_name = false; //reset
+				} else {
+					r_token.type = TK_STRING;
+					r_token.value = str;
+				}
 				return OK;
 
 			} break;
@@ -525,6 +545,19 @@ Error VariantParser::parse_value(Token &token, Variant &value, Stream *p_stream,
 
 			value = Vector2(args[0], args[1]);
 			return OK;
+		} else if (id == "Vector2i") {
+
+			Vector<int32_t> args;
+			Error err = _parse_construct<int32_t>(p_stream, args, line, r_err_str);
+			if (err)
+				return err;
+
+			if (args.size() != 2) {
+				r_err_str = "Expected 2 arguments for constructor";
+			}
+
+			value = Vector2i(args[0], args[1]);
+			return OK;
 		} else if (id == "Rect2") {
 
 			Vector<float> args;
@@ -538,6 +571,19 @@ Error VariantParser::parse_value(Token &token, Variant &value, Stream *p_stream,
 
 			value = Rect2(args[0], args[1], args[2], args[3]);
 			return OK;
+		} else if (id == "Rect2i") {
+
+			Vector<int32_t> args;
+			Error err = _parse_construct<int32_t>(p_stream, args, line, r_err_str);
+			if (err)
+				return err;
+
+			if (args.size() != 4) {
+				r_err_str = "Expected 4 arguments for constructor";
+			}
+
+			value = Rect2i(args[0], args[1], args[2], args[3]);
+			return OK;
 		} else if (id == "Vector3") {
 
 			Vector<float> args;
@@ -550,6 +596,19 @@ Error VariantParser::parse_value(Token &token, Variant &value, Stream *p_stream,
 			}
 
 			value = Vector3(args[0], args[1], args[2]);
+			return OK;
+		} else if (id == "Vector3i") {
+
+			Vector<int32_t> args;
+			Error err = _parse_construct<int32_t>(p_stream, args, line, r_err_str);
+			if (err)
+				return err;
+
+			if (args.size() != 3) {
+				r_err_str = "Expected 3 arguments for constructor";
+			}
+
+			value = Vector3i(args[0], args[1], args[2]);
 			return OK;
 		} else if (id == "Transform2D" || id == "Matrix32") { //compatibility
 
@@ -1051,6 +1110,10 @@ Error VariantParser::parse_value(Token &token, Variant &value, Stream *p_stream,
 
 		value = token.value;
 		return OK;
+	} else if (token.type == TK_STRING_NAME) {
+
+		value = token.value;
+		return OK;
 	} else if (token.type == TK_COLOR) {
 
 		value = token.value;
@@ -1411,16 +1474,32 @@ Error VariantWriter::write(const Variant &p_variant, StoreStringFunc p_store_str
 			Vector2 v = p_variant;
 			p_store_string_func(p_store_string_ud, "Vector2( " + rtosfix(v.x) + ", " + rtosfix(v.y) + " )");
 		} break;
+		case Variant::VECTOR2I: {
+
+			Vector2i v = p_variant;
+			p_store_string_func(p_store_string_ud, "Vector2i( " + itos(v.x) + ", " + itos(v.y) + " )");
+		} break;
 		case Variant::RECT2: {
 
 			Rect2 aabb = p_variant;
 			p_store_string_func(p_store_string_ud, "Rect2( " + rtosfix(aabb.position.x) + ", " + rtosfix(aabb.position.y) + ", " + rtosfix(aabb.size.x) + ", " + rtosfix(aabb.size.y) + " )");
 
 		} break;
+		case Variant::RECT2I: {
+
+			Rect2i aabb = p_variant;
+			p_store_string_func(p_store_string_ud, "Rect2i( " + itos(aabb.position.x) + ", " + itos(aabb.position.y) + ", " + itos(aabb.size.x) + ", " + itos(aabb.size.y) + " )");
+
+		} break;
 		case Variant::VECTOR3: {
 
 			Vector3 v = p_variant;
 			p_store_string_func(p_store_string_ud, "Vector3( " + rtosfix(v.x) + ", " + rtosfix(v.y) + ", " + rtosfix(v.z) + " )");
+		} break;
+		case Variant::VECTOR3I: {
+
+			Vector3i v = p_variant;
+			p_store_string_func(p_store_string_ud, "Vector3i( " + itos(v.x) + ", " + itos(v.y) + ", " + itos(v.z) + " )");
 		} break;
 		case Variant::PLANE: {
 
@@ -1496,6 +1575,14 @@ Error VariantWriter::write(const Variant &p_variant, StoreStringFunc p_store_str
 
 			Color c = p_variant;
 			p_store_string_func(p_store_string_ud, "Color( " + rtosfix(c.r) + ", " + rtosfix(c.g) + ", " + rtosfix(c.b) + ", " + rtosfix(c.a) + " )");
+
+		} break;
+		case Variant::STRING_NAME: {
+
+			String str = p_variant;
+
+			str = "@\"" + str.c_escape() + "\"";
+			p_store_string_func(p_store_string_ud, str);
 
 		} break;
 		case Variant::NODE_PATH: {

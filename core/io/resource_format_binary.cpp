@@ -75,6 +75,10 @@ enum {
 	VARIANT_DOUBLE = 41,
 	VARIANT_CALLABLE = 42,
 	VARIANT_SIGNAL = 43,
+	VARIANT_STRING_NAME = 44,
+	VARIANT_VECTOR2I = 45,
+	VARIANT_RECT2I = 46,
+	VARIANT_VECTOR3I = 47,
 	OBJECT_EMPTY = 0,
 	OBJECT_EXTERNAL_RESOURCE = 1,
 	OBJECT_INTERNAL_RESOURCE = 2,
@@ -158,6 +162,14 @@ Error ResourceInteractiveLoaderBinary::parse_variant(Variant &r_v) {
 			r_v = v;
 
 		} break;
+		case VARIANT_VECTOR2I: {
+
+			Vector2i v;
+			v.x = f->get_32();
+			v.y = f->get_32();
+			r_v = v;
+
+		} break;
 		case VARIANT_RECT2: {
 
 			Rect2 v;
@@ -168,12 +180,30 @@ Error ResourceInteractiveLoaderBinary::parse_variant(Variant &r_v) {
 			r_v = v;
 
 		} break;
+		case VARIANT_RECT2I: {
+
+			Rect2i v;
+			v.position.x = f->get_32();
+			v.position.y = f->get_32();
+			v.size.x = f->get_32();
+			v.size.y = f->get_32();
+			r_v = v;
+
+		} break;
 		case VARIANT_VECTOR3: {
 
 			Vector3 v;
 			v.x = f->get_real();
 			v.y = f->get_real();
 			v.z = f->get_real();
+			r_v = v;
+		} break;
+		case VARIANT_VECTOR3I: {
+
+			Vector3i v;
+			v.x = f->get_32();
+			v.y = f->get_32();
+			v.z = f->get_32();
 			r_v = v;
 		} break;
 		case VARIANT_PLANE: {
@@ -259,6 +289,10 @@ Error ResourceInteractiveLoaderBinary::parse_variant(Variant &r_v) {
 			v.a = f->get_real();
 			r_v = v;
 
+		} break;
+		case VARIANT_STRING_NAME: {
+
+			r_v = StringName(get_unicode_string());
 		} break;
 
 		case VARIANT_NODE_PATH: {
@@ -1288,6 +1322,14 @@ void ResourceFormatSaverBinaryInstance::write_variant(FileAccess *f, const Varia
 			f->store_real(val.y);
 
 		} break;
+		case Variant::VECTOR2I: {
+
+			f->store_32(VARIANT_VECTOR2I);
+			Vector2i val = p_property;
+			f->store_32(val.x);
+			f->store_32(val.y);
+
+		} break;
 		case Variant::RECT2: {
 
 			f->store_32(VARIANT_RECT2);
@@ -1298,6 +1340,16 @@ void ResourceFormatSaverBinaryInstance::write_variant(FileAccess *f, const Varia
 			f->store_real(val.size.y);
 
 		} break;
+		case Variant::RECT2I: {
+
+			f->store_32(VARIANT_RECT2I);
+			Rect2i val = p_property;
+			f->store_32(val.position.x);
+			f->store_32(val.position.y);
+			f->store_32(val.size.x);
+			f->store_32(val.size.y);
+
+		} break;
 		case Variant::VECTOR3: {
 
 			f->store_32(VARIANT_VECTOR3);
@@ -1305,6 +1357,15 @@ void ResourceFormatSaverBinaryInstance::write_variant(FileAccess *f, const Varia
 			f->store_real(val.x);
 			f->store_real(val.y);
 			f->store_real(val.z);
+
+		} break;
+		case Variant::VECTOR3I: {
+
+			f->store_32(VARIANT_VECTOR3I);
+			Vector3i val = p_property;
+			f->store_32(val.x);
+			f->store_32(val.y);
+			f->store_32(val.z);
 
 		} break;
 		case Variant::PLANE: {
@@ -1392,6 +1453,13 @@ void ResourceFormatSaverBinaryInstance::write_variant(FileAccess *f, const Varia
 			f->store_real(val.g);
 			f->store_real(val.b);
 			f->store_real(val.a);
+
+		} break;
+		case Variant::STRING_NAME: {
+
+			f->store_32(VARIANT_STRING_NAME);
+			String val = p_property;
+			save_unicode_string(f, val);
 
 		} break;
 

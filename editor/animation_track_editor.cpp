@@ -593,7 +593,7 @@ public:
 			} break;
 			case Animation::TYPE_METHOD: {
 
-				p_list->push_back(PropertyInfo(Variant::STRING, "name"));
+				p_list->push_back(PropertyInfo(Variant::STRING_NAME, "name"));
 				p_list->push_back(PropertyInfo(Variant::INT, "arg_count", PROPERTY_HINT_RANGE, "0,5,1"));
 
 				Dictionary d = animation->track_get_key_value(track, key);
@@ -654,7 +654,7 @@ public:
 				}
 				animations += "[stop]";
 
-				p_list->push_back(PropertyInfo(Variant::STRING, "animation", PROPERTY_HINT_ENUM, animations));
+				p_list->push_back(PropertyInfo(Variant::STRING_NAME, "animation", PROPERTY_HINT_ENUM, animations));
 
 			} break;
 		}
@@ -1293,7 +1293,7 @@ public:
 				} break;
 				case Animation::TYPE_METHOD: {
 
-					p_list->push_back(PropertyInfo(Variant::STRING, "name"));
+					p_list->push_back(PropertyInfo(Variant::STRING_NAME, "name"));
 					p_list->push_back(PropertyInfo(Variant::INT, "arg_count", PROPERTY_HINT_RANGE, "0,5,1"));
 
 					Dictionary d = animation->track_get_key_value(first_track, first_key);
@@ -1354,7 +1354,7 @@ public:
 					}
 					animations += "[stop]";
 
-					p_list->push_back(PropertyInfo(Variant::STRING, "animation", PROPERTY_HINT_ENUM, animations));
+					p_list->push_back(PropertyInfo(Variant::STRING_NAME, "animation", PROPERTY_HINT_ENUM, animations));
 				} break;
 			}
 		}
@@ -5707,7 +5707,7 @@ float AnimationTrackEditor::snap_time(float p_value, bool p_relative) {
 	return p_value;
 }
 
-void AnimationTrackEditor::_show_imported_anim_warning() const {
+void AnimationTrackEditor::_show_imported_anim_warning() {
 
 	// It looks terrible on a single line but the TTR extractor doesn't support line breaks yet.
 	EditorNode::get_singleton()->show_warning(TTR("This animation belongs to an imported scene, so changes to imported tracks will not be saved.\n\nTo enable the ability to add custom tracks, navigate to the scene's import settings and set\n\"Animation > Storage\" to \"Files\", enable \"Animation > Keep Custom Tracks\", then re-import.\nAlternatively, use an import preset that imports animations to separate files."),

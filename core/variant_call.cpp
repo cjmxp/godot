@@ -383,6 +383,10 @@ struct _VariantCall {
 	VCALL_LOCALMEM1R(Vector2, clamped);
 	VCALL_LOCALMEM0R(Vector2, sign);
 
+	VCALL_LOCALMEM0R(Vector2i, aspect);
+	VCALL_LOCALMEM0R(Vector2i, sign);
+	VCALL_LOCALMEM0R(Vector2i, abs);
+
 	VCALL_LOCALMEM0R(Rect2, get_area);
 	VCALL_LOCALMEM0R(Rect2, has_no_area);
 	VCALL_LOCALMEM1R(Rect2, has_point);
@@ -396,6 +400,19 @@ struct _VariantCall {
 	VCALL_LOCALMEM2R(Rect2, grow_margin);
 	VCALL_LOCALMEM4R(Rect2, grow_individual);
 	VCALL_LOCALMEM0R(Rect2, abs);
+
+	VCALL_LOCALMEM0R(Rect2i, get_area);
+	VCALL_LOCALMEM0R(Rect2i, has_no_area);
+	VCALL_LOCALMEM1R(Rect2i, has_point);
+	VCALL_LOCALMEM1R(Rect2i, intersects);
+	VCALL_LOCALMEM1R(Rect2i, encloses);
+	VCALL_LOCALMEM1R(Rect2i, clip);
+	VCALL_LOCALMEM1R(Rect2i, merge);
+	VCALL_LOCALMEM1R(Rect2i, expand);
+	VCALL_LOCALMEM1R(Rect2i, grow);
+	VCALL_LOCALMEM2R(Rect2i, grow_margin);
+	VCALL_LOCALMEM4R(Rect2i, grow_individual);
+	VCALL_LOCALMEM0R(Rect2i, abs);
 
 	VCALL_LOCALMEM0R(Vector3, min_axis);
 	VCALL_LOCALMEM0R(Vector3, max_axis);
@@ -430,6 +447,10 @@ struct _VariantCall {
 	VCALL_LOCALMEM1R(Vector3, bounce);
 	VCALL_LOCALMEM1R(Vector3, reflect);
 	VCALL_LOCALMEM0R(Vector3, sign);
+
+	VCALL_LOCALMEM0R(Vector3i, min_axis);
+	VCALL_LOCALMEM0R(Vector3i, max_axis);
+	VCALL_LOCALMEM0R(Vector3i, sign);
 
 	VCALL_LOCALMEM0R(Plane, normalized);
 	VCALL_LOCALMEM0R(Plane, center);
@@ -645,90 +666,115 @@ struct _VariantCall {
 		r_ret = s;
 	}
 
-	VCALL_LOCALMEM0R(PackedByteArray, size);
-	VCALL_LOCALMEM0R(PackedByteArray, empty);
-	VCALL_LOCALMEM2(PackedByteArray, set);
-	VCALL_LOCALMEM1R(PackedByteArray, get);
-	VCALL_LOCALMEM1(PackedByteArray, push_back);
-	VCALL_LOCALMEM1(PackedByteArray, resize);
-	VCALL_LOCALMEM2R(PackedByteArray, insert);
-	VCALL_LOCALMEM1(PackedByteArray, remove);
-	VCALL_LOCALMEM1(PackedByteArray, append);
-	VCALL_LOCALMEM1(PackedByteArray, append_array);
-	VCALL_LOCALMEM0(PackedByteArray, invert);
-	VCALL_LOCALMEM2R(PackedByteArray, subarray);
+#define VCALL_PARRMEM0(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(); }
+#define VCALL_PARRMEM0R(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { r_ret = Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(); }
+#define VCALL_PARRMEM1(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0]); }
+#define VCALL_PARRMEM1R(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { r_ret = Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0]); }
+#define VCALL_PARRMEM2(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0], *p_args[1]); }
+#define VCALL_PARRMEM2R(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { r_ret = Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0], *p_args[1]); }
+#define VCALL_PARRMEM3(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0], *p_args[1], *p_args[2]); }
+#define VCALL_PARRMEM3R(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { r_ret = Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0], *p_args[1], *p_args[2]); }
+#define VCALL_PARRMEM4(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0], *p_args[1], *p_args[2], *p_args[3]); }
+#define VCALL_PARRMEM4R(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { r_ret = Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0], *p_args[1], *p_args[2], *p_args[3]); }
+#define VCALL_PARRMEM5(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0], *p_args[1], *p_args[2], *p_args[3], *p_args[4]); }
+#define VCALL_PARRMEM5R(m_type, m_elemtype, m_method) \
+	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { r_ret = Variant::PackedArrayRef<m_elemtype>::get_array_ptr(p_self._data.packed_array)->m_method(*p_args[0], *p_args[1], *p_args[2], *p_args[3], *p_args[4]); }
 
-	VCALL_LOCALMEM0R(PackedIntArray, size);
-	VCALL_LOCALMEM0R(PackedIntArray, empty);
-	VCALL_LOCALMEM2(PackedIntArray, set);
-	VCALL_LOCALMEM1R(PackedIntArray, get);
-	VCALL_LOCALMEM1(PackedIntArray, push_back);
-	VCALL_LOCALMEM1(PackedIntArray, resize);
-	VCALL_LOCALMEM2R(PackedIntArray, insert);
-	VCALL_LOCALMEM1(PackedIntArray, remove);
-	VCALL_LOCALMEM1(PackedIntArray, append);
-	VCALL_LOCALMEM1(PackedIntArray, append_array);
-	VCALL_LOCALMEM0(PackedIntArray, invert);
+	VCALL_PARRMEM0R(PackedByteArray, uint8_t, size);
+	VCALL_PARRMEM0R(PackedByteArray, uint8_t, empty);
+	VCALL_PARRMEM2(PackedByteArray, uint8_t, set);
+	VCALL_PARRMEM1R(PackedByteArray, uint8_t, get);
+	VCALL_PARRMEM1(PackedByteArray, uint8_t, push_back);
+	VCALL_PARRMEM1(PackedByteArray, uint8_t, resize);
+	VCALL_PARRMEM2R(PackedByteArray, uint8_t, insert);
+	VCALL_PARRMEM1(PackedByteArray, uint8_t, remove);
+	VCALL_PARRMEM1(PackedByteArray, uint8_t, append);
+	VCALL_PARRMEM1(PackedByteArray, uint8_t, append_array);
+	VCALL_PARRMEM0(PackedByteArray, uint8_t, invert);
+	VCALL_PARRMEM2R(PackedByteArray, uint8_t, subarray);
 
-	VCALL_LOCALMEM0R(PackedRealArray, size);
-	VCALL_LOCALMEM0R(PackedRealArray, empty);
-	VCALL_LOCALMEM2(PackedRealArray, set);
-	VCALL_LOCALMEM1R(PackedRealArray, get);
-	VCALL_LOCALMEM1(PackedRealArray, push_back);
-	VCALL_LOCALMEM1(PackedRealArray, resize);
-	VCALL_LOCALMEM2R(PackedRealArray, insert);
-	VCALL_LOCALMEM1(PackedRealArray, remove);
-	VCALL_LOCALMEM1(PackedRealArray, append);
-	VCALL_LOCALMEM1(PackedRealArray, append_array);
-	VCALL_LOCALMEM0(PackedRealArray, invert);
+	VCALL_PARRMEM0R(PackedIntArray, int32_t, size);
+	VCALL_PARRMEM0R(PackedIntArray, int32_t, empty);
+	VCALL_PARRMEM2(PackedIntArray, int32_t, set);
+	VCALL_PARRMEM1R(PackedIntArray, int32_t, get);
+	VCALL_PARRMEM1(PackedIntArray, int32_t, push_back);
+	VCALL_PARRMEM1(PackedIntArray, int32_t, resize);
+	VCALL_PARRMEM2R(PackedIntArray, int32_t, insert);
+	VCALL_PARRMEM1(PackedIntArray, int32_t, remove);
+	VCALL_PARRMEM1(PackedIntArray, int32_t, append);
+	VCALL_PARRMEM1(PackedIntArray, int32_t, append_array);
+	VCALL_PARRMEM0(PackedIntArray, int32_t, invert);
 
-	VCALL_LOCALMEM0R(PackedStringArray, size);
-	VCALL_LOCALMEM0R(PackedStringArray, empty);
-	VCALL_LOCALMEM2(PackedStringArray, set);
-	VCALL_LOCALMEM1R(PackedStringArray, get);
-	VCALL_LOCALMEM1(PackedStringArray, push_back);
-	VCALL_LOCALMEM1(PackedStringArray, resize);
-	VCALL_LOCALMEM2R(PackedStringArray, insert);
-	VCALL_LOCALMEM1(PackedStringArray, remove);
-	VCALL_LOCALMEM1(PackedStringArray, append);
-	VCALL_LOCALMEM1(PackedStringArray, append_array);
-	VCALL_LOCALMEM0(PackedStringArray, invert);
+	VCALL_PARRMEM0R(PackedRealArray, real_t, size);
+	VCALL_PARRMEM0R(PackedRealArray, real_t, empty);
+	VCALL_PARRMEM2(PackedRealArray, real_t, set);
+	VCALL_PARRMEM1R(PackedRealArray, real_t, get);
+	VCALL_PARRMEM1(PackedRealArray, real_t, push_back);
+	VCALL_PARRMEM1(PackedRealArray, real_t, resize);
+	VCALL_PARRMEM2R(PackedRealArray, real_t, insert);
+	VCALL_PARRMEM1(PackedRealArray, real_t, remove);
+	VCALL_PARRMEM1(PackedRealArray, real_t, append);
+	VCALL_PARRMEM1(PackedRealArray, real_t, append_array);
+	VCALL_PARRMEM0(PackedRealArray, real_t, invert);
 
-	VCALL_LOCALMEM0R(PackedVector2Array, size);
-	VCALL_LOCALMEM0R(PackedVector2Array, empty);
-	VCALL_LOCALMEM2(PackedVector2Array, set);
-	VCALL_LOCALMEM1R(PackedVector2Array, get);
-	VCALL_LOCALMEM1(PackedVector2Array, push_back);
-	VCALL_LOCALMEM1(PackedVector2Array, resize);
-	VCALL_LOCALMEM2R(PackedVector2Array, insert);
-	VCALL_LOCALMEM1(PackedVector2Array, remove);
-	VCALL_LOCALMEM1(PackedVector2Array, append);
-	VCALL_LOCALMEM1(PackedVector2Array, append_array);
-	VCALL_LOCALMEM0(PackedVector2Array, invert);
+	VCALL_PARRMEM0R(PackedStringArray, String, size);
+	VCALL_PARRMEM0R(PackedStringArray, String, empty);
+	VCALL_PARRMEM2(PackedStringArray, String, set);
+	VCALL_PARRMEM1R(PackedStringArray, String, get);
+	VCALL_PARRMEM1(PackedStringArray, String, push_back);
+	VCALL_PARRMEM1(PackedStringArray, String, resize);
+	VCALL_PARRMEM2R(PackedStringArray, String, insert);
+	VCALL_PARRMEM1(PackedStringArray, String, remove);
+	VCALL_PARRMEM1(PackedStringArray, String, append);
+	VCALL_PARRMEM1(PackedStringArray, String, append_array);
+	VCALL_PARRMEM0(PackedStringArray, String, invert);
 
-	VCALL_LOCALMEM0R(PackedVector3Array, size);
-	VCALL_LOCALMEM0R(PackedVector3Array, empty);
-	VCALL_LOCALMEM2(PackedVector3Array, set);
-	VCALL_LOCALMEM1R(PackedVector3Array, get);
-	VCALL_LOCALMEM1(PackedVector3Array, push_back);
-	VCALL_LOCALMEM1(PackedVector3Array, resize);
-	VCALL_LOCALMEM2R(PackedVector3Array, insert);
-	VCALL_LOCALMEM1(PackedVector3Array, remove);
-	VCALL_LOCALMEM1(PackedVector3Array, append);
-	VCALL_LOCALMEM1(PackedVector3Array, append_array);
-	VCALL_LOCALMEM0(PackedVector3Array, invert);
+	VCALL_PARRMEM0R(PackedVector2Array, Vector2, size);
+	VCALL_PARRMEM0R(PackedVector2Array, Vector2, empty);
+	VCALL_PARRMEM2(PackedVector2Array, Vector2, set);
+	VCALL_PARRMEM1R(PackedVector2Array, Vector2, get);
+	VCALL_PARRMEM1(PackedVector2Array, Vector2, push_back);
+	VCALL_PARRMEM1(PackedVector2Array, Vector2, resize);
+	VCALL_PARRMEM2R(PackedVector2Array, Vector2, insert);
+	VCALL_PARRMEM1(PackedVector2Array, Vector2, remove);
+	VCALL_PARRMEM1(PackedVector2Array, Vector2, append);
+	VCALL_PARRMEM1(PackedVector2Array, Vector2, append_array);
+	VCALL_PARRMEM0(PackedVector2Array, Vector2, invert);
 
-	VCALL_LOCALMEM0R(PackedColorArray, size);
-	VCALL_LOCALMEM0R(PackedColorArray, empty);
-	VCALL_LOCALMEM2(PackedColorArray, set);
-	VCALL_LOCALMEM1R(PackedColorArray, get);
-	VCALL_LOCALMEM1(PackedColorArray, push_back);
-	VCALL_LOCALMEM1(PackedColorArray, resize);
-	VCALL_LOCALMEM2R(PackedColorArray, insert);
-	VCALL_LOCALMEM1(PackedColorArray, remove);
-	VCALL_LOCALMEM1(PackedColorArray, append);
-	VCALL_LOCALMEM1(PackedColorArray, append_array);
-	VCALL_LOCALMEM0(PackedColorArray, invert);
+	VCALL_PARRMEM0R(PackedVector3Array, Vector3, size);
+	VCALL_PARRMEM0R(PackedVector3Array, Vector3, empty);
+	VCALL_PARRMEM2(PackedVector3Array, Vector3, set);
+	VCALL_PARRMEM1R(PackedVector3Array, Vector3, get);
+	VCALL_PARRMEM1(PackedVector3Array, Vector3, push_back);
+	VCALL_PARRMEM1(PackedVector3Array, Vector3, resize);
+	VCALL_PARRMEM2R(PackedVector3Array, Vector3, insert);
+	VCALL_PARRMEM1(PackedVector3Array, Vector3, remove);
+	VCALL_PARRMEM1(PackedVector3Array, Vector3, append);
+	VCALL_PARRMEM1(PackedVector3Array, Vector3, append_array);
+	VCALL_PARRMEM0(PackedVector3Array, Vector3, invert);
+
+	VCALL_PARRMEM0R(PackedColorArray, Color, size);
+	VCALL_PARRMEM0R(PackedColorArray, Color, empty);
+	VCALL_PARRMEM2(PackedColorArray, Color, set);
+	VCALL_PARRMEM1R(PackedColorArray, Color, get);
+	VCALL_PARRMEM1(PackedColorArray, Color, push_back);
+	VCALL_PARRMEM1(PackedColorArray, Color, resize);
+	VCALL_PARRMEM2R(PackedColorArray, Color, insert);
+	VCALL_PARRMEM1(PackedColorArray, Color, remove);
+	VCALL_PARRMEM1(PackedColorArray, Color, append);
+	VCALL_PARRMEM1(PackedColorArray, Color, append_array);
+	VCALL_PARRMEM0(PackedColorArray, Color, invert);
 
 #define VCALL_PTR0(m_type, m_method) \
 	static void _call_##m_type##_##m_method(Variant &r_ret, Variant &p_self, const Variant **p_args) { reinterpret_cast<m_type *>(p_self._data._ptr)->m_method(); }
@@ -909,6 +955,11 @@ struct _VariantCall {
 		r_ret = Vector2(*p_args[0], *p_args[1]);
 	}
 
+	static void Vector2i_init1(Variant &r_ret, const Variant **p_args) {
+
+		r_ret = Vector2i(*p_args[0], *p_args[1]);
+	}
+
 	static void Rect2_init1(Variant &r_ret, const Variant **p_args) {
 
 		r_ret = Rect2(*p_args[0], *p_args[1]);
@@ -917,6 +968,16 @@ struct _VariantCall {
 	static void Rect2_init2(Variant &r_ret, const Variant **p_args) {
 
 		r_ret = Rect2(*p_args[0], *p_args[1], *p_args[2], *p_args[3]);
+	}
+
+	static void Rect2i_init1(Variant &r_ret, const Variant **p_args) {
+
+		r_ret = Rect2i(*p_args[0], *p_args[1]);
+	}
+
+	static void Rect2i_init2(Variant &r_ret, const Variant **p_args) {
+
+		r_ret = Rect2i(*p_args[0], *p_args[1], *p_args[2], *p_args[3]);
 	}
 
 	static void Transform2D_init2(Variant &r_ret, const Variant **p_args) {
@@ -937,6 +998,11 @@ struct _VariantCall {
 	static void Vector3_init1(Variant &r_ret, const Variant **p_args) {
 
 		r_ret = Vector3(*p_args[0], *p_args[1], *p_args[2]);
+	}
+
+	static void Vector3i_init1(Variant &r_ret, const Variant **p_args) {
+
+		r_ret = Vector3i(*p_args[0], *p_args[1], *p_args[2]);
 	}
 
 	static void Plane_init1(Variant &r_ret, const Variant **p_args) {
@@ -1215,6 +1281,8 @@ Variant Variant::construct(const Variant::Type p_type, const Variant **p_args, i
 
 			// misc types
 			case COLOR: return Color();
+			case STRING_NAME:
+				return StringName(); // 15
 			case NODE_PATH:
 				return NodePath(); // 15
 			case _RID: return RID();
@@ -1260,8 +1328,13 @@ Variant Variant::construct(const Variant::Type p_type, const Variant **p_args, i
 			case VECTOR2: {
 				return Vector2(*p_args[0]);
 			}
+			case VECTOR2I: {
+				return Vector2i(*p_args[0]);
+			}
 			case RECT2: return (Rect2(*p_args[0]));
+			case RECT2I: return (Rect2i(*p_args[0]));
 			case VECTOR3: return (Vector3(*p_args[0]));
+			case VECTOR3I: return (Vector3i(*p_args[0]));
 			case PLANE: return (Plane(*p_args[0]));
 			case QUAT: return (p_args[0]->operator Quat());
 			case AABB:
@@ -1272,10 +1345,14 @@ Variant Variant::construct(const Variant::Type p_type, const Variant **p_args, i
 
 			// misc types
 			case COLOR: return p_args[0]->type == Variant::STRING ? Color::html(*p_args[0]) : Color::hex(*p_args[0]);
+			case STRING_NAME:
+				return (StringName(p_args[0]->operator StringName())); // 15
 			case NODE_PATH:
 				return (NodePath(p_args[0]->operator NodePath())); // 15
 			case _RID: return (RID(*p_args[0]));
 			case OBJECT: return ((Object *)(p_args[0]->operator Object *()));
+			case CALLABLE: return ((Callable)(p_args[0]->operator Callable()));
+			case SIGNAL: return ((Signal)(p_args[0]->operator Signal()));
 			case DICTIONARY: return p_args[0]->operator Dictionary();
 			case ARRAY:
 				return p_args[0]->operator Array(); // 20
@@ -1721,6 +1798,10 @@ void register_variant_methods() {
 	ADDFUNC1R(VECTOR2, VECTOR2, Vector2, clamped, REAL, "length", varray());
 	ADDFUNC0R(VECTOR2, VECTOR2, Vector2, sign, varray());
 
+	ADDFUNC0R(VECTOR2I, REAL, Vector2i, aspect, varray());
+	ADDFUNC0R(VECTOR2I, VECTOR2I, Vector2i, sign, varray());
+	ADDFUNC0R(VECTOR2I, VECTOR2I, Vector2i, abs, varray());
+
 	ADDFUNC0R(RECT2, REAL, Rect2, get_area, varray());
 	ADDFUNC0R(RECT2, BOOL, Rect2, has_no_area, varray());
 	ADDFUNC1R(RECT2, BOOL, Rect2, has_point, VECTOR2, "point", varray());
@@ -1734,6 +1815,19 @@ void register_variant_methods() {
 	ADDFUNC2R(RECT2, RECT2, Rect2, grow_margin, INT, "margin", REAL, "by", varray());
 	ADDFUNC4R(RECT2, RECT2, Rect2, grow_individual, REAL, "left", REAL, "top", REAL, "right", REAL, " bottom", varray());
 	ADDFUNC0R(RECT2, RECT2, Rect2, abs, varray());
+
+	ADDFUNC0R(RECT2I, INT, Rect2i, get_area, varray());
+	ADDFUNC0R(RECT2I, BOOL, Rect2i, has_no_area, varray());
+	ADDFUNC1R(RECT2I, BOOL, Rect2i, has_point, VECTOR2I, "point", varray());
+	ADDFUNC1R(RECT2I, BOOL, Rect2i, intersects, RECT2I, "b", varray());
+	ADDFUNC1R(RECT2I, BOOL, Rect2i, encloses, RECT2I, "b", varray());
+	ADDFUNC1R(RECT2I, RECT2I, Rect2i, clip, RECT2I, "b", varray());
+	ADDFUNC1R(RECT2I, RECT2I, Rect2i, merge, RECT2I, "b", varray());
+	ADDFUNC1R(RECT2I, RECT2I, Rect2i, expand, VECTOR2I, "to", varray());
+	ADDFUNC1R(RECT2I, RECT2I, Rect2i, grow, INT, "by", varray());
+	ADDFUNC2R(RECT2I, RECT2I, Rect2i, grow_margin, INT, "margin", INT, "by", varray());
+	ADDFUNC4R(RECT2I, RECT2I, Rect2i, grow_individual, INT, "left", INT, "top", INT, "right", INT, " bottom", varray());
+	ADDFUNC0R(RECT2I, RECT2I, Rect2i, abs, varray());
 
 	ADDFUNC0R(VECTOR3, INT, Vector3, min_axis, varray());
 	ADDFUNC0R(VECTOR3, INT, Vector3, max_axis, varray());
@@ -1768,6 +1862,10 @@ void register_variant_methods() {
 	ADDFUNC1R(VECTOR3, VECTOR3, Vector3, bounce, VECTOR3, "n", varray());
 	ADDFUNC1R(VECTOR3, VECTOR3, Vector3, reflect, VECTOR3, "n", varray());
 	ADDFUNC0R(VECTOR3, VECTOR3, Vector3, sign, varray());
+
+	ADDFUNC0R(VECTOR3I, INT, Vector3i, min_axis, varray());
+	ADDFUNC0R(VECTOR3I, INT, Vector3i, max_axis, varray());
+	ADDFUNC0R(VECTOR3I, VECTOR3I, Vector3i, sign, varray());
 
 	ADDFUNC0R(PLANE, PLANE, Plane, normalized, varray());
 	ADDFUNC0R(PLANE, VECTOR3, Plane, center, varray());
@@ -1840,13 +1938,13 @@ void register_variant_methods() {
 	ADDFUNC0R(CALLABLE, BOOL, Callable, is_standard, varray());
 	ADDFUNC0R(CALLABLE, OBJECT, Callable, get_object, varray());
 	ADDFUNC0R(CALLABLE, INT, Callable, get_object_id, varray());
-	ADDFUNC0R(CALLABLE, STRING, Callable, get_method, varray());
+	ADDFUNC0R(CALLABLE, STRING_NAME, Callable, get_method, varray());
 	ADDFUNC0R(CALLABLE, INT, Callable, hash, varray());
 
 	ADDFUNC0R(SIGNAL, BOOL, Signal, is_null, varray());
 	ADDFUNC0R(SIGNAL, OBJECT, Signal, get_object, varray());
 	ADDFUNC0R(SIGNAL, INT, Signal, get_object_id, varray());
-	ADDFUNC0R(SIGNAL, STRING, Signal, get_name, varray());
+	ADDFUNC0R(SIGNAL, STRING_NAME, Signal, get_name, varray());
 
 	ADDFUNC3R(SIGNAL, INT, Signal, connect, CALLABLE, "callable", ARRAY, "binds", INT, "flags", varray(Array(), 0));
 
@@ -2042,14 +2140,19 @@ void register_variant_methods() {
 	/* REGISTER CONSTRUCTORS */
 
 	_VariantCall::add_constructor(_VariantCall::Vector2_init1, Variant::VECTOR2, "x", Variant::REAL, "y", Variant::REAL);
+	_VariantCall::add_constructor(_VariantCall::Vector2i_init1, Variant::VECTOR2I, "x", Variant::INT, "y", Variant::INT);
 
 	_VariantCall::add_constructor(_VariantCall::Rect2_init1, Variant::RECT2, "position", Variant::VECTOR2, "size", Variant::VECTOR2);
 	_VariantCall::add_constructor(_VariantCall::Rect2_init2, Variant::RECT2, "x", Variant::REAL, "y", Variant::REAL, "width", Variant::REAL, "height", Variant::REAL);
+
+	_VariantCall::add_constructor(_VariantCall::Rect2i_init1, Variant::RECT2I, "position", Variant::VECTOR2, "size", Variant::VECTOR2);
+	_VariantCall::add_constructor(_VariantCall::Rect2i_init2, Variant::RECT2I, "x", Variant::INT, "y", Variant::INT, "width", Variant::INT, "height", Variant::INT);
 
 	_VariantCall::add_constructor(_VariantCall::Transform2D_init2, Variant::TRANSFORM2D, "rotation", Variant::REAL, "position", Variant::VECTOR2);
 	_VariantCall::add_constructor(_VariantCall::Transform2D_init3, Variant::TRANSFORM2D, "x_axis", Variant::VECTOR2, "y_axis", Variant::VECTOR2, "origin", Variant::VECTOR2);
 
 	_VariantCall::add_constructor(_VariantCall::Vector3_init1, Variant::VECTOR3, "x", Variant::REAL, "y", Variant::REAL, "z", Variant::REAL);
+	_VariantCall::add_constructor(_VariantCall::Vector3i_init1, Variant::VECTOR3I, "x", Variant::INT, "y", Variant::INT, "z", Variant::INT);
 
 	_VariantCall::add_constructor(_VariantCall::Plane_init1, Variant::PLANE, "a", Variant::REAL, "b", Variant::REAL, "c", Variant::REAL, "d", Variant::REAL);
 	_VariantCall::add_constructor(_VariantCall::Plane_init2, Variant::PLANE, "v1", Variant::VECTOR3, "v2", Variant::VECTOR3, "v3", Variant::VECTOR3);
@@ -2070,8 +2173,8 @@ void register_variant_methods() {
 	_VariantCall::add_constructor(_VariantCall::Transform_init1, Variant::TRANSFORM, "x_axis", Variant::VECTOR3, "y_axis", Variant::VECTOR3, "z_axis", Variant::VECTOR3, "origin", Variant::VECTOR3);
 	_VariantCall::add_constructor(_VariantCall::Transform_init2, Variant::TRANSFORM, "basis", Variant::BASIS, "origin", Variant::VECTOR3);
 
-	_VariantCall::add_constructor(_VariantCall::Callable_init2, Variant::CALLABLE, "object", Variant::OBJECT, "method_name", Variant::STRING);
-	_VariantCall::add_constructor(_VariantCall::Signal_init2, Variant::SIGNAL, "object", Variant::OBJECT, "signal_name", Variant::STRING);
+	_VariantCall::add_constructor(_VariantCall::Callable_init2, Variant::CALLABLE, "object", Variant::OBJECT, "method_name", Variant::STRING_NAME);
+	_VariantCall::add_constructor(_VariantCall::Signal_init2, Variant::SIGNAL, "object", Variant::OBJECT, "signal_name", Variant::STRING_NAME);
 
 	/* REGISTER CONSTANTS */
 
@@ -2094,8 +2197,24 @@ void register_variant_methods() {
 	_VariantCall::add_variant_constant(Variant::VECTOR3, "FORWARD", Vector3(0, 0, -1));
 	_VariantCall::add_variant_constant(Variant::VECTOR3, "BACK", Vector3(0, 0, 1));
 
+	_VariantCall::add_constant(Variant::VECTOR3I, "AXIS_X", Vector3::AXIS_X);
+	_VariantCall::add_constant(Variant::VECTOR3I, "AXIS_Y", Vector3::AXIS_Y);
+	_VariantCall::add_constant(Variant::VECTOR3I, "AXIS_Z", Vector3::AXIS_Z);
+
+	_VariantCall::add_variant_constant(Variant::VECTOR3I, "ZERO", Vector3i(0, 0, 0));
+	_VariantCall::add_variant_constant(Variant::VECTOR3I, "ONE", Vector3i(1, 1, 1));
+	_VariantCall::add_variant_constant(Variant::VECTOR3I, "LEFT", Vector3i(-1, 0, 0));
+	_VariantCall::add_variant_constant(Variant::VECTOR3I, "RIGHT", Vector3i(1, 0, 0));
+	_VariantCall::add_variant_constant(Variant::VECTOR3I, "UP", Vector3i(0, 1, 0));
+	_VariantCall::add_variant_constant(Variant::VECTOR3I, "DOWN", Vector3i(0, -1, 0));
+	_VariantCall::add_variant_constant(Variant::VECTOR3I, "FORWARD", Vector3i(0, 0, -1));
+	_VariantCall::add_variant_constant(Variant::VECTOR3I, "BACK", Vector3i(0, 0, 1));
+
 	_VariantCall::add_constant(Variant::VECTOR2, "AXIS_X", Vector2::AXIS_X);
 	_VariantCall::add_constant(Variant::VECTOR2, "AXIS_Y", Vector2::AXIS_Y);
+
+	_VariantCall::add_constant(Variant::VECTOR2I, "AXIS_X", Vector2::AXIS_X);
+	_VariantCall::add_constant(Variant::VECTOR2I, "AXIS_Y", Vector2::AXIS_Y);
 
 	_VariantCall::add_variant_constant(Variant::VECTOR2, "ZERO", Vector2(0, 0));
 	_VariantCall::add_variant_constant(Variant::VECTOR2, "ONE", Vector2(1, 1));
@@ -2104,6 +2223,13 @@ void register_variant_methods() {
 	_VariantCall::add_variant_constant(Variant::VECTOR2, "RIGHT", Vector2(1, 0));
 	_VariantCall::add_variant_constant(Variant::VECTOR2, "UP", Vector2(0, -1));
 	_VariantCall::add_variant_constant(Variant::VECTOR2, "DOWN", Vector2(0, 1));
+
+	_VariantCall::add_variant_constant(Variant::VECTOR2I, "ZERO", Vector2i(0, 0));
+	_VariantCall::add_variant_constant(Variant::VECTOR2I, "ONE", Vector2i(1, 1));
+	_VariantCall::add_variant_constant(Variant::VECTOR2I, "LEFT", Vector2i(-1, 0));
+	_VariantCall::add_variant_constant(Variant::VECTOR2I, "RIGHT", Vector2i(1, 0));
+	_VariantCall::add_variant_constant(Variant::VECTOR2I, "UP", Vector2i(0, -1));
+	_VariantCall::add_variant_constant(Variant::VECTOR2I, "DOWN", Vector2i(0, 1));
 
 	_VariantCall::add_variant_constant(Variant::TRANSFORM2D, "IDENTITY", Transform2D());
 	_VariantCall::add_variant_constant(Variant::TRANSFORM2D, "FLIP_X", Transform2D(-1, 0, 0, 1, 0, 0));
